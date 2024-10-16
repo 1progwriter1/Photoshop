@@ -3,16 +3,17 @@ cmake_minimum_required( VERSION 3.10)
 set( CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-project( IdealGas)
+project( Photoshop)
 
 file( GLOB_RECURSE SOURCES src/*.cpp)
 
+set( TARGET run)
 
-add_executable(a.out ${SOURCES})
+add_executable( ${TARGET} ${SOURCES})
 
 
-target_link_directories( a.out PRIVATE /opt/homebrew/lib/)
-target_link_libraries( a.out PRIVATE sfml-graphics sfml-window sfml-system)
+target_link_directories( ${TARGET} PRIVATE /opt/homebrew/lib/)
+target_link_libraries( ${TARGET} PRIVATE sfml-graphics sfml-window sfml-system)
 
 include_directories( headers)
 include_directories( /opt/homebrew/include/)
