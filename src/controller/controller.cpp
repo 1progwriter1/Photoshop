@@ -19,7 +19,14 @@ bool Controller::inProgress()
 
 void Controller::getRequests()
 {
-    while
+    sf::Event event;
+    while ( view_->screen_.pollEvent( event) )
+    {
+        if ( event.type == sf::Event::Closed )
+        {
+            view_->screen_.close();
+        }
+    }
 }
 
 
