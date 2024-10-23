@@ -16,6 +16,7 @@ target_link_directories( ${TARGET} PRIVATE /opt/homebrew/lib/)
 target_link_libraries( ${TARGET} PRIVATE sfml-graphics sfml-window sfml-system)
 
 include_directories( headers)
+include_directories( api)
 include_directories( /opt/homebrew/include/)
 include_directories( ../MyLibraries/headers/)
 
