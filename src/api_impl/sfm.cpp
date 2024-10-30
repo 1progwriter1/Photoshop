@@ -1,6 +1,6 @@
-#include "sfm.hpp"
-#include <memory>
+#include <api_impl/sfm.hpp>
 #include <assert.h>
+
 
 namespace psapi
 {
@@ -10,44 +10,70 @@ namespace sfm
 {
 
 
-RenderWindow::RenderWindow(unsigned int width, unsigned int height, const std::string& title)
-    : window_(sf::VideoMode(width, height), title) {}
+RenderWindow::RenderWindow( unsigned int width, unsigned int height, const std::string& title)
+    : window_( sf::VideoMode(width, height), title) {}
 
-sf::RenderWindow &RenderWindow::getWindow()
+
+void RenderWindow::setFps( float fps)
 {
-    return window_;
+    assert( 0 && "Not implemented" );
 }
 
-bool RenderWindow::isOpen()
+
+float RenderWindow::getFps() const
+{
+    assert( 0 && "Not implemented" );
+
+    return 0;
+}
+
+
+bool RenderWindow::isOpen() const
 {
     return window_.isOpen();
 }
+
 
 void RenderWindow::clear()
 {
     window_.clear();
 }
 
+
 void RenderWindow::display()
 {
     window_.display();
 }
+
 
 void RenderWindow::close()
 {
     window_.close();
 }
 
-bool RenderWindow::pollEvent(Event& event)
+
+sf::RenderWindow &RenderWindow::getWindow()
+{
+    return window_;
+}
+
+
+vec2u RenderWindow::getSize() const
+{
+    return vec2u( width_, height_);
+}
+
+
+bool RenderWindow::pollEvent( Event& event)
 {
     sf::Event sfEvent;
 
-    if (!window_.pollEvent(sfEvent))
+    if ( !window_.pollEvent(sfEvent) )
     {
         return false;
     }
 
-    switch (sfEvent.type)
+    switch ( sfEvent.type )
     {
         case sf::Event::Closed:
             event.type = Event::Closed;
@@ -144,239 +170,565 @@ bool RenderWindow::pollEvent(Event& event)
     return true;
 }
 
-void RenderWindow::draw(Drawable *target)
+void RenderWindow::draw( Drawable *target)
 {
     if (target)
     {
-        target->draw(this);
+        target->draw( this);
     }
 }
 
 
-Image::Image(size_t init_size)
-    :   pixels_( sf::Points, init_size), size_(init_size) {}
+PixelsArray::PixelsArray( size_t init_size)
+    :   pixels_( sf::Points, init_size), size_( init_size) {}
 
 
-void Image::setColor(const Color &color, size_t ind)
+void PixelsArray::setColor( const Color &color, size_t ind)
 {
-    pixels_[ind].color = sf::Color(color.r, color.g, color.b, color.a);
+    pixels_[ind].color = sf::Color( color.r, color.g, color.b, color.a);
 }
 
-void Image::setPosition(const vec2i &coord, size_t ind)
+
+Color PixelsArray::getColor( size_t ind) const
 {
-    pixels_[ind].position = sf::Vector2f(static_cast<float>(coord.x), static_cast<float>(coord.y));
+    sf::Color color = pixels_[ind].color;
+
+    return Color( color.r, color.g, color.b, color.a);
 }
 
-void Image::setPosition(const vec2f &coord, size_t ind)
+
+void PixelsArray::setPosition(const vec2i &coord, size_t ind)
 {
-    pixels_[ind].position = sf::Vector2f(coord.x, coord.y);
+    pixels_[ind].position = sf::Vector2f( static_cast<float>( coord.x), static_cast<float>( coord.y));
 }
 
-void Image::setPosition(const vec2d &coord, size_t ind)
+
+void PixelsArray::setPosition(const vec2f &coord, size_t ind)
 {
-    pixels_[ind].position = sf::Vector2f(static_cast<float>(coord.x), static_cast<float>(coord.y));
+    pixels_[ind].position = sf::Vector2f( coord.x, coord.y);
 }
 
-void Image::setPosition(int x, int y, size_t ind)
+
+void PixelsArray::setPosition(const vec2d &coord, size_t ind)
 {
-    pixels_[ind].position = sf::Vector2f( static_cast<float>(x), static_cast<float>(y));
+    pixels_[ind].position = sf::Vector2f( static_cast<float>( coord.x), static_cast<float>( coord.y));
 }
 
-void Image::setPosition(float x, float y, size_t ind)
+
+void PixelsArray::setPosition(int x, int y, size_t ind)
+{
+    pixels_[ind].position = sf::Vector2f( static_cast<float>( x), static_cast<float>( y));
+}
+
+
+void PixelsArray::setPosition(float x, float y, size_t ind)
 {
     pixels_[ind].position = sf::Vector2f( x, y);
 }
-void Image::setPosition(double x, double y, size_t ind)
+
+
+void PixelsArray::setPosition(double x, double y, size_t ind)
 {
-    pixels_[ind].position = sf::Vector2f( static_cast<float>(x), static_cast<float>(y));
+    pixels_[ind].position = sf::Vector2f( static_cast<float>( x), static_cast<float>( y));
 }
 
-void Image::draw(ARenderWindow *window)
-{
-    RenderWindow *w_ptr = dynamic_cast<RenderWindow *>( window);
-    assert( w_ptr && "Incompatible cast" );
 
-    w_ptr->getWindow().draw(pixels_);
+void PixelsArray::draw( IRenderWindow *renderWindow) const
+{
+    assert( renderWindow );
+
+    RenderWindow *w_ptr = dynamic_cast<RenderWindow *>( renderWindow);
+    assert( w_ptr && "Failed to cast IRenderWindow to RenderWindow" );
+
+    w_ptr->getWindow().draw( pixels_);
 }
+
+
+void Image::create(unsigned int width, unsigned int height, const Color &color /*= Color(0, 0, 0)*/)
+{
+    image_.create( width, height, sf::Color( color.r, color.g, color.b, color.a));
+}
+
+
+void Image::create(vec2u size, const Color &color /*= Color(0, 0, 0)*/)
+{
+    create( size.x, size.y, color);
+}
+
+
+void Image::create(unsigned int width, unsigned int height, const Color *pixels)
+{
+    assert( 0 && "Not implemented" );
+}
+
+
+void Image::create(vec2u size, const Color *pixels)
+{
+    create( size.x, size.y, pixels);
+}
+
+
+bool Image::loadFromFile(const std::string &filename)
+{
+    return image_.loadFromFile( filename);
+}
+
+
+vec2u Image::getSize() const
+{
+    return vec2u( image_.getSize().x, image_.getSize().y);
+}
+
+
+void Image::setPixel(unsigned int x, unsigned int y, const Color &color)
+{
+    image_.setPixel( x, y, sf::Color( color.r, color.g, color.b, color.a));
+}
+
+
+void Image::setPixel(vec2u pos, const Color &color)
+{
+    setPixel( pos.x, pos.y, color);
+}
+
+
+Color Image::getPixel(unsigned int x, unsigned int y) const
+{
+    sf::Color color = image_.getPixel( x, y);
+
+    return Color( color.r, color.g, color.b, color.a);
+}
+
+
+Color Image::getPixel(vec2u pos) const
+{
+    return getPixel( pos.x, pos.y);
+}
+
 
 bool Texture::create(unsigned int width, unsigned int height)
 {
-    return texture_.create(width, height);
+    return texture_.create( width, height);
 }
 
-bool Texture::loadFromFile(const std::string& filename, const IntRect& area)
+
+bool Texture::loadFromFile(const std::string& filename, const IntRect& area /*= IntRect()*/)
 {
-    sf::IntRect sfArea(static_cast<int>(area.top_x),
-                       static_cast<int>(area.top_y),
-                       static_cast<int>(area.width),
-                       static_cast<int>(area.height));
-    return texture_.loadFromFile(filename, sfArea);
+    sf::IntRect sf_area( area.top_x, area.top_y, area.width, area.height);
+    return texture_.loadFromFile( filename, sf_area);
 }
 
-bool Texture::loadFromMemory(const void* data, std::size_t size, const IntRect& area)
+
+bool Texture::loadFromMemory(const void* data, std::size_t size, const IntRect& area = IntRect())
 {
-    sf::IntRect sfArea(static_cast<int>(area.top_x),
-                       static_cast<int>(area.top_y),
-                       static_cast<int>(area.width),
-                       static_cast<int>(area.height));
-    return texture_.loadFromMemory(data, size, sfArea);
+    sf::IntRect sf_area( area.top_x, area.top_y, area.width, area.height);
+    return texture_.loadFromMemory( data, size, sf_area);
 }
 
-bool Texture::loadFromImage(const AImage *image, const IntRect& area)
+
+vec2u Texture::getSize() const
 {
-    assert( 0 && "Not implemented yet" );
-    // const Image* sfmImage = static_cast<const Image*>(image);
-    // sf::IntRect sfArea(static_cast<int>(area.top_x),
-    //                    static_cast<int>(area.top_y),
-    //                    static_cast<int>(area.width),
-    //                    static_cast<int>(area.height));
-    // return texture_.loadFromImage(sfmImage., sfArea);
-
-    return false;
+    return vec2u( texture_.getSize().x, texture_.getSize().y);
 }
 
-vec2u Texture::getSize() const {
-    return { texture_.getSize().x, texture_.getSize().y };
-}
 
-std::unique_ptr<AImage> Texture::copyToImage() const
+std::unique_ptr<IImage> Texture::copyToImage() const
 {
-    assert( 0 && "Not implemented yet" );
-
-    // auto image = std::make_unique<Image()>;
+    assert( 0 && "Not implemented" );
 
     return nullptr;
 }
 
+
+void Texture::update(const IImage *image)
+{
+    assert( 0 && "Not implemented" );
+}
+
+
 void Texture::update(const Color *pixels)
 {
-    texture_.update(reinterpret_cast<const sf::Uint8*>(pixels));
+    assert( 0 && "Not implemented" );
 }
+
 
 void Texture::update(const Color *pixels, unsigned int width, unsigned int height, unsigned int x, unsigned int y)
 {
-    texture_.update(reinterpret_cast<const sf::Uint8*>(pixels), width, height, x, y);
+    assert( 0 && "Not implemented" );
 }
 
-const sf::Texture &Texture::getTexture() const
+
+void Sprite::setTexture(const ITexture *texture, bool reset_rect /*= false*/)
 {
-    return texture_;
+    assert( 0 && "Not implemented" );
 }
 
-ATexture& Texture::operator=(const ATexture& right) {
-    if (this != &right)
-    {
-        const Texture* sfmTexture = dynamic_cast<const Texture*>(&right);
-        texture_ = sfmTexture->texture_;
-    }
-    return *this;
-}
 
-void Sprite::setTexture(const ATexture *texture, bool reset_rect)
+void Sprite::setTextureRect(const IntRect &rectangle)
 {
-    const Texture* sfmTexture = static_cast<const Texture*>(texture);
-    sprite_.setTexture(sfmTexture->getTexture(), reset_rect);
+    sf::IntRect sf_area( rectangle.top_x, rectangle.top_y, rectangle.width, rectangle.height);
+    sprite_.setTextureRect( sf_area);
 }
 
-void Sprite::setTextureRect(const IntRect &rectangle) {
-    sprite_.setTextureRect(sf::IntRect(static_cast<int>(rectangle.top_x),
-                                       static_cast<int>(rectangle.top_y),
-                                       static_cast<int>(rectangle.width),
-                                       static_cast<int>(rectangle.height)));
-}
 
 void Sprite::setPosition(float x, float y)
 {
-    sprite_.setPosition(x, y);
+    sprite_.setPosition( x, y);
 }
+
 
 void Sprite::setPosition(const vec2f &pos)
 {
-    sprite_.setPosition(pos.x, pos.y);
+    sprite_.setPosition( pos.x, pos.y);
 }
+
 
 void Sprite::setScale(float factorX, float factorY)
 {
-    sprite_.setScale(factorX, factorY);
+    sprite_.setScale( factorX, factorY);
 }
+
+
+vec2u Sprite::getSize() const
+{
+    return vec2u( sprite_.getTextureRect().width, sprite_.getTextureRect().height);
+}
+
 
 void Sprite::setColor(const Color &color)
 {
-    sprite_.setColor(sf::Color(color.r, color.g, color.b, color.a));
+    sprite_.setColor( sf::Color( color.r, color.g, color.b, color.a));
 }
+
 
 void Sprite::setRotation(float angle)
 {
-    sprite_.setRotation(angle);
+    sprite_.setRotation( angle);
 }
+
 
 const vec2f Sprite::getPosition() const
 {
-    sf::Vector2f pos = sprite_.getPosition();
-    return { pos.x, pos.y };
+    return vec2f( sprite_.getPosition().x, sprite_.getPosition().y);
 }
+
 
 IntRect Sprite::getGlobalBounds() const
 {
-    sf::FloatRect bounds = sprite_.getGlobalBounds();
-    return { static_cast<unsigned int>(bounds.left), static_cast<unsigned int>(bounds.top),
-             static_cast<unsigned int>(bounds.width), static_cast<unsigned int>(bounds.height) };
+    sf::IntRect rect = sprite_.getTextureRect();
+    return IntRect( rect.left, rect.top, rect.width, rect.height);
 }
 
-void Sprite::draw(ARenderWindow *window)
+
+bool Font::loadFromFile( const std::string &filename)
 {
-    RenderWindow* sfmWindow = dynamic_cast<RenderWindow*>(window);
-    assert( sfmWindow && "Incompatible cast" );
-    sfmWindow->getWindow().draw(sprite_);
+    return font_.loadFromFile( filename);
 }
 
-bool Font::loadFromFile(const std::string& filename)
-{
-    return font_.loadFromFile(filename);
-}
-
-void Text::draw(ARenderWindow *window)
-{
-    RenderWindow* sfmWindow = dynamic_cast<RenderWindow*>(window);
-    assert( sfmWindow && "Incompatible cast" );
-
-    sfmWindow->getWindow().draw(text_);
-}
 
 void Text::setString(const std::string& string)
 {
-    text_.setString(string);
+    text_.setString( string);
 }
 
-void Text::setFont(const AFont* font)
+
+void Text::setFont(const IFont* font)
 {
-    const Font* sfmFont = static_cast<const Font*>(font);
-    text_.setFont(sfmFont->font_);
+    assert( 0 && "Not implemented" );
 }
+
 
 void Text::setCharacterSize(unsigned int size)
 {
-    text_.setCharacterSize(size);
+    text_.setCharacterSize( size);
 }
+
 
 void Text::setStyle(uint32_t style)
 {
-    text_.setStyle(style);
+    text_.setStyle( style);
 }
+
 
 void Text::setFillColor(const Color* color)
 {
-    text_.setFillColor(sf::Color(color->r, color->g, color->b, color->a));
+    assert( color );
+
+    text_.setFillColor( sf::Color( color->r, color->g, color->b, color->a));
 }
+
 
 void Text::setOutlineColor(const Color* color)
 {
-    text_.setOutlineColor(sf::Color(color->r, color->g, color->b, color->a));
+    assert( color );
+
+    text_.setOutlineColor( sf::Color( color->r, color->g, color->b, color->a));
 }
+
 
 void Text::setOutlineThickness(float thickness)
 {
-    text_.setOutlineThickness(thickness);
+    text_.setOutlineThickness( thickness);
+}
+
+
+void RectangleShape::setTexture(const ITexture *texture)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void RectangleShape::setFillColor(const Color &color)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void RectangleShape::setPosition(const vec2i &pos)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void RectangleShape::setPosition(const vec2f &pos)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void RectangleShape::setPosition(const vec2d &pos)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void RectangleShape::setScale(const vec2f &scale)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void RectangleShape::setSize(const vec2u &size)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void RectangleShape::setRotation(float angle)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void RectangleShape::setOutlineColor(const Color &color)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void RectangleShape::setOutlineThickness(float thickness)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+float RectangleShape::getRotation() const
+{
+    assert( 0 && "Not implemented");
+
+    return 0;
+}
+
+
+vec2f RectangleShape::getScale() const
+{
+    assert( 0 && "Not implemented");
+
+    return vec2f();
+}
+
+
+vec2f RectangleShape::getPosition() const
+{
+    assert( 0 && "Not implemented");
+
+    return vec2f();
+}
+
+
+const Color &RectangleShape::getFillColor() const
+{
+    assert( 0 && "Not implemented" );
+
+    return *new Color();
+}
+
+
+vec2u RectangleShape::getSize() const
+{
+    assert( 0 && "Not implemented");
+
+    return vec2u();
+}
+
+
+float RectangleShape::getOutlineThickness() const
+{
+    assert( 0 && "Not implemented");
+
+    return 0;
+}
+
+
+const Color &RectangleShape::getOutlineColor() const
+{
+    assert( 0 && "Not implemented");
+
+    return *new Color();
+}
+
+
+const IImage *RectangleShape::getImage() const
+{
+    assert( 0 && "Not implemented");
+
+    return nullptr;
+}
+
+
+void RectangleShape::move(const vec2f &offset)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setTexture(const ITexture *texture)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setFillColor(const Color &color)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setPosition(const vec2i &pos)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setPosition(const vec2f &pos)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setPosition(const vec2d &pos)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setScale(const vec2f &scale)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setSize(const vec2u &size)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setRotation(float angle)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setOutlineColor(const Color &color)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+void EllipseShape::setOutlineThickness(float thickness)
+{
+    assert( 0 && "Not implemented");
+}
+
+
+float EllipseShape::getRotation() const
+{
+    assert( 0 && "Not implemented");
+
+    return 0;
+}
+
+
+vec2f EllipseShape::getScale() const
+{
+    assert( 0 && "Not implemented");
+
+    return vec2f();
+}
+
+
+vec2f EllipseShape::getPosition() const
+{
+    assert( 0 && "Not implemented");
+
+    return vec2f();
+}
+
+
+const Color &EllipseShape::getFillColor() const
+{
+    assert( 0 && "Not implemented" );
+
+    return *new Color();
+}
+
+
+vec2u EllipseShape::getSize() const
+{
+    assert( 0 && "Not implemented");
+
+    return vec2u();
+}
+
+
+float EllipseShape::getOutlineThickness() const
+{
+    assert( 0 && "Not implemented");
+
+    return 0;
+}
+
+
+const Color &EllipseShape::getOutlineColor() const
+{
+    assert( 0 && "Not implemented");
+
+    return *new Color();
+}
+
+
+const IImage *RectangleShape::getImage() const
+{
+    assert( 0 && "Not implemented");
+
+    return nullptr;
+}
+
+
+void RectangleShape::move(const vec2f &offset)
+{
+    assert( 0 && "Not implemented");
 }
 
 

@@ -9,10 +9,10 @@
 class Controller
 {
     Model *model_;
-    WindowManager *view_;
+    RootWindow *root_window_;
 
 public:
-    Controller( Model *init_model, WindowManager *init_view);
+    Controller( Model *init_model, IWindowContainer *init_root);
     ~Controller() = default;
 
     bool inProgress();

@@ -1,20 +1,20 @@
-#include <cstdio>
-
 #include <controller/controller.hpp>
 #include <systemdata.h>
 #include <sys/my_exceptions.hpp>
-#include <plugins/plugins.hpp>
+#include <api_impl/windows.hpp>
+#include <sys/plugins.hpp>
 
 
 int main()
 {
 	try
 	{
-		Model model;
-		WindowManager view( 1400, 800);
-		Controller ctrl( &model, &view);
+		IWindowContainer *root = getRootWindow();
 
-		runPlugin();
+		Model model;
+		Controller ctrl( &model, root);
+
+		actionPlugins( "loadPlugin");
 
 		while ( ctrl.inProgress() )
 		{
@@ -22,12 +22,49 @@ int main()
 			ctrl.proceedModel();
 			ctrl.proceedView();
 		}
-	} catch ( my_std::exception *exc )
+
+		actionPlugins( "unloadPlugin");
+
+	} catch ( my_std::exception &exc )
 	{
-		exc->dumpInfo();
+		exc.dumpInfo();
 	}
 
 	return SUCCESS;
 }
+
+
+/*
+
+
+IWindowContainer root_window = nullptr;
+
+class WindowManager
+{
+    RenderWindow window_;
+    IWindowContainer *container_;
+public:
+    some functions
+};
+
+
+class Model
+{
+    IWindowContainer *container_;
+
+};
+
+
+class Controller
+{
+    WindowManager *manager_;
+	Model *model_;
+public:
+	void getRequests();
+	void proceedModel();
+	void proceedView();
+};
+
+*/
 
 
