@@ -38,7 +38,7 @@ function( add_dynamic_plugin plugin_name)
 	)
 endfunction()
 
-set(PLUGINS "canvas")
+set(PLUGINS "canvas" "toolbar")
 foreach(plugin ${PLUGINS})
     add_dynamic_plugin(${plugin})
 endforeach()

@@ -111,6 +111,8 @@ public:
     void update(const Color *pixels)                                                         override;
     void update(const Color *pixels, unsigned int width, unsigned int height,
                                              unsigned int x,     unsigned int y) override;
+
+    const sf::Texture *get() const;
 };
 
 
@@ -174,6 +176,11 @@ public:
 class RectangleShape : public IRectangleShape
 {
     sf::RectangleShape shape_;
+    Color color_;
+    Color outline_color_;
+    vec2u size_;
+    vec2f pos_;
+    vec2f scale_;
 public:
     RectangleShape() = default;
     ~RectangleShape() = default;
@@ -200,6 +207,8 @@ public:
     const IImage *getImage() const override;
 
     void move(const vec2f &offset) override;
+
+    void draw( IRenderWindow *renderWindow) const override;
 };
 
 

@@ -366,6 +366,12 @@ void Texture::update(const Color *pixels)
 }
 
 
+const sf::Texture *Texture::get() const
+{
+    return &texture_;
+}
+
+
 void Texture::update(const Color *pixels, unsigned int width, unsigned int height, unsigned int x, unsigned int y)
 {
     assert( pixels );
@@ -511,117 +517,121 @@ void Text::setOutlineThickness(float thickness)
 
 void RectangleShape::setTexture(const ITexture *texture)
 {
-    assert( 0 && "Not implemented");
+    assert( texture );
+
+    shape_.setTexture( static_cast<const Texture *>( texture)->get());
 }
 
 
 void RectangleShape::setFillColor(const Color &color)
 {
-    assert( 0 && "Not implemented");
+    color_ = color;
+
+    shape_.setFillColor( sf::Color( color.r, color.g, color.b, color.a));
 }
 
 
 void RectangleShape::setPosition(const vec2i &pos)
 {
-    assert( 0 && "Not implemented");
+    setPosition( vec2f( pos.x, pos.y));
 }
 
 
 void RectangleShape::setPosition(const vec2f &pos)
 {
-    assert( 0 && "Not implemented");
+    pos_ = pos;
+
+    shape_.setPosition( pos.x, pos.y);
 }
 
 
 void RectangleShape::setPosition(const vec2d &pos)
 {
-    assert( 0 && "Not implemented");
+    setPosition( vec2f( pos.x, pos.y));
 }
 
 
 void RectangleShape::setScale(const vec2f &scale)
 {
-    assert( 0 && "Not implemented");
+    shape_.setScale( scale.x, scale.y);
 }
 
 
 void RectangleShape::setSize(const vec2u &size)
 {
-    assert( 0 && "Not implemented");
+    size_ = size;
+
+    shape_.setSize( sf::Vector2f( size.x, size.y));
 }
 
 
 void RectangleShape::setRotation(float angle)
 {
-    assert( 0 && "Not implemented");
+    shape_.setRotation( angle);
 }
 
 
 void RectangleShape::setOutlineColor(const Color &color)
 {
-    assert( 0 && "Not implemented");
+    outline_color_ = color;
+
+    shape_.setOutlineColor( sf::Color( color.r, color.g, color.b, color.a));
 }
 
 
 void RectangleShape::setOutlineThickness(float thickness)
 {
-    assert( 0 && "Not implemented");
+    shape_.setOutlineThickness( thickness);
 }
 
 
 float RectangleShape::getRotation() const
 {
-    assert( 0 && "Not implemented");
-
-    return 0;
+    return shape_.getRotation();
 }
 
 
 vec2f RectangleShape::getScale() const
 {
-    assert( 0 && "Not implemented");
-
-    return vec2f();
+    return scale_;
 }
 
 
 vec2f RectangleShape::getPosition() const
 {
-    assert( 0 && "Not implemented");
-
-    return vec2f();
+    return pos_;
 }
 
 
 const Color &RectangleShape::getFillColor() const
 {
-    assert( 0 && "Not implemented" );
-
-    return *new Color();
+    return color_;
 }
 
 
 vec2u RectangleShape::getSize() const
 {
-    assert( 0 && "Not implemented");
-
-    return vec2u();
+    return size_;
 }
 
 
 float RectangleShape::getOutlineThickness() const
 {
-    assert( 0 && "Not implemented");
+    return shape_.getOutlineThickness();
+}
 
-    return 0;
+
+void RectangleShape::draw( IRenderWindow *renderWindow) const
+{
+    assert( renderWindow );
+
+    static_cast<RenderWindow *>( renderWindow)->getWindow().draw( shape_);
 }
 
 
 const Color &RectangleShape::getOutlineColor() const
 {
-    assert( 0 && "Not implemented");
-
-    return *new Color();
+    return outline_color_;
 }
 
 

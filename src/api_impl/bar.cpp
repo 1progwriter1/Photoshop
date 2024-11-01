@@ -104,13 +104,24 @@ IBarButton::State ABarButton::getState() const
 }
 
 
-void ABar::draw(IRenderWindow* renderWindow)
+Bar::Bar( vec2u init_size, vec2i init_pos, const sfm::Color &in_color, const sfm::Color &out_color, const float thickness)
+    :   size_( init_size), pos_( init_pos)
 {
-    assert( 0 && "Not implemented" );
+    shape_.setSize( init_size);
+    shape_.setFillColor( in_color);
+    shape_.setPosition( init_pos);
+    shape_.setOutlineColor( out_color);
+    shape_.setOutlineThickness( thickness);
 }
 
 
-bool ABar::update(const IRenderWindow* renderWindow, const Event& event)
+void Bar::draw(IRenderWindow* renderWindow)
+{
+    shape_.draw( renderWindow);
+}
+
+
+bool Bar::update(const IRenderWindow* renderWindow, const Event& event)
 {
     assert( 0 && "Not implemented" );
 
@@ -118,81 +129,93 @@ bool ABar::update(const IRenderWindow* renderWindow, const Event& event)
 }
 
 
-wid_t ABar::getId() const
+void Bar::addWindow(std::unique_ptr<IWindow> window)
 {
     assert( 0 && "Not implemented" );
-
-    return 0;
 }
 
 
-IWindow* ABar::getWindowById(wid_t id)
+void Bar::removeWindow(wid_t id)
 {
     assert( 0 && "Not implemented" );
+}
 
+
+wid_t Bar::getId() const
+{
+    return kToolBarWindowId;
+}
+
+
+IWindow* Bar::getWindowById(wid_t id)
+{
+    for ( const auto &button : buttons_ )
+    {
+        if ( button->getId() == id )
+        {
+            return button.get();
+        }
+    }
     return nullptr;
 }
 
 
-const IWindow* ABar::getWindowById(wid_t id) const
+const IWindow* Bar::getWindowById(wid_t id) const
 {
-    assert( 0 && "Not implemented" );
-
+    for ( const auto &button : buttons_ )
+    {
+        if ( button->getId() == id )
+        {
+            return button.get();
+        }
+    }
     return nullptr;
 }
 
 
-vec2i ABar::getPos() const
+vec2i Bar::getPos() const
 {
-    assert( 0 && "Not implemented" );
-
-    return vec2i();
+    return pos_;
 }
 
 
-vec2u ABar::getSize() const
+vec2u Bar::getSize() const
 {
-    assert( 0 && "Not implemented" );
-
-    return vec2u();
+    return size_;
 }
 
 
-void ABar::setParent(const IWindow* parent)
+void Bar::setParent(const IWindow* parent)
 {
-    assert( 0 && "Not implemented" );
+    parent_ = parent;
 }
 
 
-void ABar::forceActivate()
+void Bar::forceActivate()
 {
-    assert( 0 && "Not implemented" );
+    is_active_ = true;
 }
 
 
-void ABar::forceDeactivate()
+void Bar::forceDeactivate()
 {
-    assert( 0 && "Not implemented" );
+    is_active_ = false;
 }
 
 
-bool ABar::isActive() const
+bool Bar::isActive() const
 {
-    assert( 0 && "Not implemented" );
-
-    return false;
+    return is_active_;
 }
 
 
-bool ABar::isWindowContainer() const
+bool Bar::isWindowContainer() const
 {
-    assert( 0 && "Not implemented" );
-
-    return false;
+    return true;
 }
 
 
-ChildInfo ABar::getNextChildInfo() const
+ChildInfo Bar::getNextChildInfo() const
 {
     assert( 0 && "Not implemented" );
 
@@ -200,7 +223,7 @@ ChildInfo ABar::getNextChildInfo() const
 }
 
 
-void ABar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
+void Bar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
 {
     assert( 0 && "Not implemented" );
 }
