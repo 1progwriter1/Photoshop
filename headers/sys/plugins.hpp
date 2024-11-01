@@ -2,12 +2,12 @@
 #define PLUGINS_FUNCTIONS
 
 
-const char *PLUGINS_PATH[] =
+static const char *PLUGINS_PATH[] =
 {
-	"../plugins/libtest_plugin.dylib"
+	"../plugins/libcanvas.dylib"
 };
 
-// g++ ../src/api_impl/api_sfm.cpp ../src/api_impl/bar.cpp ../src/api_impl/canvas.cpp ../src/api_impl/sfm.cpp ../src/api_impl/windows.cpp -dynamiclib -o libapi_photoshop.dylib -I../api -I../headers/ -std=c++11 -I/opt/homebrew/include/
+//  g++ ../src/api_impl/api_system.cpp ../src/api_impl/bar.cpp ../src/api_impl/canvas.cpp ../src/api_impl/sfm.cpp ../src/api_impl/windows.cpp  -dynamiclib -o libapi_photoshop.dylib -I../api -I../headers/ -std=c++11 -I/opt/homebrew/include/ -L/opt/homebrew/lib/ -lsfml-graphics -lsfml-window -lsfml-system ../src/sys/my_exceptions.cpp -I../../MyLibraries/headers
 
 
 void actionPlugins( const char *func);

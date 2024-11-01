@@ -20,6 +20,8 @@ class RenderWindow : public IRenderWindow
     unsigned int width_;
     unsigned int height_;
 
+    float fps_ = NAN;
+
 public:
     RenderWindow( unsigned int init_width, unsigned int init_height, const std::string &title = "PhotoShop");
     ~RenderWindow() = default;

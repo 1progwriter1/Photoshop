@@ -5,16 +5,57 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 set( TARGET run)
+set( DYLIB api_photoshop)
 
 project( Photoshop)
 
-file( GLOB_RECURSE SOURCES src/*.cpp)
+file( GLOB_RECURSE SOURCES src/controller/*.cpp src/gui/*.cpp src/sys/*.cpp src/model/*.cpp, src/main.cpp)
+file( GLOB_RECURSE SRC_DYLIB src/api_impl/*.cpp src/sys/my_exceptions.cpp)
 
-
+add_library( ${DYLIB} SHARED ${SRC_DYLIB})
 add_executable( ${TARGET} ${SOURCES})
 
+
+
+
+
+set(PLUGIN_INSTALL_DIR /Users/ivanvodolazenko/VSProjects/Photoshop/plugins/)
+
+function( add_dynamic_plugin plugin_name)
+	set( plugin_src "../plugins/${plugin_name}.cpp")
+	if(NOT EXISTS ${plugin_src})
+        message(FATAL_ERROR "Source file ${plugin_scr} does not exist.")
+    endif()
+	add_library( ${plugin_name} SHARED ${plugin_src})
+
+	# set_target_properties( ${plugin_name} PROPERTIES OUTPUT_NAME "${plugin_name}")
+
+	target_link_directories( ${plugin_name} PRIVATE build/)
+	target_link_libraries( ${plugin_name} PRIVATE api_photoshop)
+
+	install( TARGETS ${plugin_name}
+    	LIBRARY DESTINATION ${PLUGIN_INSTALL_DIR}
+	)
+endfunction()
+
+set(PLUGINS "canvas")
+foreach(plugin ${PLUGINS})
+    add_dynamic_plugin(${plugin})
+endforeach()
+
+
+
+
+
+
+target_link_directories( ${DYLIB} PRIVATE /opt/homebrew/lib/)
+target_link_directories( ${DYLIB} PRIVATE build/)
+target_link_libraries( ${DYLIB} PRIVATE sfml-graphics sfml-window sfml-system)
+
 target_link_directories( ${TARGET} PRIVATE /opt/homebrew/lib/)
+target_link_directories( ${TARGET} PRIVATE build/)
 target_link_libraries( ${TARGET} PRIVATE sfml-graphics sfml-window sfml-system)
+target_link_libraries( ${TARGET} PRIVATE api_photoshop)
 
 include_directories( headers)
 include_directories( api)

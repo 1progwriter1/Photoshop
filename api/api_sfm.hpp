@@ -106,6 +106,7 @@ public:
     virtual vec2u getSize() const = 0;
 
     virtual void setColor(const Color &color) = 0;
+    virtual Color getColor() const = 0;
 
     virtual void setRotation(float angle) = 0;
 
@@ -221,7 +222,7 @@ public:
 
     static std::unique_ptr<IEllipseShape> create(unsigned int width = 0, unsigned int height = 0);
     static std::unique_ptr<IEllipseShape> create(const vec2u &size = vec2u(0, 0));
-    static std::unique_ptr<IEllipseShape> create(unsigned int radius); // creates ellipse with width == height == raduis - circle
+    static std::unique_ptr<IEllipseShape> create(unsigned int radius); // creates ellipse with width == height == radius - circle
 };
 
 class Mouse

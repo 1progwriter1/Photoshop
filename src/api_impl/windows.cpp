@@ -1,8 +1,16 @@
 #include <api_impl/windows.hpp>
 #include <cassert>
+#include <sys/my_exceptions.hpp>
 
 
 using namespace psapi;
+
+
+
+bool IWindowContainer::isWindowContainer() const
+{
+    return true;
+}
 
 
 IWindow::~IWindow()
@@ -52,12 +60,6 @@ void AWindow::setParent( const IWindow *new_parent)
 }
 
 
-bool AWindow::isWindowContainer() const
-{
-    return false;
-}
-
-
 IWindow *AWindow::getWindowById( wid_t id)
 {
     return id == id_ ? this : nullptr;
@@ -70,7 +72,7 @@ const IWindow *AWindow::getWindowById( wid_t id) const
 }
 
 
-void WindowContainer::draw( sfm::IRenderWindow *renderWindow)
+void AWindowContainer::draw( sfm::IRenderWindow *renderWindow)
 {
     for ( auto &window : windows_ )
     {
@@ -79,7 +81,7 @@ void WindowContainer::draw( sfm::IRenderWindow *renderWindow)
 }
 
 
-bool WindowContainer::update( const IRenderWindow* renderWindow, const Event& event)
+bool AWindowContainer::update( const IRenderWindow* renderWindow, const Event& event)
 {
     assert( 0 && "Not implemented" );
 
@@ -87,7 +89,7 @@ bool WindowContainer::update( const IRenderWindow* renderWindow, const Event& ev
 }
 
 
-IWindow *WindowContainer::getWindowById( wid_t id)
+IWindow *AWindowContainer::getWindowById( wid_t id)
 {
     for ( auto &window : windows_ )
     {
@@ -101,7 +103,7 @@ IWindow *WindowContainer::getWindowById( wid_t id)
 }
 
 
-const IWindow *WindowContainer::getWindowById( wid_t id) const
+const IWindow *AWindowContainer::getWindowById( wid_t id) const
 {
     for ( auto &window : windows_ )
     {
@@ -115,13 +117,13 @@ const IWindow *WindowContainer::getWindowById( wid_t id) const
 }
 
 
-void WindowContainer::addWindow( std::unique_ptr<IWindow> window)
+void AWindowContainer::addWindow( std::unique_ptr<IWindow> window)
 {
     windows_.insert( windows_.end(), std::move( window));
 }
 
 
-void WindowContainer::removeWindow( wid_t id)
+void AWindowContainer::removeWindow( wid_t id)
 {
     for ( auto &window : windows_ )
     {
@@ -133,13 +135,13 @@ void WindowContainer::removeWindow( wid_t id)
 }
 
 
-bool WindowContainer::isWindowContainer() const
+bool AWindowContainer::isWindowContainer() const
 {
     return true;
 }
 
 
-void WindowVector::draw( IRenderWindow *renderWindow)
+void AWindowVector::draw( IRenderWindow *renderWindow)
 {
     for ( auto &window : windows_ )
     {
@@ -148,7 +150,7 @@ void WindowVector::draw( IRenderWindow *renderWindow)
 }
 
 
-bool WindowVector::update( const IRenderWindow *renderWindow, const Event &event)
+bool AWindowVector::update( const IRenderWindow *renderWindow, const Event &event)
 {
     assert( 0 && "Not implemented" );
 
@@ -156,13 +158,13 @@ bool WindowVector::update( const IRenderWindow *renderWindow, const Event &event
 }
 
 
-void WindowVector::addWindow( std::unique_ptr<IWindow> window)
+void AWindowVector::addWindow( std::unique_ptr<IWindow> window)
 {
     windows_.push_back( std::move( window));
 }
 
 
-void WindowVector::removeWindow( wid_t id)
+void AWindowVector::removeWindow( wid_t id)
 {
     size_t w_cnt = windows_.size();
     for ( size_t i = 0; i < w_cnt; i++ )
@@ -173,7 +175,7 @@ void WindowVector::removeWindow( wid_t id)
 }
 
 
-IWindow *WindowVector::getWindowById( wid_t id)
+IWindow *AWindowVector::getWindowById( wid_t id)
 {
     for ( auto &window : windows_ )
     {
@@ -182,10 +184,11 @@ IWindow *WindowVector::getWindowById( wid_t id)
             window->getWindowById( id);
         }
     }
+    return nullptr;
 }
 
 
-const IWindow *WindowVector::getWindowById( wid_t id) const
+const IWindow *AWindowVector::getWindowById( wid_t id) const
 {
     for ( auto &window : windows_ )
     {
@@ -194,6 +197,7 @@ const IWindow *WindowVector::getWindowById( wid_t id) const
             window->getWindowById( id);
         }
     }
+    return nullptr;
 }
 
 
@@ -201,3 +205,82 @@ generalFunction getGeneralFunction(const std::string &name)
 {
     assert( 0 && "generalFunction is not implemented" );
 }
+
+
+RootWindow::RootWindow()
+    :   window_( kRootWindowWidth, kRootWindowHeight, kRootWindowTitle)
+{}
+
+
+const IRenderWindow *RootWindow::getRenderWindow() const
+{
+    return &window_;
+}
+
+
+IRenderWindow *RootWindow::getRenderWindow()
+{
+    return &window_;
+}
+
+
+IWindowContainer *RootWindow::getInstance()
+{
+    static RootWindow window;
+    return &window;
+}
+
+
+IWindowContainer *psapi::getRootWindow()
+{
+    return RootWindow::getInstance();
+}
+
+
+wid_t RootWindow::getId() const
+{
+    return kRootWindowId;
+}
+
+
+vec2u RootWindow::getSize() const
+{
+    return size_;
+}
+
+
+void RootWindow::setParent(const IWindow *parent)
+{
+    throw MY_EXCEPTION( "you cannot set parent for RootWindow", nullptr);
+}
+
+
+vec2i RootWindow::getPos() const
+{
+    return pos_;
+}
+
+
+void RootWindow::forceActivate()
+{
+    is_active_ = true;
+}
+
+
+void RootWindow::forceDeactivate()
+{
+    is_active_ = false;
+}
+
+
+bool RootWindow::isActive() const
+{
+    return is_active_;
+}
+
+
+void RootWindow::drawChildren( IRenderWindow *renderWindow)
+{
+    assert( 0 &&"Not implemented" );
+}
+

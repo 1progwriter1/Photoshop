@@ -22,12 +22,7 @@ void actionPlugins( const char *func)
 			throw MY_EXCEPTION( "plugin load error", nullptr);
 		}
 
-		bool result = pluginFunction();
+		pluginFunction();
     	dlclose(handle);
-
-    	if ( !result )
-		{
-			throw MY_EXCEPTION( "error during plugin load", nullptr);
-		}
 	}
 }

@@ -4,6 +4,7 @@
 
 #include <model/model.hpp>
 #include <gui/window_manager.hpp>
+#include <api_impl/windows.hpp>
 
 
 class Controller

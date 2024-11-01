@@ -11,20 +11,19 @@ namespace sfm
 
 
 RenderWindow::RenderWindow( unsigned int width, unsigned int height, const std::string& title)
-    : window_( sf::VideoMode(width, height), title) {}
+    : window_( sf::VideoMode(width, height), title)
+{}
 
 
 void RenderWindow::setFps( float fps)
 {
-    assert( 0 && "Not implemented" );
+    fps_ = fps;
 }
 
 
 float RenderWindow::getFps() const
 {
-    assert( 0 && "Not implemented" );
-
-    return 0;
+    return fps_;
 }
 
 
@@ -319,7 +318,7 @@ bool Texture::loadFromFile(const std::string& filename, const IntRect& area /*= 
 }
 
 
-bool Texture::loadFromMemory(const void* data, std::size_t size, const IntRect& area = IntRect())
+bool Texture::loadFromMemory(const void* data, std::size_t size, const IntRect& area /*= IntRect()*/)
 {
     sf::IntRect sf_area( area.top_x, area.top_y, area.width, area.height);
     return texture_.loadFromMemory( data, size, sf_area);
@@ -415,8 +414,14 @@ const vec2f Sprite::getPosition() const
 
 IntRect Sprite::getGlobalBounds() const
 {
-    sf::IntRect rect = sprite_.getTextureRect();
-    return IntRect( rect.left, rect.top, rect.width, rect.height);
+    sf::IntRect sf_rect = sprite_.getTextureRect();
+    IntRect rect = {};
+    rect.top_x = sf_rect.left;
+    rect.top_y = sf_rect.top;
+    rect.height = sf_rect.height;
+    rect.width = sf_rect.width;
+
+    return rect;
 }
 
 
@@ -718,7 +723,7 @@ const Color &EllipseShape::getOutlineColor() const
 }
 
 
-const IImage *RectangleShape::getImage() const
+const IImage *EllipseShape::getImage() const
 {
     assert( 0 && "Not implemented");
 
@@ -726,7 +731,7 @@ const IImage *RectangleShape::getImage() const
 }
 
 
-void RectangleShape::move(const vec2f &offset)
+void EllipseShape::move(const vec2f &offset)
 {
     assert( 0 && "Not implemented");
 }

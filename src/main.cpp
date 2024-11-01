@@ -9,10 +9,8 @@ int main()
 {
 	try
 	{
-		IWindowContainer *root = getRootWindow();
-
 		Model model;
-		Controller ctrl( &model, root);
+		Controller ctrl( &model, psapi::getRootWindow());
 
 		actionPlugins( "loadPlugin");
 
@@ -32,39 +30,5 @@ int main()
 
 	return SUCCESS;
 }
-
-
-/*
-
-
-IWindowContainer root_window = nullptr;
-
-class WindowManager
-{
-    RenderWindow window_;
-    IWindowContainer *container_;
-public:
-    some functions
-};
-
-
-class Model
-{
-    IWindowContainer *container_;
-
-};
-
-
-class Controller
-{
-    WindowManager *manager_;
-	Model *model_;
-public:
-	void getRequests();
-	void proceedModel();
-	void proceedView();
-};
-
-*/
 
 

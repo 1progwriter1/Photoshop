@@ -3,12 +3,12 @@
 
 
 #include <api_canvas.hpp>
+#include <api_impl/windows.hpp>
 
 
 using namespace psapi;
 
 using sfm::Color;
-
 
 
 class Layer : public ILayer
@@ -29,8 +29,15 @@ public:
 class Canvas : public ICanvas
 {
     std::vector<std::unique_ptr<ILayer>> layers_;
+
+    bool is_active_;
+    const IWindow *parent_;
+
+    vec2u size_;
+    vec2i pos_;
+
 public:
-    Canvas() = default;
+    Canvas( vec2i init_pos, vec2u init_size);
     ~Canvas() = default;
 
     ILayer*       getLayer(size_t index)       override;
@@ -56,6 +63,20 @@ public:
 
     sfm::vec2i getMousePosition() const override;
     bool isPressed()              const override;
+
+    bool isWindowContainer() const override;
+    wid_t getId() const override;
+    vec2i getPos() const override;
+    vec2u getSize() const override;
+    void setParent(const IWindow* parent) override;
+    bool isActive() const override;
+    void forceActivate() override;
+    void forceDeactivate() override;
+    IWindow *getWindowById( wid_t id) override;
+    const IWindow *getWindowById( wid_t id) const override;
+
+    void draw( IRenderWindow *removeWindow) override;
+    bool update( const IRenderWindow *renderWindow, const Event &event) override;
 };
 
 

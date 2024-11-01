@@ -14,18 +14,18 @@ Controller::Controller( Model *init_model, IWindowContainer *init_root_window)
 
 bool Controller::inProgress()
 {
-    return root_window_->getRenderWindow().isOpen();
+    return root_window_->getRenderWindow()->isOpen();
 }
 
 
 void Controller::getRequests()
 {
     Event event;
-    while ( root_window_->getRenderWindow().pollEvent( event) )
+    while ( root_window_->getRenderWindow()->pollEvent( event) )
     {
         if ( event.type == Event::Closed )
         {
-            root_window_->getRenderWindow().close();
+            root_window_->getRenderWindow()->close();
         }
     }
 }
@@ -33,8 +33,9 @@ void Controller::getRequests()
 
 void Controller::proceedView()
 {
-    root_window_->getRenderWindow().clear();
-    root_window_->getRenderWindow().clear();
+    root_window_->getRenderWindow()->clear();
+    root_window_->draw( root_window_->getRenderWindow());
+    root_window_->getRenderWindow()->display();
 }
 
 
