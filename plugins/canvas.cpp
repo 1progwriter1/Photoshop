@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "api_canvas.hpp"
 #include "api_photoshop.hpp"
 #include "../headers/api_impl/canvas.hpp"
@@ -20,7 +19,7 @@ bool loadPlugin()
 
     kRootWindowPtr = psapi::getRootWindow();
 
-    std::unique_ptr<psapi::ICanvas> canvas = std::make_unique<Canvas>( psapi::vec2i( 240, 270), psapi::vec2u( 1120, 1120));
+    std::unique_ptr<psapi::ICanvas> canvas = std::make_unique<Canvas>( psapi::vec2i( 120, 135), psapi::vec2u( 1480, 765));
 
     kRootWindowPtr->addWindow( std::move( canvas));
 

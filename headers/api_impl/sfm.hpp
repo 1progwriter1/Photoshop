@@ -96,6 +96,8 @@ public:
 class Texture : public ITexture
 {
     sf::Texture texture_;
+
+    friend class Sprite;
 public:
     Texture() = default;
     ~Texture() = default;
@@ -129,11 +131,14 @@ public:
     vec2u getSize() const override;
 
     void setColor(const Color &color) override;
+    Color getColor() const override;
 
     void setRotation(float angle) override;
 
     const vec2f getPosition() const override;
     IntRect getGlobalBounds() const override;
+
+    void draw( IRenderWindow *renderWindow) const override;
 };
 
 

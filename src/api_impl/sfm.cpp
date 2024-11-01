@@ -1,5 +1,6 @@
 #include <api_impl/sfm.hpp>
 #include <assert.h>
+#include <memory>
 
 
 namespace psapi
@@ -10,9 +11,20 @@ namespace sfm
 {
 
 
+std::unique_ptr<ITexture> ITexture::create()
+{
+    return std::make_unique<Texture>();
+}
+
+
+std::unique_ptr<ISprite> ISprite::create()
+{
+    return std::make_unique<Sprite>();
+}
+
+
 RenderWindow::RenderWindow( unsigned int width, unsigned int height, const std::string& title)
-    : window_( sf::VideoMode(width, height), title)
-{}
+    : window_( sf::VideoMode(width, height), title) {}
 
 
 void RenderWindow::setFps( float fps)
@@ -347,19 +359,24 @@ void Texture::update(const IImage *image)
 
 void Texture::update(const Color *pixels)
 {
-    assert( 0 && "Not implemented" );
+    assert( pixels );
+
+    vec2u size = getSize();
+    texture_.update( reinterpret_cast<const uint8_t *>( pixels), size.x, size.y, 0, 0);
 }
 
 
 void Texture::update(const Color *pixels, unsigned int width, unsigned int height, unsigned int x, unsigned int y)
 {
-    assert( 0 && "Not implemented" );
+    assert( pixels );
+
+    texture_.update( reinterpret_cast<const uint8_t *>( pixels), width, height, x, y);
 }
 
 
 void Sprite::setTexture(const ITexture *texture, bool reset_rect /*= false*/)
 {
-    assert( 0 && "Not implemented" );
+    sprite_.setTexture( static_cast<const Texture *>( texture)->texture_, reset_rect);
 }
 
 
@@ -385,6 +402,13 @@ void Sprite::setPosition(const vec2f &pos)
 void Sprite::setScale(float factorX, float factorY)
 {
     sprite_.setScale( factorX, factorY);
+}
+
+Color Sprite::getColor() const
+{
+    assert( 0 && "Not implemented" );
+
+    return Color();
 }
 
 
@@ -422,6 +446,14 @@ IntRect Sprite::getGlobalBounds() const
     rect.width = sf_rect.width;
 
     return rect;
+}
+
+
+void Sprite::draw( IRenderWindow *renderWindow) const
+{
+    assert( renderWindow );
+
+    static_cast<RenderWindow *>( renderWindow)->getWindow().draw( sprite_);
 }
 
 

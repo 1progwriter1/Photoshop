@@ -14,11 +14,13 @@ using sfm::Color;
 class Layer : public ILayer
 {
     vec2i pos_;
-    vec2i size_;
+    vec2u size_;
 
     std::vector<Color> pixels_;
+
+    friend class Canvas;
 public:
-    Layer( vec2i size, vec2i pos = vec2i());
+    Layer( vec2u size, vec2i pos = vec2i());
     ~Layer() = default;
 
     Color getPixel(sfm::vec2i pos) const override;
@@ -28,7 +30,7 @@ public:
 
 class Canvas : public ICanvas
 {
-    std::vector<std::unique_ptr<ILayer>> layers_;
+    std::list<std::unique_ptr<ILayer>> layers_;
 
     bool is_active_;
     const IWindow *parent_;
@@ -36,6 +38,8 @@ class Canvas : public ICanvas
     vec2u size_;
     vec2i pos_;
 
+    std::unique_ptr<sfm::ITexture> texture_;
+    std::unique_ptr<sfm::ISprite> sprite_;
 public:
     Canvas( vec2i init_pos, vec2u init_size);
     ~Canvas() = default;

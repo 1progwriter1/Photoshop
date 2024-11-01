@@ -3,7 +3,7 @@
 #include <cassert>
 
 
-Layer::Layer( vec2i size, vec2i pos /*= vec2i()*/)
+Layer::Layer( vec2u size, vec2i pos /*= vec2i()*/)
     :   size_( size), pos_( pos), pixels_( size.x * size.y, Color()) {}
 
 
@@ -81,7 +81,17 @@ void Canvas::setActiveLayerIndex(size_t index)
 
 bool Canvas::insertLayer(size_t index, std::unique_ptr<ILayer> layer)
 {
-    assert( 0 && "Not implemented" );
+    size_t cur_index = 0;
+    auto iter = layers_.begin();
+    for ( auto &cur_layer : layers_ )
+    {
+        if ( cur_index == index )
+        {
+            break;
+        }
+        iter++;
+    }
+    layers_.insert( iter, std::move( layer));
 
     return true;
 }
@@ -202,15 +212,16 @@ void Canvas::draw( IRenderWindow *renderWindow)
 {
     assert( renderWindow );
 
-    sf::CircleShape circle;
-    circle.setRadius( size_.x / 2);
-    circle.setPosition( pos_.x, pos_.y);
-    circle.setFillColor( sf::Color::Yellow);
+    for ( auto &layer : layers_ )
+    {
+        Layer *cur_layer = dynamic_cast<Layer *>( layer.get());
+        assert( cur_layer );
 
-    sfm::RenderWindow *window = dynamic_cast<sfm::RenderWindow *>( renderWindow);
-    assert( window && "Failed to cast IRenderWindow to RenderWindow" );
-
-    dynamic_cast<sfm::RenderWindow *>( renderWindow)->getWindow().draw( circle);
+        texture_->update( cur_layer->pixels_.data());
+        sprite_->setTexture( texture_.get());
+        sprite_->setPosition( pos_.x, pos_.y);
+        sprite_->draw( renderWindow);
+    }
 }
 
 
@@ -223,4 +234,19 @@ bool Canvas::update( const IRenderWindow *renderWindow, const Event &event)
 
 
 Canvas::Canvas( vec2i init_pos, vec2u init_size)
-    :   is_active_( true), parent_( nullptr), size_( init_size), pos_( init_pos) {}
+    :   is_active_( true), parent_( nullptr), size_( init_size), pos_( init_pos)
+{
+    texture_ = sfm::ITexture::create();
+    texture_->create( init_size.x, init_size.y);
+
+    sprite_ = sfm::ISprite::create();
+
+    insertLayer( 0, std::make_unique<Layer>( init_size, init_pos));
+    for ( int x = 0; x < init_size.x; x++ )
+    {
+        for ( int y = 0; y < init_size.y; y++ )
+        {
+            layers_.front()->setPixel( vec2i( x, y), sfm::Color( 255, 255, 255, 255));
+        }
+    }
+}
