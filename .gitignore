@@ -3,3 +3,4 @@
 build/
 .vscode
 *.dylib
+.DS_Store

@@ -182,8 +182,8 @@ class RectangleShape : public IRectangleShape
     vec2f pos_;
     vec2f scale_;
 public:
-    RectangleShape() = default;
-    ~RectangleShape() = default;
+    RectangleShape();
+    ~RectangleShape();
 
     void setTexture(const ITexture *texture) override;
     void setFillColor(const Color &color) override;

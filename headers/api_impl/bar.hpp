@@ -10,10 +10,13 @@
 using namespace psapi;
 
 
-class ABarButton : public IBarButton
+class BarButton : public IBarButton
 {
+    std::unique_ptr<sfm::Texture> texture_;
+    std::unique_ptr<sfm::Sprite> sprite_;
 public:
-    virtual ~ABarButton() = default;
+    BarButton(  std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
+    ~BarButton() = default;
 
     virtual void draw(IRenderWindow* renderWindow) override;
     virtual bool update(const IRenderWindow* renderWindow, const Event& event) override;
@@ -44,10 +47,17 @@ class Bar : public IBar
 
     std::list<std::unique_ptr<IBarButton>> buttons_;
 
-    psapi::sfm::RectangleShape shape_;
+    std::unique_ptr<sfm::RectangleShape> main_shape_;
+    std::unique_ptr<sfm::RectangleShape> normal_;
+    std::unique_ptr<sfm::RectangleShape> onHover_;
+    std::unique_ptr<sfm::RectangleShape> pressed_;
+    std::unique_ptr<sfm::RectangleShape> released_;
 
 public:
-    Bar( vec2u init_size, vec2i init_pos, const sfm::Color &in_color, const sfm::Color &out_color, const float thickness);
+    Bar( std::unique_ptr<sfm::RectangleShape> main_shape,   std::unique_ptr<sfm::RectangleShape> normal,
+                                                            std::unique_ptr<sfm::RectangleShape> onHover,
+                                                            std::unique_ptr<sfm::RectangleShape> pressed,
+                                                            std::unique_ptr<sfm::RectangleShape> released);
     ~Bar() = default;
 
     void draw(IRenderWindow* renderWindow) override;

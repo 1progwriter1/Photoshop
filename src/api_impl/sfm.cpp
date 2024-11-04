@@ -515,6 +515,13 @@ void Text::setOutlineThickness(float thickness)
 }
 
 
+RectangleShape::RectangleShape()
+    :   color_( Color()), outline_color_( Color()), size_( vec2u()), pos_( vec2f()), scale_( vec2f()) {}
+
+
+RectangleShape::~RectangleShape() {}
+
+
 void RectangleShape::setTexture(const ITexture *texture)
 {
     assert( texture );
@@ -647,6 +654,10 @@ void RectangleShape::move(const vec2f &offset)
 {
     assert( 0 && "Not implemented");
 }
+
+
+static std::unique_ptr<IRectangleShape> create(unsigned int width = 0, unsigned int height = 0);
+static std::unique_ptr<IRectangleShape> create(const vec2u &size = vec2u(0, 0));
 
 
 void EllipseShape::setTexture(const ITexture *texture)

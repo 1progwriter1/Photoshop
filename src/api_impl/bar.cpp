@@ -2,13 +2,13 @@
 #include <cassert>
 
 
-void ABarButton::draw(IRenderWindow* renderWindow)
+void BarButton::draw(IRenderWindow* renderWindow)
 {
     assert( 0 && "Not implemented" );
 }
 
 
-bool ABarButton::update(const IRenderWindow* renderWindow, const Event& event)
+bool BarButton::update(const IRenderWindow* renderWindow, const Event& event)
 {
     assert( 0 && "Not implemented" );
 
@@ -16,7 +16,7 @@ bool ABarButton::update(const IRenderWindow* renderWindow, const Event& event)
 }
 
 
-wid_t ABarButton::getId() const
+wid_t BarButton::getId() const
 {
     assert( 0 && "Not implemented" );
 
@@ -24,7 +24,7 @@ wid_t ABarButton::getId() const
 }
 
 
-IWindow* ABarButton::getWindowById(wid_t id)
+IWindow* BarButton::getWindowById(wid_t id)
 {
     assert( 0 && "Not implemented" );
 
@@ -32,7 +32,7 @@ IWindow* ABarButton::getWindowById(wid_t id)
 }
 
 
-const IWindow* ABarButton::getWindowById(wid_t id) const
+const IWindow* BarButton::getWindowById(wid_t id) const
 {
     assert( 0 && "Not implemented" );
 
@@ -40,7 +40,7 @@ const IWindow* ABarButton::getWindowById(wid_t id) const
 }
 
 
-vec2i ABarButton::getPos() const
+vec2i BarButton::getPos() const
 {
     assert( 0 && "Not implemented" );
 
@@ -48,7 +48,7 @@ vec2i ABarButton::getPos() const
 }
 
 
-vec2u ABarButton::getSize() const
+vec2u BarButton::getSize() const
 {
     assert( 0 && "Not implemented" );
 
@@ -56,33 +56,25 @@ vec2u ABarButton::getSize() const
 }
 
 
-void ABarButton::setParent(const IWindow* parent)
+void BarButton::setParent(const IWindow* parent)
 {
     assert( 0 && "Not implemented" );
 }
 
 
-void ABarButton::forceActivate()
+void BarButton::forceActivate()
 {
     assert( 0 && "Not implemented" );
 }
 
 
-void ABarButton::forceDeactivate()
+void BarButton::forceDeactivate()
 {
     assert( 0 && "Not implemented" );
 }
 
 
-bool ABarButton::isActive() const
-{
-    assert( 0 && "Not implemented" );
-
-    return false;
-}
-
-
-bool ABarButton::isWindowContainer() const
+bool BarButton::isActive() const
 {
     assert( 0 && "Not implemented" );
 
@@ -90,13 +82,21 @@ bool ABarButton::isWindowContainer() const
 }
 
 
-void ABarButton::setState(State state)
+bool BarButton::isWindowContainer() const
+{
+    assert( 0 && "Not implemented" );
+
+    return false;
+}
+
+
+void BarButton::setState(State state)
 {
     assert( 0 && "Not implemented" );
 }
 
 
-IBarButton::State ABarButton::getState() const
+IBarButton::State BarButton::getState() const
 {
     assert( 0 && "Not implemented" );
 
@@ -104,20 +104,23 @@ IBarButton::State ABarButton::getState() const
 }
 
 
-Bar::Bar( vec2u init_size, vec2i init_pos, const sfm::Color &in_color, const sfm::Color &out_color, const float thickness)
-    :   size_( init_size), pos_( init_pos)
+Bar::Bar( std::unique_ptr<sfm::RectangleShape> main_shape, std::unique_ptr<sfm::RectangleShape> normal,
+                                                    std::unique_ptr<sfm::RectangleShape> onHover,
+                                                    std::unique_ptr<sfm::RectangleShape> pressed,
+                                                    std::unique_ptr<sfm::RectangleShape> released)
+    :   size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().x))
 {
-    shape_.setSize( init_size);
-    shape_.setFillColor( in_color);
-    shape_.setPosition( init_pos);
-    shape_.setOutlineColor( out_color);
-    shape_.setOutlineThickness( thickness);
+    main_shape_ = std::move( main_shape);
+    normal_ = std::move( normal);
+    onHover_ = std::move( onHover);
+    pressed_ = std::move( pressed);
+    released_ = std::move( released);
 }
 
 
 void Bar::draw(IRenderWindow* renderWindow)
 {
-    shape_.draw( renderWindow);
+    renderWindow->draw( main_shape_.get());
 }
 
 
@@ -225,5 +228,22 @@ ChildInfo Bar::getNextChildInfo() const
 
 void Bar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
 {
-    assert( 0 && "Not implemented" );
+    switch ( button->getState() )
+    {
+        case IBarButton::State::Normal:
+            renderWindow->draw( normal_.get());
+            break;
+        case IBarButton::State::Hover:
+            renderWindow->draw( onHover_.get());
+            break;
+        case IBarButton::State::Press:
+            renderWindow->draw( pressed_.get());
+            break;
+        case IBarButton::State::Released:
+            renderWindow->draw( released_.get());
+            break;
+        default:
+            assert( 0 && "Unreachable" );
+
+    }
 }

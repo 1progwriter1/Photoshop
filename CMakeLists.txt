@@ -32,10 +32,6 @@ function( add_dynamic_plugin plugin_name)
 
 	target_link_directories( ${plugin_name} PRIVATE build/)
 	target_link_libraries( ${plugin_name} PRIVATE api_photoshop)
-
-	install( TARGETS ${plugin_name}
-    	LIBRARY DESTINATION ${PLUGIN_INSTALL_DIR}
-	)
 endfunction()
 
 set(PLUGINS "canvas" "toolbar")
