@@ -1,14 +1,22 @@
 #include <api_impl/bar.hpp>
 #include <cassert>
+#include <iostream>
 
 
-void BarButton::draw(IRenderWindow* renderWindow)
+void ABarButton::draw(IRenderWindow* renderWindow)
 {
-    assert( 0 && "Not implemented" );
+    renderWindow->draw( sprite_.get());
 }
 
 
-bool BarButton::update(const IRenderWindow* renderWindow, const Event& event)
+ABarButton::ABarButton(  std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
+{
+    texture_ = std::move( init_texture);
+    sprite_ = std::move( init_sprite);
+}
+
+
+bool ABarButton::update(const IRenderWindow* renderWindow, const Event& event)
 {
     assert( 0 && "Not implemented" );
 
@@ -16,7 +24,7 @@ bool BarButton::update(const IRenderWindow* renderWindow, const Event& event)
 }
 
 
-wid_t BarButton::getId() const
+wid_t ABarButton::getId() const
 {
     assert( 0 && "Not implemented" );
 
@@ -24,7 +32,7 @@ wid_t BarButton::getId() const
 }
 
 
-IWindow* BarButton::getWindowById(wid_t id)
+IWindow* ABarButton::getWindowById(wid_t id)
 {
     assert( 0 && "Not implemented" );
 
@@ -32,7 +40,7 @@ IWindow* BarButton::getWindowById(wid_t id)
 }
 
 
-const IWindow* BarButton::getWindowById(wid_t id) const
+const IWindow* ABarButton::getWindowById(wid_t id) const
 {
     assert( 0 && "Not implemented" );
 
@@ -40,15 +48,14 @@ const IWindow* BarButton::getWindowById(wid_t id) const
 }
 
 
-vec2i BarButton::getPos() const
+vec2i ABarButton::getPos() const
 {
-    assert( 0 && "Not implemented" );
-
-    return vec2i();
+    vec2f pos = sprite_->getPosition();
+    return vec2i( static_cast<int>( pos.x), static_cast<int>( pos.y));
 }
 
 
-vec2u BarButton::getSize() const
+vec2u ABarButton::getSize() const
 {
     assert( 0 && "Not implemented" );
 
@@ -56,25 +63,25 @@ vec2u BarButton::getSize() const
 }
 
 
-void BarButton::setParent(const IWindow* parent)
+void ABarButton::setParent(const IWindow* parent)
 {
     assert( 0 && "Not implemented" );
 }
 
 
-void BarButton::forceActivate()
+void ABarButton::forceActivate()
 {
     assert( 0 && "Not implemented" );
 }
 
 
-void BarButton::forceDeactivate()
+void ABarButton::forceDeactivate()
 {
     assert( 0 && "Not implemented" );
 }
 
 
-bool BarButton::isActive() const
+bool ABarButton::isActive() const
 {
     assert( 0 && "Not implemented" );
 
@@ -82,7 +89,7 @@ bool BarButton::isActive() const
 }
 
 
-bool BarButton::isWindowContainer() const
+bool ABarButton::isWindowContainer() const
 {
     assert( 0 && "Not implemented" );
 
@@ -90,24 +97,22 @@ bool BarButton::isWindowContainer() const
 }
 
 
-void BarButton::setState(State state)
+void ABarButton::setState(State state)
 {
     assert( 0 && "Not implemented" );
 }
 
 
-IBarButton::State BarButton::getState() const
+IBarButton::State ABarButton::getState() const
 {
-    assert( 0 && "Not implemented" );
-
     return IBarButton::State::Normal;
 }
 
 
-Bar::Bar( std::unique_ptr<sfm::RectangleShape> main_shape, std::unique_ptr<sfm::RectangleShape> normal,
-                                                    std::unique_ptr<sfm::RectangleShape> onHover,
-                                                    std::unique_ptr<sfm::RectangleShape> pressed,
-                                                    std::unique_ptr<sfm::RectangleShape> released)
+Bar::Bar( std::unique_ptr<sfm::RectangleShape> &main_shape, std::unique_ptr<sfm::RectangleShape> &normal,
+                                                    std::unique_ptr<sfm::RectangleShape> &onHover,
+                                                    std::unique_ptr<sfm::RectangleShape> &pressed,
+                                                    std::unique_ptr<sfm::RectangleShape> &released)
     :   size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().x))
 {
     main_shape_ = std::move( main_shape);
@@ -120,7 +125,16 @@ Bar::Bar( std::unique_ptr<sfm::RectangleShape> main_shape, std::unique_ptr<sfm::
 
 void Bar::draw(IRenderWindow* renderWindow)
 {
+    assert( renderWindow );
+
     renderWindow->draw( main_shape_.get());
+
+    for ( auto &button : buttons_ )
+    {
+        button->draw( renderWindow);
+        finishButtonDraw( renderWindow, button.get());
+
+    }
 }
 
 
@@ -134,7 +148,10 @@ bool Bar::update(const IRenderWindow* renderWindow, const Event& event)
 
 void Bar::addWindow(std::unique_ptr<IWindow> window)
 {
-    assert( 0 && "Not implemented" );
+    buttons_.push_back(  std::unique_ptr<IBarButton>( dynamic_cast<IBarButton *>( window.release())));
+    // buttons_.back()->draw( nullptr);
+    // win = std::move( window);
+    // button_ =  dynamic_cast<IBarButton *>( win.get());
 }
 
 
@@ -152,6 +169,8 @@ wid_t Bar::getId() const
 
 IWindow* Bar::getWindowById(wid_t id)
 {
+    if ( this->getId() == id ) return this;
+
     for ( const auto &button : buttons_ )
     {
         if ( button->getId() == id )
@@ -165,6 +184,8 @@ IWindow* Bar::getWindowById(wid_t id)
 
 const IWindow* Bar::getWindowById(wid_t id) const
 {
+    if ( id == this->getId() ) return this;
+
     for ( const auto &button : buttons_ )
     {
         if ( button->getId() == id )
@@ -228,18 +249,23 @@ ChildInfo Bar::getNextChildInfo() const
 
 void Bar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
 {
+    vec2i pos = button->getPos();
     switch ( button->getState() )
     {
         case IBarButton::State::Normal:
+            normal_->setPosition( pos);
             renderWindow->draw( normal_.get());
             break;
         case IBarButton::State::Hover:
+            onHover_->setPosition( pos);
             renderWindow->draw( onHover_.get());
             break;
         case IBarButton::State::Press:
+            pressed_->setPosition( pos);
             renderWindow->draw( pressed_.get());
             break;
         case IBarButton::State::Released:
+            released_->setPosition( pos);
             renderWindow->draw( released_.get());
             break;
         default:

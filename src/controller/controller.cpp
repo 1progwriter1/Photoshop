@@ -33,6 +33,7 @@ void Controller::getRequests()
 
 void Controller::proceedView()
 {
+    // psapi::getRootWindow()->getWindowById( 101)->draw( root_window_->getRenderWindow());
     root_window_->getRenderWindow()->clear();
     root_window_->draw( root_window_->getRenderWindow());
     root_window_->getRenderWindow()->display();

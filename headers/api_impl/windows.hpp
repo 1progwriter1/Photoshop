@@ -42,8 +42,8 @@ public:
 
 class AWindowContainer : public IWindowContainer
 {
-    std::list<std::unique_ptr<IWindow>> windows_;
 protected:
+    std::list<std::unique_ptr<IWindow>> windows_;
     virtual void drawChildren( IRenderWindow *renderWindow) = 0;
 public:
     virtual ~AWindowContainer() = default;
@@ -104,6 +104,8 @@ public:
 
     static IWindowContainer *getInstance();
 
+    IWindow *getWindowById( wid_t id) override;
+    const IWindow *getWindowById( wid_t id) const override;
     wid_t getId() const override;
     vec2u getSize() const override;
     void setParent(const IWindow *parent) override;

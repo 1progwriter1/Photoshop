@@ -16,9 +16,6 @@ add_library( ${DYLIB} SHARED ${SRC_DYLIB})
 add_executable( ${TARGET} ${SOURCES})
 
 
-
-
-
 set(PLUGIN_INSTALL_DIR /Users/ivanvodolazenko/VSProjects/Photoshop/plugins/)
 
 function( add_dynamic_plugin plugin_name)
@@ -30,11 +27,13 @@ function( add_dynamic_plugin plugin_name)
 
 	# set_target_properties( ${plugin_name} PROPERTIES OUTPUT_NAME "${plugin_name}")
 
+	target_link_directories( ${plugin_name} PRIVATE /opt/homebrew/lib/)
+	target_link_libraries( ${plugin_name} PRIVATE sfml-graphics sfml-window sfml-system)
 	target_link_directories( ${plugin_name} PRIVATE build/)
 	target_link_libraries( ${plugin_name} PRIVATE api_photoshop)
 endfunction()
 
-set(PLUGINS "canvas" "toolbar")
+set(PLUGINS "canvas" "toolbar" "brush" "eraser" "rectangle" "ellipse")
 foreach(plugin ${PLUGINS})
     add_dynamic_plugin(${plugin})
 endforeach()
@@ -63,7 +62,7 @@ add_compile_options( -D _DEBUG -ggdb3 -std=c++20 -O0 -Wall -Wextra -Weffc++ -Wc+
 		-Wnon-virtual-dtor -Woverloaded-virtual -Wpacked -Wpointer-arith -Winit-self -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo
 		-Wstrict-overflow=2 -Wswitch-default -Wswitch-enum -Wundef -Wunreachable-code -Wunused -Wvariadic-macros
 		-Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -Wstack-protector -fcheck-new -fsized-deallocation
-		-fstack-protector -fstrict-overflow -fno-omit-frame-pointer -fPIE -Werror=vla)
+		-fstack-protector -fstrict-overflow -fno-omit-frame-pointer -fPIE -Werror=vla -flat-namespace)
 # -Wsuggest-override
 
 add_compile_options( -fsanitize=address,alignment)

@@ -50,6 +50,7 @@ vec2u AWindow::getSize() const
 
 wid_t AWindow::getId() const
 {
+    assert( "here" );
     return id_;
 }
 
@@ -62,12 +63,14 @@ void AWindow::setParent( const IWindow *new_parent)
 
 IWindow *AWindow::getWindowById( wid_t id)
 {
+    fprintf( stderr, "cur id: %lld\n", id_);
     return id == id_ ? this : nullptr;
 }
 
 
 const IWindow *AWindow::getWindowById( wid_t id) const
 {
+    fprintf( stderr, "cur id: %lld\n", id_);
     return id == id_ ? this : nullptr;
 }
 
@@ -284,3 +287,33 @@ void RootWindow::drawChildren( IRenderWindow *renderWindow)
     assert( 0 &&"Not implemented" );
 }
 
+
+IWindow *RootWindow::getWindowById( wid_t id)
+{
+    if ( id == kRootWindowId )  return this;
+
+    for ( auto &window : windows_ )
+    {
+        if ( window->getId() == id )
+        {
+            return window->getWindowById( id);
+        }
+    }
+    return nullptr;
+}
+
+
+const IWindow *RootWindow::getWindowById( wid_t id) const
+{
+    assert( 0 && "here" );
+    if ( id == kRootWindowId )  return this;
+
+    for ( auto &window : windows_ )
+    {
+        if ( window->getId() == id )
+        {
+            return window->getWindowById( id);
+        }
+    }
+    return nullptr;
+}

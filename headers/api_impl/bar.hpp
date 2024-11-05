@@ -10,13 +10,13 @@
 using namespace psapi;
 
 
-class BarButton : public IBarButton
+class ABarButton : public IBarButton
 {
     std::unique_ptr<sfm::Texture> texture_;
     std::unique_ptr<sfm::Sprite> sprite_;
 public:
-    BarButton(  std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
-    ~BarButton() = default;
+    ABarButton(  std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
+    ~ABarButton() = default;
 
     virtual void draw(IRenderWindow* renderWindow) override;
     virtual bool update(const IRenderWindow* renderWindow, const Event& event) override;
@@ -38,6 +38,8 @@ public:
 
 class Bar : public IBar
 {
+    wid_t id_;
+
     vec2u size_;
     vec2i pos_;
 
@@ -47,6 +49,9 @@ class Bar : public IBar
 
     std::list<std::unique_ptr<IBarButton>> buttons_;
 
+    std::unique_ptr<IWindow> win;
+    IBarButton *button_;
+
     std::unique_ptr<sfm::RectangleShape> main_shape_;
     std::unique_ptr<sfm::RectangleShape> normal_;
     std::unique_ptr<sfm::RectangleShape> onHover_;
@@ -54,10 +59,10 @@ class Bar : public IBar
     std::unique_ptr<sfm::RectangleShape> released_;
 
 public:
-    Bar( std::unique_ptr<sfm::RectangleShape> main_shape,   std::unique_ptr<sfm::RectangleShape> normal,
-                                                            std::unique_ptr<sfm::RectangleShape> onHover,
-                                                            std::unique_ptr<sfm::RectangleShape> pressed,
-                                                            std::unique_ptr<sfm::RectangleShape> released);
+    Bar( std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
+                                                            std::unique_ptr<sfm::RectangleShape> &onHover,
+                                                            std::unique_ptr<sfm::RectangleShape> &pressed,
+                                                            std::unique_ptr<sfm::RectangleShape> &released);
     ~Bar() = default;
 
     void draw(IRenderWindow* renderWindow) override;
