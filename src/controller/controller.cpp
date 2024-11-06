@@ -4,7 +4,7 @@
 
 
 Controller::Controller( Model *init_model, IWindowContainer *init_root_window)
-    :   model_( init_model), root_window_( dynamic_cast<RootWindow *>( init_root_window))
+    :   model_( init_model), root_window_( dynamic_cast<RootWindow *>( init_root_window)), last_event_( sfm::Event::None)
 {
     assert( init_model );
     assert( init_root_window );
@@ -27,13 +27,14 @@ void Controller::getRequests()
         {
             root_window_->getRenderWindow()->close();
         }
+        last_event_ = event;
+        root_window_->update( root_window_->getRenderWindow(), last_event_);
     }
 }
 
 
 void Controller::proceedView()
 {
-    // psapi::getRootWindow()->getWindowById( 101)->draw( root_window_->getRenderWindow());
     root_window_->getRenderWindow()->clear();
     root_window_->draw( root_window_->getRenderWindow());
     root_window_->getRenderWindow()->display();
@@ -42,5 +43,5 @@ void Controller::proceedView()
 
 void Controller::proceedModel()
 {
-
+    root_window_->update( root_window_->getRenderWindow(), last_event_);
 }

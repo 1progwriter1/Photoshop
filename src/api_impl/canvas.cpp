@@ -1,6 +1,7 @@
 #include <api_impl/canvas.hpp>
 #include <api_canvas.hpp>
 #include <cassert>
+#include <iostream>
 
 
 Layer::Layer( vec2u size, vec2i pos /*= vec2i()*/)
@@ -9,20 +10,32 @@ Layer::Layer( vec2u size, vec2i pos /*= vec2i()*/)
 
 Color Layer::getPixel(sfm::vec2i pos) const
 {
+    assert( pos.x >= 0 && size_.x > pos.x && pos.y >= 0 && size_.y > pos.y );
     return pixels_[pos.y * size_.x + pos.x];
 }
 
 
 void Layer::setPixel(sfm::vec2i pos, sfm::Color pixel)
 {
+    if ( !(pos.x >= 0 && size_.x > pos.x && pos.y >= 0 && size_.y > pos.y) )
+    {
+        return;
+    }
     pixels_[pos.y * size_.x + pos.x] = pixel;
 }
 
 
 ILayer* Canvas::getLayer(size_t index)
 {
-    assert( 0 && "Not implemented" );
-
+    size_t cur_index = 0;
+    for ( auto &layer : layers_ )
+    {
+        if ( cur_index == index )
+        {
+            return layer.get();
+        }
+        cur_index++;
+    }
     return nullptr;
 }
 
@@ -67,15 +80,13 @@ size_t Canvas::getNumLayers() const
 
 size_t Canvas::getActiveLayerIndex() const
 {
-    assert( 0 && "Not implemented" );
-
-    return 0;
+    return active_layer_index_;
 }
 
 
 void Canvas::setActiveLayerIndex(size_t index)
 {
-    assert( 0 && "Not implemented" );
+    active_layer_index_ = index;
 }
 
 
@@ -227,9 +238,18 @@ void Canvas::draw( IRenderWindow *renderWindow)
 
 bool Canvas::update( const IRenderWindow *renderWindow, const Event &event)
 {
-    assert( 0 && "Not implemented" );
-
-    return false;
+    if ( event.type == sfm::Event::MouseWheelScrolled )
+    {
+        if ( event.mouseWheel.wheel == sfm::Mouse::Wheel::Vertical )
+        {
+            pos_.y += event.mouseWheel.delta * 10;
+        }
+        else if ( event.mouseWheel.wheel == sfm::Mouse::Wheel::Horizontal )
+        {
+            pos_.x += event.mouseWheel.delta * 10;
+        }
+    }
+    return true;
 }
 
 
@@ -249,4 +269,5 @@ Canvas::Canvas( vec2i init_pos, vec2u init_size)
             layers_.front()->setPixel( vec2i( x, y), sfm::Color( 255, 255, 255, 255));
         }
     }
+    active_layer_index_ = 0;
 }

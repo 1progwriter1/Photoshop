@@ -34,6 +34,7 @@ class Canvas : public ICanvas
 
     bool is_active_;
     const IWindow *parent_;
+    size_t active_layer_index_;
 
     vec2u size_;
     vec2i pos_;

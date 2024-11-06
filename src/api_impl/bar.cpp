@@ -1,4 +1,5 @@
 #include <api_impl/bar.hpp>
+#include <api_impl/sfm.hpp>
 #include <cassert>
 #include <iostream>
 
@@ -9,7 +10,8 @@ void ABarButton::draw(IRenderWindow* renderWindow)
 }
 
 
-ABarButton::ABarButton(  std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
+ABarButton::ABarButton(  wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
+    :   id_( init_id)
 {
     texture_ = std::move( init_texture);
     sprite_ = std::move( init_sprite);
@@ -18,7 +20,25 @@ ABarButton::ABarButton(  std::unique_ptr<sfm::Texture> &init_texture, std::uniqu
 
 bool ABarButton::update(const IRenderWindow* renderWindow, const Event& event)
 {
-    assert( 0 && "Not implemented" );
+    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow);
+    sfm::vec2i button_pos = getPos();
+
+    sfm::vec2u size = getSize();
+    bool is_on_focus = button_pos.x <= mouse_pos.x && mouse_pos.x <= button_pos.x + size.x &&
+                        button_pos.y <= mouse_pos.y && mouse_pos.y <= button_pos.y + size.y;
+    if ( is_on_focus )
+    {
+        if ( event.type == sfm::Event::MouseButtonPressed )
+        {
+            state_ = (state_ != IBarButton::State::Press) ? IBarButton::State::Press : IBarButton::State::Released;
+        } else if ( state_ != IBarButton::State::Press )
+        {
+            state_ = psapi::IBarButton::State::Hover;
+        }
+    } else if ( state_ == psapi::IBarButton::State::Hover || state_ == psapi::IBarButton::State::Released )
+    {
+        state_ = psapi::IBarButton::State::Normal;
+    }
 
     return true;
 }
@@ -26,9 +46,7 @@ bool ABarButton::update(const IRenderWindow* renderWindow, const Event& event)
 
 wid_t ABarButton::getId() const
 {
-    assert( 0 && "Not implemented" );
-
-    return 0;
+    return id_;
 }
 
 
@@ -57,15 +75,14 @@ vec2i ABarButton::getPos() const
 
 vec2u ABarButton::getSize() const
 {
-    assert( 0 && "Not implemented" );
-
-    return vec2u();
+    return sprite_->getSize();
 }
 
 
 void ABarButton::setParent(const IWindow* parent)
 {
-    assert( 0 && "Not implemented" );
+    parent_ = dynamic_cast<const IBar *>( parent);
+    assert( parent_ );
 }
 
 
@@ -99,13 +116,13 @@ bool ABarButton::isWindowContainer() const
 
 void ABarButton::setState(State state)
 {
-    assert( 0 && "Not implemented" );
+    state_ = state;
 }
 
 
 IBarButton::State ABarButton::getState() const
 {
-    return IBarButton::State::Normal;
+    return state_;
 }
 
 
@@ -140,8 +157,24 @@ void Bar::draw(IRenderWindow* renderWindow)
 
 bool Bar::update(const IRenderWindow* renderWindow, const Event& event)
 {
-    assert( 0 && "Not implemented" );
-
+    for ( auto &button : buttons_ )
+    {
+        if ( !button->update( renderWindow, event) )
+            return false;
+        if ( button->getState() == psapi::IBarButton::State::Press && button->getId() != last_pressed_id_ )
+        {
+            IWindow *prev_button = this->getWindowById( last_pressed_id_);
+            if ( prev_button )
+            {
+                IBarButton *button_ptr =  static_cast<IBarButton *>( prev_button);
+                if ( button_ptr->getState() == psapi::IBarButton::State::Press )
+                {
+                    button_ptr->setState( psapi::IBarButton::State::Normal);
+                }
+            }
+            last_pressed_id_ = button->getId();
+        }
+    }
     return true;
 }
 
@@ -250,6 +283,7 @@ ChildInfo Bar::getNextChildInfo() const
 void Bar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
 {
     vec2i pos = button->getPos();
+    // std::cerr << "finishButtonDraw for button id: " << button->getId() << "state: " << (int) button->getState() << '\n';
     switch ( button->getState() )
     {
         case IBarButton::State::Normal:

@@ -86,7 +86,13 @@ void AWindowContainer::draw( sfm::IRenderWindow *renderWindow)
 
 bool AWindowContainer::update( const IRenderWindow* renderWindow, const Event& event)
 {
-    assert( 0 && "Not implemented" );
+    assert( renderWindow );
+
+    for ( auto &window : windows_ )
+    {
+        if ( !window->update( renderWindow, event) )
+            return false;
+    }
 
     return true;
 }

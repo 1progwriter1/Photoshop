@@ -3,7 +3,7 @@
 #include <sys/my_exceptions.hpp>
 
 
-void actionPlugins( const char *func)
+void actionPlugins( const char *func, bool is_load)
 {
 	for ( const auto &plugin_path : PLUGINS_PATH )
 	{
@@ -22,7 +22,9 @@ void actionPlugins( const char *func)
 			throw MY_EXCEPTION( "plugin load error", nullptr);
 		}
 
-		pluginFunction();
-    	dlclose(handle);
+		if ( is_load && !pluginFunction() )
+		{
+			throw MY_EXCEPTION( "loadPlugin returned false", nullptr);
+		}
 	}
 }

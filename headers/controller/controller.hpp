@@ -12,6 +12,7 @@ class Controller
     Model *model_;
     RootWindow *root_window_;
 
+    sfm::Event last_event_;
 public:
     Controller( Model *init_model, IWindowContainer *init_root);
     ~Controller() = default;

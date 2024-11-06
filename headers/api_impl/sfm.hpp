@@ -35,6 +35,7 @@ public:
     float getFps() const override;
 
     sf::RenderWindow &getWindow();
+    const sf::RenderWindow &getWindow() const;
 
     vec2u getSize() const override;
 

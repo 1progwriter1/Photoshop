@@ -12,7 +12,7 @@ int main()
 		Model model;
 		Controller ctrl( &model, psapi::getRootWindow());
 
-		actionPlugins( "loadPlugin");
+		actionPlugins( "loadPlugin", true);
 
 		while ( ctrl.inProgress() )
 		{
@@ -21,7 +21,7 @@ int main()
 			ctrl.proceedView();
 		}
 
-		actionPlugins( "unloadPlugin");
+		actionPlugins( "unloadPlugin", false);
 
 	} catch ( my_std::exception &exc )
 	{

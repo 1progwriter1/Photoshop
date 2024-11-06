@@ -1,6 +1,7 @@
 #include <api_impl/sfm.hpp>
 #include <assert.h>
 #include <memory>
+#include <api_impl/windows.hpp>
 
 
 namespace psapi
@@ -69,6 +70,12 @@ sf::RenderWindow &RenderWindow::getWindow()
 }
 
 
+const sf::RenderWindow &RenderWindow::getWindow() const
+{
+    return window_;
+}
+
+
 vec2u RenderWindow::getSize() const
 {
     return vec2u( width_, height_);
@@ -132,6 +139,9 @@ bool RenderWindow::pollEvent( Event& event)
             event.mouseWheel.delta = sfEvent.mouseWheelScroll.delta;
             event.mouseWheel.x     = sfEvent.mouseWheelScroll.x;
             event.mouseWheel.y     = sfEvent.mouseWheelScroll.y;
+            event.mouseWheel.wheel = sfEvent.mouseWheelScroll.wheel == sf::Mouse::HorizontalWheel ?
+                                                                        sfm::Mouse::Wheel::Horizontal :
+                                                                        sfm::Mouse::Wheel::Vertical;
             break;
 
         case sf::Event::MouseButtonPressed:
@@ -362,7 +372,7 @@ void Texture::update(const Color *pixels)
     assert( pixels );
 
     vec2u size = getSize();
-    texture_.update( reinterpret_cast<const uint8_t *>( pixels), size.x, size.y, 0, 0);
+    texture_.update( reinterpret_cast<const sf::Uint8 *>( pixels), size.x, size.y, 0, 0);
 }
 
 
@@ -376,7 +386,7 @@ void Texture::update(const Color *pixels, unsigned int width, unsigned int heigh
 {
     assert( pixels );
 
-    texture_.update( reinterpret_cast<const uint8_t *>( pixels), width, height, x, y);
+    texture_.update( reinterpret_cast<const sf::Uint8 *>( pixels), width, height, x, y);
 }
 
 
@@ -789,6 +799,49 @@ void EllipseShape::move(const vec2f &offset)
     assert( 0 && "Not implemented");
 }
 
+
+// * Mouse implementation
+
+
+bool Mouse::isButtonPressed( Button button)
+{
+    return sf::Mouse::isButtonPressed( sf::Mouse::Button( button));
+}
+
+
+vec2i Mouse::getPosition()
+{
+    sf::Vector2i pos = sf::Mouse::getPosition();
+    return vec2i( pos.x, pos.y);
+}
+
+
+vec2i Mouse::getPosition(const IRenderWindow *relative_to)
+{
+    const RenderWindow *window = dynamic_cast<const RenderWindow *>( relative_to);
+    assert( window && "Failed to cast to RenderWindow" );
+
+    sf::Vector2i pos = sf::Mouse::getPosition( window->getWindow());
+
+    return vec2i( pos.x, pos.y);
+}
+
+
+void Mouse::setPosition(const vec2i &position)
+{
+    sf::Mouse::setPosition( sf::Vector2i( position.x, position.y));
+}
+
+void Mouse::setPosition(const vec2i &position, const IRenderWindow *relative_to)
+{
+    const RenderWindow *window = dynamic_cast<const RenderWindow *>( relative_to);
+    assert( window && "Failed to cast to RenderWindow" );
+
+    sf::Mouse::setPosition( sf::Vector2i( position.x, position.y), window->getWindow());
+}
+
+
+// * end of mouse implementation
 
 } // namespace sfm
 

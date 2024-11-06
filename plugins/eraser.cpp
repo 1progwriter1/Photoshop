@@ -1,9 +1,11 @@
 #include "eraser.hpp"
+#include "../api/api_canvas.hpp"
 
 #include <cassert>
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
+const wid_t kEraserButtonId = 2;
 
 
 bool loadPlugin()
@@ -20,7 +22,8 @@ bool loadPlugin()
     sprite->setTexture( texture.get());
     sprite->setPosition( 36, 132);
 
-    std::unique_ptr<ABarButton> eraser = std::make_unique<ABarButton>( texture, sprite);
+    std::unique_ptr<ABarButton> eraser = std::make_unique<Eraser>( kEraserButtonId, texture, sprite);
+    eraser->setParent( toolbar);
     toolbar->addWindow( std::move( eraser));
 
     return true;
@@ -29,4 +32,43 @@ bool loadPlugin()
 void unloadPlugin()
 {
 
+}
+
+
+Eraser::Eraser( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
+    :   ABarButton( init_id, init_texture, init_sprite) {}
+
+
+bool Eraser::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event)
+{
+    ABarButton::update( renderWindow, event);
+
+    if ( getState() != psapi::IBarButton::State::Press )
+        return true;
+
+    ICanvas *canvas = dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId));
+    assert( canvas && "Failed to cast to canvas" );
+
+    sfm::vec2u size = canvas->getSize();
+    ILayer *cur_layer = canvas->getLayer( canvas->getActiveLayerIndex());
+    assert( cur_layer );
+
+    for ( unsigned int x = 0; x < size.x; x++ )
+    {
+        for ( unsigned int y = 0; y < size.y; y++ )
+        {
+            cur_layer->setPixel( vec2i( x, y), sfm::Color( 255, 255, 255, 255));
+        }
+    }
+
+    setState( psapi::IBarButton::State::Normal);
+
+    return true;
+}
+
+
+void Eraser::draw( sfm::IRenderWindow *renderWindow)
+{
+    ABarButton::draw( renderWindow);
+    parent_->finishButtonDraw( renderWindow, this);
 }

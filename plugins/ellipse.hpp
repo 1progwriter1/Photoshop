@@ -14,6 +14,8 @@ extern "C"
 
 class Ellipse : public ABarButton
 {
+public:
+    Ellipse( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
 };
 
 
