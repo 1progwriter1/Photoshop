@@ -3,6 +3,7 @@
 
 
 #include "../headers/api_impl/bar.hpp"
+#include "../api/api_canvas.hpp"
 
 
 extern "C"
@@ -14,6 +15,7 @@ extern "C"
 
 class Eraser : public ABarButton
 {
+    ICanvas *canvas_;
 public:
     Eraser( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
 

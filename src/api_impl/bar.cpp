@@ -182,9 +182,6 @@ bool Bar::update(const IRenderWindow* renderWindow, const Event& event)
 void Bar::addWindow(std::unique_ptr<IWindow> window)
 {
     buttons_.push_back(  std::unique_ptr<IBarButton>( dynamic_cast<IBarButton *>( window.release())));
-    // buttons_.back()->draw( nullptr);
-    // win = std::move( window);
-    // button_ =  dynamic_cast<IBarButton *>( win.get());
 }
 
 
@@ -283,7 +280,6 @@ ChildInfo Bar::getNextChildInfo() const
 void Bar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
 {
     vec2i pos = button->getPos();
-    // std::cerr << "finishButtonDraw for button id: " << button->getId() << "state: " << (int) button->getState() << '\n';
     switch ( button->getState() )
     {
         case IBarButton::State::Normal:

@@ -22,6 +22,7 @@ bool loadPlugin()
     sprite->setPosition( 36, 228);
 
     std::unique_ptr<ABarButton> rectangle = std::make_unique<Rectangle>( kRectangleButtonId, texture, sprite);
+    rectangle->setParent( toolbar);
     toolbar->addWindow( std::move( rectangle));
 
     return true;

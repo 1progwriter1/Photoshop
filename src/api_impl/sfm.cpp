@@ -31,6 +31,7 @@ RenderWindow::RenderWindow( unsigned int width, unsigned int height, const std::
 void RenderWindow::setFps( float fps)
 {
     fps_ = fps;
+    window_.setFramerateLimit( fps);
 }
 
 

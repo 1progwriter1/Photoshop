@@ -35,8 +35,10 @@ void unloadPlugin()
 
 
 Brush::Brush( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
-    :   ABarButton( init_id, init_texture, init_sprite)
+    :   ABarButton( init_id, init_texture, init_sprite),
+        canvas_( dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId)))
 {
+    assert( canvas_ && "Failed to cast to canvas" );
 }
 
 
@@ -60,14 +62,9 @@ bool Brush::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &ev
     }
 
     sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow);
+    sfm::vec2i relative_pos = mouse_pos - canvas_->getPos();
 
-    ICanvas *canvas = dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId));
-    assert( canvas && "Failed to cast to canvas" );
-
-    sfm::vec2i canvas_pos = canvas->getPos();
-    sfm::vec2i relative_pos = sfm::vec2i( mouse_pos.x - canvas_pos.x, mouse_pos.y - canvas_pos.y);
-
-    drawInterpolatedPoints( canvas->getLayer( canvas->getActiveLayerIndex()), relative_pos);
+    drawInterpolatedPoints( canvas_->getLayer( canvas_->getActiveLayerIndex()), relative_pos);
 
     return true;
 }
@@ -82,8 +79,8 @@ void Brush::draw( sfm::IRenderWindow *renderWindow)
 
 void Brush::drawPoint( ILayer *layer, sfm::vec2i pos)
 {
-    int radius = 4;
-    int radius2 = 16;
+    int radius = 2;
+    int radius2 = 4;
 
     for ( int x = -radius; x < radius; x++ )
     {

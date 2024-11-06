@@ -3,6 +3,7 @@
 #include <sys/my_exceptions.hpp>
 #include <api_impl/windows.hpp>
 #include <sys/plugins.hpp>
+#include <cassert>
 
 
 int main()

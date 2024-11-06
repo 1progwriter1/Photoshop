@@ -1,11 +1,9 @@
 #include "eraser.hpp"
-#include "../api/api_canvas.hpp"
-
 #include <cassert>
 
 
-psapi::IWindowContainer *kRootWindowPtr = nullptr;
 const wid_t kEraserButtonId = 2;
+psapi::IWindowContainer *kRootWindowPtr = nullptr;
 
 
 bool loadPlugin()
@@ -36,7 +34,11 @@ void unloadPlugin()
 
 
 Eraser::Eraser( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
-    :   ABarButton( init_id, init_texture, init_sprite) {}
+    :   ABarButton( init_id, init_texture, init_sprite),
+        canvas_( dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId)))
+{
+    assert( canvas_ && "Failed to cast to canvas" );
+}
 
 
 bool Eraser::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event)

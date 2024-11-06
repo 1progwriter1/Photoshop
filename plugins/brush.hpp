@@ -17,6 +17,9 @@ extern "C"
 class Brush : public ABarButton
 {
     std::deque<sfm::vec2i> points_;
+    sfm::vec2i last_pos_ = sfm::vec2i( 0, 0);
+
+    ICanvas *canvas_;
 public:
     Brush( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
     ~Brush();
