@@ -1,6 +1,5 @@
 #include "brush.hpp"
 #include <cassert>
-#include <iostream>
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
@@ -138,7 +137,7 @@ void Brush::drawInterpolatedPoints( ILayer *layer, sfm::vec2i new_point)
     sfm::vec2i &p2 = points_[2];
     sfm::vec2i &p3 = points_[3];
 
-    float steps = static_cast<float>( std::min<double>( sfm::len( p0, p1) + sfm::len( p1, p2) + sfm::len( p2, p3), 30.f));
+    float steps = static_cast<float>( std::min<double>( sfm::len( p0, p1) + sfm::len( p1, p2) + sfm::len( p2, p3), 100.f));
 
     for ( float t = 0; t < steps; t += 0.01 )
     {

@@ -42,39 +42,49 @@ ILayer* Canvas::getLayer(size_t index)
 
 const ILayer* Canvas::getLayer(size_t index) const
 {
-    assert( 0 && "Not implemented" );
+    if ( index >= layers_.size() )
+        return nullptr;
 
+    size_t cur_index = 0;
+    for ( auto &layer : layers_ )
+    {
+        if ( cur_index == index )
+        {
+            return layer.get();
+        }
+        cur_index++;
+    }
     return nullptr;
 }
 
 
 ILayer* Canvas::getTempLayer()
 {
-    assert( 0 && "Not implemented" );
-
-    return nullptr;
+    return temp_layer_.get();
 }
 
 
 const ILayer* Canvas::getTempLayer() const
 {
-    assert( 0 && "Not implemented" );
-
-    return nullptr;
+    return temp_layer_.get();
 }
 
 
 void Canvas::cleanTempLayer()
 {
-    assert( 0 && "Not implemented" );
+    for ( int x = 0; x < size_.x; x++ )
+    {
+        for ( int y = 0; y < size_.y; y++ )
+        {
+            temp_layer_->setPixel( vec2i( x, y), sfm::Color(0, 0, 0, 0));
+        }
+    }
 }
 
 
 size_t Canvas::getNumLayers() const
 {
-    assert( 0 && "Not implemented" );
-
-    return 0;
+    return layers_.size();
 }
 
 
@@ -110,7 +120,12 @@ bool Canvas::insertLayer(size_t index, std::unique_ptr<ILayer> layer)
 
 bool Canvas::removeLayer(size_t index)
 {
-    assert( 0 && "Not implemented" );
+    if ( getNumLayers() <= index )
+        return false;
+
+    auto iter = layers_.begin();
+    std::advance( iter, index);
+    layers_.erase( iter);
 
     return true;
 }
@@ -118,7 +133,21 @@ bool Canvas::removeLayer(size_t index)
 
 bool Canvas::insertEmptyLayer(size_t index)
 {
-    assert( 0 && "Not implemented" );
+    if ( layers_.size() < index )
+        return false;
+
+    std::unique_ptr<ILayer> new_layer = std::make_unique<Layer>( size_, pos_);
+    for ( int x = 0; x < size_.x; x++ )
+    {
+        for ( int y = 0; y < size_.y; y++ )
+        {
+            new_layer->setPixel( vec2i( x, y), sfm::Color(0, 0, 0, 0));
+        }
+    }
+
+    auto iter = layers_.begin();
+    std::advance( iter, index);
+    layers_.insert( iter, std::move( new_layer));
 
     return true;
 }
@@ -126,27 +155,29 @@ bool Canvas::insertEmptyLayer(size_t index)
 
 void Canvas::setPos(sfm::vec2i pos)
 {
-    assert( 0 && "Not implemented" );
+    pos_ = pos;
 }
 
 
 void Canvas::setSize(sfm::vec2i size)
 {
-    assert( 0 && "Not implemented" );
+    assert( size.x >= 0 && size.y >= 0 );
+
+    size_ = vec2u( static_cast<unsigned int>( size.x), static_cast<unsigned int>( size.y));
 }
 
 
 void Canvas::setScale(sfm::vec2f scale)
 {
-    assert( 0 && "Not implemented" );
+    scale_ = scale;
 }
 
 
 sfm::vec2i Canvas::getMousePosition() const
 {
-    assert( 0 && "Not implemented" );
+    vec2i mouse_pos = sfm::Mouse::getPosition();
 
-    return vec2i();
+    return mouse_pos;
 }
 
 
@@ -185,6 +216,7 @@ vec2u Canvas::getSize() const
 void Canvas::setParent(const IWindow* parent)
 {
     assert( parent );
+
     parent_ = parent;
 }
 
@@ -233,6 +265,14 @@ void Canvas::draw( IRenderWindow *renderWindow)
         sprite_->setPosition( pos_.x, pos_.y);
         sprite_->draw( renderWindow);
     }
+
+    Layer *cur_layer = dynamic_cast<Layer *>( temp_layer_.get());
+    assert( cur_layer );
+
+    texture_->update( cur_layer->pixels_.data());
+    sprite_->setTexture( texture_.get());
+    sprite_->setPosition( pos_.x, pos_.y);
+    sprite_->draw( renderWindow);
 }
 
 
@@ -254,7 +294,7 @@ bool Canvas::update( const IRenderWindow *renderWindow, const Event &event)
 
 
 Canvas::Canvas( vec2i init_pos, vec2u init_size)
-    :   is_active_( true), parent_( nullptr), size_( init_size), pos_( init_pos)
+    :   is_active_( true), parent_( nullptr), size_( init_size), pos_( init_pos), temp_layer_( std::make_unique<Layer>( init_size, init_pos))
 {
     texture_ = sfm::ITexture::create();
     texture_->create( init_size.x, init_size.y);
@@ -267,7 +307,10 @@ Canvas::Canvas( vec2i init_pos, vec2u init_size)
         for ( int y = 0; y < init_size.y; y++ )
         {
             layers_.front()->setPixel( vec2i( x, y), sfm::Color( 255, 255, 255, 255));
+            temp_layer_->setPixel( vec2i( x, y), sfm::Color(0, 0, 0, 0));
         }
     }
     active_layer_index_ = 0;
+
+
 }

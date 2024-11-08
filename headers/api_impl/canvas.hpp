@@ -31,6 +31,7 @@ public:
 class Canvas : public ICanvas
 {
     std::list<std::unique_ptr<ILayer>> layers_;
+    std::unique_ptr<ILayer> temp_layer_;
 
     bool is_active_;
     const IWindow *parent_;
@@ -38,6 +39,8 @@ class Canvas : public ICanvas
 
     vec2u size_;
     vec2i pos_;
+    vec2f scale_ = vec2f( 1, 1);
+    vec2i mouse_pos_ = vec2i( 0, 0);
 
     std::unique_ptr<sfm::ITexture> texture_;
     std::unique_ptr<sfm::ISprite> sprite_;

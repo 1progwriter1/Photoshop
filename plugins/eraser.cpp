@@ -48,11 +48,8 @@ bool Eraser::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &e
     if ( getState() != psapi::IBarButton::State::Press )
         return true;
 
-    ICanvas *canvas = dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId));
-    assert( canvas && "Failed to cast to canvas" );
-
-    sfm::vec2u size = canvas->getSize();
-    ILayer *cur_layer = canvas->getLayer( canvas->getActiveLayerIndex());
+    sfm::vec2u size = canvas_->getSize();
+    ILayer *cur_layer = canvas_->getLayer( canvas_->getActiveLayerIndex());
     assert( cur_layer );
 
     for ( unsigned int x = 0; x < size.x; x++ )
