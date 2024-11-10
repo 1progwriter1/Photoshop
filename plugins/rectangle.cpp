@@ -39,6 +39,8 @@ Rectangle::Rectangle( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture
         canvas_( dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId)))
 {
     assert( canvas_ && "Failed to cast to canvas" );
+    layer_ = canvas_->getTempLayer();
+    assert( layer_ && "Failed to get temp layer" );
 }
 
 
@@ -61,23 +63,23 @@ bool Rectangle::update( const sfm::IRenderWindow *renderWindow, const sfm::Event
     {
         draw_ = true;
         left_upper_edge_ = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
+        last_mouse_pos_ = left_upper_edge_;
+    } else if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
+    {
+        canvas_->cleanTempLayer();
+        drawRectangle( renderWindow, canvas_->getLayer( canvas_->getActiveLayerIndex()), false);
+        draw_ = false;
+        left_upper_edge_ = sfm::vec2i();
+        return true;
     }
+
     if ( draw_ )
     {
-        if ( !layer_ )
+        sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
+        if ( std::abs( new_mouse_pos.x - last_mouse_pos_.x) >= 10 || std::abs( new_mouse_pos.y - last_mouse_pos_.y) >= 10 )
         {
-            canvas_->cleanTempLayer();
-            layer_ = canvas_->getTempLayer();
-        }
-        if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
-        {
-            drawFinalVersion( renderWindow);
-            draw_ = false;
-            left_upper_edge_ = sfm::vec2i();
-            return true;
-        } else
-        {
-            drawTempVersion( renderWindow);
+            last_mouse_pos_ = new_mouse_pos;
+            drawRectangle( renderWindow, layer_, true);
         }
     }
 
@@ -85,49 +87,30 @@ bool Rectangle::update( const sfm::IRenderWindow *renderWindow, const sfm::Event
 }
 
 
-void Rectangle::drawTempVersion( const sfm::IRenderWindow *renderWindow)
+void Rectangle::drawRectangle( const sfm::IRenderWindow *renderWindow, ILayer *layer, bool is_temp_layer)
 {
     assert( renderWindow );
+    assert( layer );
 
     sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
     sfm::vec2u size( std::abs( mouse_pos.x - left_upper_edge_.x), std::abs( mouse_pos.y - left_upper_edge_.y));
+    sfm::vec2u canvas_size = canvas_->getSize();
 
     int edge_x = std::min( mouse_pos.x, left_upper_edge_.x);
     int edge_y = std::min( mouse_pos.y, left_upper_edge_.y);
 
     sfm::Color rect_color( 0, 150, 0);
-    canvas_->cleanTempLayer();
-
-    for ( int x = 0; x < size.x; x++ )
+    for ( int x = 0; x < canvas_size.x; x++ )
     {
-        for ( int y = 0; y < size.y; y++ )
+        for ( int y = 0; y < canvas_size.y; y++ )
         {
-            layer_->setPixel( sfm::vec2i( x + edge_x, y + edge_y), rect_color);
-        }
-    }
-}
-
-
-void Rectangle::drawFinalVersion( const sfm::IRenderWindow *renderWindow)
-{
-    assert( renderWindow );
-
-    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
-    sfm::vec2u size( std::abs( mouse_pos.x - left_upper_edge_.x), std::abs( mouse_pos.y - left_upper_edge_.y));
-
-    int offset_x = std::min( mouse_pos.x, left_upper_edge_.x);
-    int offset_y = std::min( mouse_pos.y, left_upper_edge_.y);
-
-    sfm::Color rect_color( 0, 150, 0);
-    canvas_->cleanTempLayer();
-    ILayer *layer = canvas_->getLayer( canvas_->getActiveLayerIndex());
-    assert( layer );
-
-    for ( int x = 0; x < size.x; x++ )
-    {
-        for ( int y = 0; y < size.y; y++ )
-        {
-            layer->setPixel( sfm::vec2i( x + offset_x, y + offset_y), rect_color);
+            if ( x >= edge_x && x < edge_x + size.x && y >= edge_y && y < edge_y + size.y )
+            {
+                layer->setPixel( sfm::vec2i( x, y), rect_color);
+            } else if ( is_temp_layer )
+            {
+                layer->setPixel( sfm::vec2i( x, y), sfm::Color(0, 0, 0, 0));
+            }
         }
     }
 }

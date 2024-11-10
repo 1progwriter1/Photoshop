@@ -17,6 +17,7 @@ class Rectangle : public ABarButton
 {
     sfm::vec2i left_upper_edge_ = sfm::vec2i();
     sfm::vec2u rect_size_ = sfm::vec2u();
+    sfm::vec2i last_mouse_pos_ = sfm::vec2i();
 
     bool draw_ = false;
 
@@ -28,8 +29,7 @@ public:
     void draw( sfm::IRenderWindow *renderWindow) override;
     bool update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event) override;
 
-    void drawFinalVersion( const sfm::IRenderWindow *renderWindow);
-    void drawTempVersion( const sfm::IRenderWindow *renderWindow);
+    void drawRectangle( const sfm::IRenderWindow *renderWindow, ILayer *layer, bool is_temp_layer);
     bool isOnCanvas( sfm::vec2i mouse_pos);
 };
 
