@@ -88,8 +88,7 @@ void Ellipse::drawEllipse( const sfm::IRenderWindow *renderWindow, ILayer *layer
 
     sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
     sfm::vec2u size( std::abs( mouse_pos.x - left_upper_edge_.x), std::abs( mouse_pos.y - left_upper_edge_.y));
-    int radius2 = std::max( size.x, size.y) / 2;
-    radius2 *= radius2;
+    sfm::vec2u size2 = size * size;
     sfm::vec2u canvas_size = canvas_->getSize();
 
     int center_x = std::min( mouse_pos.x, left_upper_edge_.x) + size.x / 2;
@@ -100,7 +99,7 @@ void Ellipse::drawEllipse( const sfm::IRenderWindow *renderWindow, ILayer *layer
     {
         for ( int y = 0; y < canvas_size.y; y++ )
         {
-            if ( (x - center_x) * (x - center_x) + (y - center_y) * (y - center_y) <= radius2 )
+            if ( isOnEllipse( sfm::vec2i(x, y), size2, sfm::vec2i( center_x, center_y)) )
             {
                 layer->setPixel( sfm::vec2i( x, y), rect_color);
             } else if ( is_temp_layer )
@@ -119,4 +118,15 @@ bool Ellipse::isOnCanvas( sfm::vec2i mouse_pos)
 
     return 0 <= relative_pos.x && relative_pos.x < static_cast<int>( canvas_size.x) &&
            0 <= relative_pos.y && relative_pos.y < static_cast<int>( canvas_size.y);
+}
+
+bool Ellipse::isOnEllipse( sfm::vec2i pos, sfm::vec2u size2, sfm::vec2i center)
+{
+    sfm::vec2f delta = sfm::vec2f( pos.x, pos.y) - sfm::vec2f( center.x, center.y);
+    float delta_x = delta.x;
+    float delta_y = delta.y;
+    sfm::vec2f size_f = sfm::vec2f( size2.x, size2.y);
+    sfm::vec2f center_f = sfm::vec2f( center.x, center.y);
+
+    return delta_x * delta_x / size_f.x + delta_y * delta_y / size_f.y <= 0.25;
 }

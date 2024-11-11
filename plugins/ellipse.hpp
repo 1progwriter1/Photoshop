@@ -26,6 +26,7 @@ public:
     bool isOnCanvas( sfm::vec2i mouse_pos);
     void drawEllipse( const sfm::IRenderWindow *renderWindow, ILayer *layer, bool is_temp_layer);
     bool update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event);
+    bool isOnEllipse( sfm::vec2i pos, sfm::vec2u size2, sfm::vec2i center);
 };
 
 
