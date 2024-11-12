@@ -14,10 +14,10 @@ using psapi::sfm::Event;
 
 class Scrollable : psapi::sfm::Drawable
 {
-    const vec2i sector_pos_;
-    const vec2u sector_size_;
-    const vec2u window_size_;
-    vec2i cur_pos_;
+protected:
+    vec2i sector_pos_;
+    vec2u sector_size_;
+    vec2u window_size_;
 
     bool is_moved_ = false;
     vec2i last_mouse_pos_ = vec2i();
@@ -25,13 +25,39 @@ class Scrollable : psapi::sfm::Drawable
 
     std::unique_ptr<RectangleShape> scroll_bar_;
     std::unique_ptr<RectangleShape> scroll_bar_button_;
-public:
-    Scrollable( vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size);
-    virtual ~Scrollable() {}
-    void updateWindowPosition(vec2i &pos);
-    void draw(psapi::sfm::IRenderWindow *renderWindow) const override;
-    bool update(const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event);
+
     bool isOnFocus(const vec2i &mouse_pos) const;
+    virtual int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const Event &event);
+    bool isOnScrollButton(const vec2i &mouse_pos) const;
+
+public:
+    virtual ~Scrollable() {}
+
+    void draw(psapi::sfm::IRenderWindow *renderWindow) const override;
+    virtual bool update(const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event, vec2i &pos) = 0;
 };
+
+
+class HorizontalScroll : public Scrollable
+{
+public:
+    HorizontalScroll( vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size);
+
+    bool update(const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event, vec2i &pos) override;
+private:
+    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const Event &event) override;
+};
+
+
+class VerticalScroll : public Scrollable
+{
+public:
+    VerticalScroll( vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size);
+
+    bool update(const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event, vec2i &pos) override;
+private:
+    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const Event &event) override;
+};
+
 
 #endif // SCROLL_WINDOWS_IMPL

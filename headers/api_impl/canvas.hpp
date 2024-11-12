@@ -32,7 +32,7 @@ public:
 };
 
 
-class Canvas : public ICanvas, public Scrollable
+class Canvas : public ICanvas, public VerticalScroll, public HorizontalScroll
 {
     std::list<std::unique_ptr<ILayer>> layers_;
     std::unique_ptr<ILayer> temp_layer_;
