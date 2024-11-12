@@ -35,7 +35,7 @@ bool loadPlugin()
     std::unique_ptr<sfm::RectangleShape> onHover = std::make_unique<sfm::RectangleShape>();
     onHover->setSize( vec2u( 48, 48));
     onHover->setFillColor( sfm::Color());
-    onHover->setOutlineColor( sfm::Color( 102, 178, 255));
+    onHover->setOutlineColor( sfm::Color( 192, 192, 192));
     onHover->setOutlineThickness( 5);
 
     std::unique_ptr<sfm::RectangleShape> pressed = std::make_unique<sfm::RectangleShape>();

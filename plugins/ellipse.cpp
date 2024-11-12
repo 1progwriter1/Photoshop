@@ -125,8 +125,8 @@ bool Ellipse::isOnEllipse( sfm::vec2i pos, sfm::vec2u size2, sfm::vec2i center)
     sfm::vec2f delta = sfm::vec2f( pos.x, pos.y) - sfm::vec2f( center.x, center.y);
     float delta_x = delta.x;
     float delta_y = delta.y;
-    sfm::vec2f size_f = sfm::vec2f( size2.x, size2.y);
+    sfm::vec2f size2_f = sfm::vec2f( size2.x, size2.y);
     sfm::vec2f center_f = sfm::vec2f( center.x, center.y);
 
-    return delta_x * delta_x / size_f.x + delta_y * delta_y / size_f.y <= 0.25;
+    return delta_x * delta_x / size2_f.x + delta_y * delta_y / size2_f.y <= 0.25;
 }

@@ -1,5 +1,6 @@
 #include <api_impl/sfm.hpp>
 #include <assert.h>
+#include <iostream>
 #include <memory>
 #include <api_impl/windows.hpp>
 
@@ -642,7 +643,6 @@ float RectangleShape::getOutlineThickness() const
 void RectangleShape::draw( IRenderWindow *renderWindow) const
 {
     assert( renderWindow );
-
     static_cast<RenderWindow *>( renderWindow)->getWindow().draw( shape_);
 }
 

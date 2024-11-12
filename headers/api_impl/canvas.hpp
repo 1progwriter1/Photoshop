@@ -4,11 +4,15 @@
 
 #include <api_canvas.hpp>
 #include <api_impl/windows.hpp>
+#include <api_impl/scroll.hpp>
 
 
 using namespace psapi;
 
 using sfm::Color;
+
+const sfm::vec2u CANVAS_SECTOR_SIZE = vec2u( 1480, 900);
+const sfm::vec2i CANVAS_SECTOR_POS = vec2i( 120, 0);
 
 
 class Layer : public ILayer
@@ -28,7 +32,7 @@ public:
 };
 
 
-class Canvas : public ICanvas
+class Canvas : public ICanvas, public Scrollable
 {
     std::list<std::unique_ptr<ILayer>> layers_;
     std::unique_ptr<ILayer> temp_layer_;

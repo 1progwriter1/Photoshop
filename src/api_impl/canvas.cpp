@@ -273,28 +273,34 @@ void Canvas::draw( IRenderWindow *renderWindow)
     sprite_->setTexture( texture_.get());
     sprite_->setPosition( pos_.x, pos_.y);
     sprite_->draw( renderWindow);
+
+    Scrollable::draw( renderWindow);
 }
 
 
 bool Canvas::update( const IRenderWindow *renderWindow, const Event &event)
 {
-    if ( event.type == sfm::Event::MouseWheelScrolled )
-    {
-        if ( event.mouseWheel.wheel == sfm::Mouse::Wheel::Vertical )
-        {
-            pos_.y += event.mouseWheel.delta * 10;
-        }
-        else if ( event.mouseWheel.wheel == sfm::Mouse::Wheel::Horizontal )
-        {
-            pos_.x += event.mouseWheel.delta * 10;
-        }
-    }
+    // if ( event.type == sfm::Event::MouseWheelScrolled )
+    // {
+    //     if ( event.mouseWheel.wheel == sfm::Mouse::Wheel::Vertical )
+    //     {
+    //         pos_.y += event.mouseWheel.delta * 10;
+    //     }
+    //     else if ( event.mouseWheel.wheel == sfm::Mouse::Wheel::Horizontal )
+    //     {
+    //         pos_.x += event.mouseWheel.delta * 10;
+    //     }
+    // }
+    // return true;
+    Scrollable::update( renderWindow, event);
+    Scrollable::updateWindowPosition( pos_);
     return true;
 }
 
 
 Canvas::Canvas( vec2i init_pos, vec2u init_size)
-    :   is_active_( true), parent_( nullptr), size_( init_size), pos_( init_pos), temp_layer_( std::make_unique<Layer>( init_size, init_pos))
+    :   Scrollable( CANVAS_SECTOR_POS, CANVAS_SECTOR_SIZE, init_pos, init_size),
+        is_active_( true), parent_( nullptr), size_( init_size), pos_( init_pos), temp_layer_( std::make_unique<Layer>( init_size, init_pos))
 {
     texture_ = sfm::ITexture::create();
     texture_->create( init_size.x, init_size.y);
@@ -311,6 +317,4 @@ Canvas::Canvas( vec2i init_pos, vec2u init_size)
         }
     }
     active_layer_index_ = 0;
-
-
 }

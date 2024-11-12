@@ -64,7 +64,7 @@ include_directories( ../MyLibraries/headers/)
 # 		-Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -fcheck-new -fsized-deallocation
 # 		-fstrict-overflow -fno-omit-frame-pointer -fPIE -Werror=vla -flat-namespace)
 # -Wsuggest-override
-add_compile_options( -O3)
+add_compile_options( -O3 -std=c++20)
 
 # add_compile_options( -fsanitize=address,alignment)
 # add_link_options( -fsanitize=address,alignment)
