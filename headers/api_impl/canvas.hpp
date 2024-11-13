@@ -11,8 +11,8 @@ using namespace psapi;
 
 using sfm::Color;
 
-const sfm::vec2u CANVAS_SECTOR_SIZE = vec2u( 1480, 900);
-const sfm::vec2i CANVAS_SECTOR_POS = vec2i( 120, 0);
+const sfm::vec2u CANVAS_SECTOR_SIZE = vec2u( 1480, 790);
+const sfm::vec2i CANVAS_SECTOR_POS = vec2i( 120, 110);
 
 
 class Layer : public ILayer

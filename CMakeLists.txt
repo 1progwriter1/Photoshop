@@ -33,7 +33,7 @@ function( add_dynamic_plugin plugin_name)
 	target_link_libraries( ${plugin_name} PRIVATE api_photoshop)
 endfunction()
 
-set(PLUGINS "canvas" "toolbar" "brush" "eraser" "rectangle" "ellipse" "line")
+set(PLUGINS "canvas" "toolbar" "optionsbar" "brush" "eraser" "rectangle" "ellipse" "line")
 foreach(plugin ${PLUGINS})
     add_dynamic_plugin(${plugin})
 endforeach()
