@@ -67,7 +67,7 @@ bool Rectangle::update( const sfm::IRenderWindow *renderWindow, const sfm::Event
     } else if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
     {
         canvas_->cleanTempLayer();
-        std::cerr << "Draw rectangle ";;
+        std::cerr << "Draw rectangle ";
         drawRectangle( renderWindow, canvas_->getLayer( canvas_->getActiveLayerIndex()), false);
         draw_ = false;
         left_upper_edge_ = sfm::vec2i();
@@ -113,11 +113,6 @@ void Rectangle::drawRectangle( const sfm::IRenderWindow *renderWindow, ILayer *l
                 layer->setPixel( sfm::vec2i( x, y), sfm::Color(0, 0, 0, 0));
             }
         }
-    }
-
-    if ( !is_temp_layer )
-    {
-        std::cerr << "Size: " << size.x << ' ' << size.y << std::endl;
     }
 }
 

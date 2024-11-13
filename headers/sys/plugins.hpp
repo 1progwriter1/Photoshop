@@ -10,6 +10,7 @@ static const char *PLUGINS_PATH[] =
 	"../build/liberaser.dylib",
 	"../build/librectangle.dylib",
 	"../build/libellipse.dylib",
+	"../build/libline.dylib",
 };
 
 

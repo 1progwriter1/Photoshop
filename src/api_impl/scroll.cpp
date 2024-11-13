@@ -2,6 +2,7 @@
 #include <cassert>
 #include <iostream>
 
+
 VerticalScroll::VerticalScroll(vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size)
 {
     sector_pos_ = sector_pos;
@@ -81,11 +82,13 @@ int VerticalScroll::getOffset( const psapi::sfm::IRenderWindow *renderWindow, co
 
     if ( event.type == psapi::sfm::Event::MouseButtonPressed && isOnScrollButton( mouse_pos) )
     {
+        last_mouse_pos_ = mouse_pos;
         is_moved_ = true;
         return 0;
     }
     if ( event.type == psapi::sfm::Event::MouseButtonReleased && is_moved_ )
     {
+        last_mouse_pos_ = vec2i();
         is_moved_ = false;
         return 0;
     }
