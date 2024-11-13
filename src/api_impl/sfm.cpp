@@ -1,8 +1,9 @@
 #include <api_impl/sfm.hpp>
 #include <assert.h>
-#include <iostream>
+#include <api_impl/canvas.hpp>
 #include <memory>
 #include <api_impl/windows.hpp>
+#include <sys/my_exceptions.hpp>
 
 
 namespace psapi
@@ -281,7 +282,7 @@ void Image::create(vec2u size, const Color &color /*= Color(0, 0, 0)*/)
 
 void Image::create(unsigned int width, unsigned int height, const Color *pixels)
 {
-    assert( 0 && "Not implemented" );
+    image_.create( width, height, reinterpret_cast<const sf::Uint8 *>( pixels));
 }
 
 
@@ -655,9 +656,19 @@ const Color &RectangleShape::getOutlineColor() const
 
 const IImage *RectangleShape::getImage() const
 {
-    assert( 0 && "Not implemented");
+    sf::RenderTexture texture;
+    if ( !texture.create( CANVAS_SECTOR_SIZE.x, CANVAS_SECTOR_SIZE.y) )
+        throw MY_EXCEPTION( "Failed to create render texture", nullptr);
 
-    return nullptr;
+    texture.draw( shape_);
+    texture.display();
+
+    sf::Image image = texture.getTexture().copyToImage();
+
+    image_ = std::make_unique<Image>();
+    image_->create( CANVAS_SECTOR_SIZE, reinterpret_cast<const Color *>( image.getPixelsPtr()));
+
+    return image_.get();
 }
 
 

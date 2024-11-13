@@ -182,6 +182,9 @@ class RectangleShape : public IRectangleShape
     vec2u size_;
     vec2f pos_;
     vec2f scale_;
+
+    mutable std::unique_ptr<Image> image_;
+    mutable bool is_created_ = false;
 public:
     RectangleShape();
     ~RectangleShape();
