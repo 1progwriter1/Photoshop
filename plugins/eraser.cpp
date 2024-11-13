@@ -1,8 +1,8 @@
 #include "eraser.hpp"
 #include <cassert>
+#include "../headers/windows_id.hpp"
 
 
-const wid_t kEraserButtonId = 2;
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
 
 

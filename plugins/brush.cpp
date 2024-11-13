@@ -1,9 +1,10 @@
 #include "brush.hpp"
 #include <cassert>
 
+#include "../headers/windows_id.hpp"
+
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
-const wid_t kBrushButtonId = 1;
 
 
 bool loadPlugin()
@@ -35,9 +36,11 @@ void unloadPlugin()
 
 Brush::Brush( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
     :   ABarButton( init_id, init_texture, init_sprite),
-        canvas_( dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId)))
+        canvas_( dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId))),
+        options_bar_( dynamic_cast<IBar *>( getRootWindow()->getWindowById( kOptionsBarWindowId)))
 {
     assert( canvas_ && "Failed to cast to canvas" );
+    assert( options_bar_ && "Failed to cast to options bar" );
 }
 
 
@@ -145,4 +148,16 @@ void Brush::drawInterpolatedPoints( ILayer *layer, sfm::vec2i new_point)
     }
 
     points_.pop_front();
+}
+
+
+void Brush::addOptions()
+{
+
+}
+
+
+void Brush::removeOptions()
+{
+
 }

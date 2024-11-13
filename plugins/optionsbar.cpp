@@ -1,6 +1,7 @@
 #include "../api/api_photoshop.hpp"
 #include "../api/api_bar.hpp"
 #include "../headers/api_impl/bar.hpp"
+#include <iostream>
 #include <memory>
 
 
@@ -50,11 +51,13 @@ bool loadPlugin()
     released->setOutlineColor( sfm::Color( 153, 204, 255));
     released->setOutlineThickness( 5);
 
-    std::unique_ptr<psapi::IBar> bar = std::make_unique<Bar>( main,
+    std::unique_ptr<psapi::IBar> bar = std::make_unique<Bar>( kOptionsBarWindowId, main,
                                                                 normal,
                                                                 onHover,
                                                                 pressed,
                                                                 released);
+
+    bar->setParent( kRootWindowPtr);
 
     kRootWindowPtr->addWindow( std::move( bar));
 

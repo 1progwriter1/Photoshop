@@ -68,7 +68,7 @@ protected:
     wid_t last_pressed_id_ = -1;
 
 public:
-    Bar( std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
+    Bar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
                                                             std::unique_ptr<sfm::RectangleShape> &onHover,
                                                             std::unique_ptr<sfm::RectangleShape> &pressed,
                                                             std::unique_ptr<sfm::RectangleShape> &released);

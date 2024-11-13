@@ -1,5 +1,6 @@
 #include <api_impl/windows.hpp>
 #include <cassert>
+#include <iostream>
 #include <sys/my_exceptions.hpp>
 
 
@@ -63,14 +64,12 @@ void AWindow::setParent( const IWindow *new_parent)
 
 IWindow *AWindow::getWindowById( wid_t id)
 {
-    fprintf( stderr, "cur id: %lld\n", id_);
     return id == id_ ? this : nullptr;
 }
 
 
 const IWindow *AWindow::getWindowById( wid_t id) const
 {
-    fprintf( stderr, "cur id: %lld\n", id_);
     return id == id_ ? this : nullptr;
 }
 

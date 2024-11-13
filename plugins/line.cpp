@@ -1,9 +1,9 @@
 #include "line.hpp"
 #include <cassert>
+#include "../headers/windows_id.hpp"
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
-const wid_t kLineButtonId = 5;
 
 
 bool loadPlugin()

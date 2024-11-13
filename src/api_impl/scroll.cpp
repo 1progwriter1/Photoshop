@@ -1,6 +1,5 @@
 #include <api_impl/scroll.hpp>
 #include <cassert>
-#include <iostream>
 
 
 VerticalScroll::VerticalScroll(vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size)
@@ -178,10 +177,6 @@ bool Scrollable::isOnScrollButton(const vec2i &mouse_pos) const
 {
     vec2f button_pos = scroll_bar_button_->getPosition();
     vec2u button_size = scroll_bar_button_->getSize();
-
-    // std::cerr << "Button pos: " << button_pos.x << ' ' << button_pos.y << std::endl;
-    // std::cerr << "Button size: " << button_size.x << ' ' << button_size.y << std::endl;
-    // std::cerr << "Mouse pos: " << mouse_pos.x << ' ' << mouse_pos.y << std::endl;
 
     return button_pos.x <= mouse_pos.x && mouse_pos.x < button_pos.x + button_size.x &&
            button_pos.y <= mouse_pos.y && mouse_pos.y < button_pos.y + button_size.y;

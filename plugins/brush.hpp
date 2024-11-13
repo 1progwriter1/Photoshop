@@ -20,6 +20,7 @@ class Brush : public ABarButton
     sfm::vec2i last_pos_ = sfm::vec2i( 0, 0);
 
     ICanvas *canvas_;
+    IBar *options_bar_;
 public:
     Brush( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
     ~Brush();
@@ -27,9 +28,12 @@ public:
     bool update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event) override;
     void draw( sfm::IRenderWindow *renderWindow) override;
 
+private:
     void drawInterpolatedPoints( ILayer *layer, sfm::vec2i new_point);
     void drawPoint( ILayer *layer, sfm::vec2i pos);
     sfm::vec2i interpolate( sfm::vec2i p0, sfm::vec2i p1, sfm::vec2i p2, sfm::vec2i p3, float t);
+    void addOptions();
+    void removeOptions();
 };
 
 

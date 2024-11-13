@@ -1,10 +1,11 @@
 #include "ellipse.hpp"
 
 #include <cassert>
+#include "../headers/windows_id.hpp"
+#include "../headers/api_impl/canvas.hpp"
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
-const wid_t kEllipseButtonId = 4;
 
 
 bool loadPlugin()
@@ -56,7 +57,7 @@ bool Ellipse::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &
     if ( event.type == sfm::Event::MouseButtonPressed && isOnCanvas( sfm::Mouse::getPosition( renderWindow)) )
     {
         draw_ = true;
-        left_upper_edge_ = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
+        left_upper_edge_ = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
         last_mouse_pos_ = left_upper_edge_;
     } else if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
     {
@@ -86,7 +87,7 @@ void Ellipse::drawEllipse( const sfm::IRenderWindow *renderWindow, ILayer *layer
     assert( renderWindow );
     assert( layer );
 
-    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
+    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
     sfm::vec2u size( std::abs( mouse_pos.x - left_upper_edge_.x), std::abs( mouse_pos.y - left_upper_edge_.y));
     sfm::vec2u size2 = size * size;
     sfm::vec2u canvas_size = canvas_->getSize();
@@ -94,17 +95,18 @@ void Ellipse::drawEllipse( const sfm::IRenderWindow *renderWindow, ILayer *layer
     int center_x = std::min( mouse_pos.x, left_upper_edge_.x) + size.x / 2;
     int center_y = std::min( mouse_pos.y, left_upper_edge_.y) + size.y / 2;
 
+    sfm::vec2i offset = CANVAS_SECTOR_POS - canvas_->getPos();
     sfm::Color rect_color( 0, 0, 150);
-    for ( int x = 0; x < canvas_size.x; x++ )
+    for ( int x = 0; x < CANVAS_SECTOR_SIZE.x; x++ )
     {
-        for ( int y = 0; y < canvas_size.y; y++ )
+        for ( int y = 0; y < CANVAS_SECTOR_SIZE.y; y++ )
         {
-            if ( isOnEllipse( sfm::vec2i(x, y), size2, sfm::vec2i( center_x, center_y)) )
+            if ( isOnEllipse( sfm::vec2i( x, y), size2, sfm::vec2i( center_x, center_y)) )
             {
-                layer->setPixel( sfm::vec2i( x, y), rect_color);
+                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), rect_color);
             } else if ( is_temp_layer )
             {
-                layer->setPixel( sfm::vec2i( x, y), sfm::Color(0, 0, 0, 0));
+                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), sfm::Color(0, 0, 0, 0));
             }
         }
     }

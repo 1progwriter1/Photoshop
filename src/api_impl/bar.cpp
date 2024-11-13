@@ -126,11 +126,11 @@ IBarButton::State ABarButton::getState() const
 }
 
 
-Bar::Bar( std::unique_ptr<sfm::RectangleShape> &main_shape, std::unique_ptr<sfm::RectangleShape> &normal,
+Bar::Bar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::unique_ptr<sfm::RectangleShape> &normal,
                                                     std::unique_ptr<sfm::RectangleShape> &onHover,
                                                     std::unique_ptr<sfm::RectangleShape> &pressed,
                                                     std::unique_ptr<sfm::RectangleShape> &released)
-    :   size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().x))
+    :   id_( init_id), size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().x))
 {
     main_shape_ = std::move( main_shape);
     normal_ = std::move( normal);
@@ -193,7 +193,7 @@ void Bar::removeWindow(wid_t id)
 
 wid_t Bar::getId() const
 {
-    return kToolBarWindowId;
+    return id_;
 }
 
 

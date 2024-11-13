@@ -2,9 +2,11 @@
 #include <cassert>
 #include <iostream>
 
+#include "../headers/windows_id.hpp"
+#include "../headers/api_impl/canvas.hpp"
+
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
-const wid_t kRectangleButtonId = 3;
 
 
 bool loadPlugin()
@@ -62,7 +64,7 @@ bool Rectangle::update( const sfm::IRenderWindow *renderWindow, const sfm::Event
     if ( event.type == sfm::Event::MouseButtonPressed && isOnCanvas( sfm::Mouse::getPosition( renderWindow)) )
     {
         draw_ = true;
-        left_upper_edge_ = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
+        left_upper_edge_ = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
         last_mouse_pos_ = left_upper_edge_;
     } else if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
     {
@@ -93,24 +95,26 @@ void Rectangle::drawRectangle( const sfm::IRenderWindow *renderWindow, ILayer *l
     assert( renderWindow );
     assert( layer );
 
-    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
+    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
     sfm::vec2u size( std::abs( mouse_pos.x - left_upper_edge_.x), std::abs( mouse_pos.y - left_upper_edge_.y));
     sfm::vec2u canvas_size = canvas_->getSize();
 
     int edge_x = std::min( mouse_pos.x, left_upper_edge_.x);
     int edge_y = std::min( mouse_pos.y, left_upper_edge_.y);
 
+    sfm::vec2i offset = CANVAS_SECTOR_POS - canvas_->getPos();
+
     sfm::Color rect_color( 0, 150, 0);
-    for ( int x = 0; x < canvas_size.x; x++ )
+    for ( int x = 0; x < CANVAS_SECTOR_SIZE.x; x++ )
     {
-        for ( int y = 0; y < canvas_size.y; y++ )
+        for ( int y = 0; y < CANVAS_SECTOR_SIZE.y; y++ )
         {
             if ( x >= edge_x && x < edge_x + size.x && y >= edge_y && y < edge_y + size.y )
             {
-                layer->setPixel( sfm::vec2i( x, y), rect_color);
+                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), rect_color);
             } else if ( is_temp_layer )
             {
-                layer->setPixel( sfm::vec2i( x, y), sfm::Color(0, 0, 0, 0));
+                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), sfm::Color(0, 0, 0, 0));
             }
         }
     }

@@ -1,9 +1,11 @@
 #ifndef SCROLL_WINDOWS_IMPL
 #define SCROLL_WINDOWS_IMPL
 
+
 #include <api_system.hpp>
 #include <api_sfm.hpp>
 #include <api_impl/sfm.hpp>
+
 
 using psapi::sfm::vec2i;
 using psapi::sfm::vec2u;
@@ -11,6 +13,7 @@ using psapi::sfm::vec2f;
 using psapi::sfm::RectangleShape;
 using psapi::sfm::Color;
 using psapi::sfm::Event;
+
 
 class Scrollable : psapi::sfm::Drawable
 {
