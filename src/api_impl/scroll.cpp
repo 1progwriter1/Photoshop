@@ -1,5 +1,6 @@
 #include <api_impl/scroll.hpp>
 #include <cassert>
+#include <iostream>
 
 
 VerticalScroll::VerticalScroll(vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size)
@@ -11,12 +12,12 @@ VerticalScroll::VerticalScroll(vec2i sector_pos, vec2u sector_size, vec2i window
     scroll_bar_ = std::make_unique<RectangleShape>();
     scroll_bar_->setPosition( vec2i( sector_pos.x - 20 + sector_size.x, sector_pos.y));
     scroll_bar_->setSize( vec2u( 20, sector_size.y));
-    scroll_bar_->setFillColor( Color(192, 192, 192));
+    scroll_bar_->setFillColor( Color( 128, 128, 128));
 
     scroll_bar_button_ = std::make_unique<RectangleShape>();
     scroll_bar_button_->setPosition( vec2i( sector_pos.x - 20 + sector_size.x, sector_pos.y));
     scroll_bar_button_->setSize( vec2u( 20, sector_size.y / (static_cast<float>( window_size.y) / static_cast<float>( sector_size.y))));
-    scroll_bar_button_->setFillColor( Color( 127, 0, 255));
+    scroll_bar_button_->setFillColor( Color( 192, 192, 192));
 
     ratio_ = static_cast<float>( window_size.y) / static_cast<float>( sector_size.y);
 }
@@ -31,12 +32,12 @@ HorizontalScroll::HorizontalScroll( vec2i sector_pos, vec2u sector_size, vec2i w
     scroll_bar_ = std::make_unique<RectangleShape>();
     scroll_bar_->setPosition( vec2i( sector_pos.x, sector_pos.y));
     scroll_bar_->setSize( vec2u( sector_size.x, 20));
-    scroll_bar_->setFillColor( Color(192, 192, 192));
+    scroll_bar_->setFillColor( Color(128, 128, 128));
 
     scroll_bar_button_ = std::make_unique<RectangleShape>();
     scroll_bar_button_->setPosition( vec2i( sector_pos.x, sector_pos.y));
     scroll_bar_button_->setSize( vec2u( sector_size.x / (static_cast<float>( window_size.x) / static_cast<float>( sector_size.x)), 20));
-    scroll_bar_button_->setFillColor( Color( 127, 0, 255));
+    scroll_bar_button_->setFillColor( Color( 192, 192, 192));
 
     ratio_ = static_cast<float>( window_size.x) / static_cast<float>( sector_size.x);
 }

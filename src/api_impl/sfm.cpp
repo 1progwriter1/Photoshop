@@ -27,7 +27,10 @@ std::unique_ptr<ISprite> ISprite::create()
 
 
 RenderWindow::RenderWindow( unsigned int width, unsigned int height, const std::string& title)
-    : window_( sf::VideoMode(width, height), title) {}
+    : window_( sf::VideoMode(width, height), title)
+{
+    setFps( 60);
+}
 
 
 void RenderWindow::setFps( float fps)

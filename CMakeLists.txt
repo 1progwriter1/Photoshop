@@ -33,7 +33,8 @@ function( add_dynamic_plugin plugin_name)
 	target_link_libraries( ${plugin_name} PRIVATE api_photoshop)
 endfunction()
 
-set(PLUGINS "canvas" "toolbar" "optionsbar" "brush" "eraser" "rectangle" "ellipse" "line")
+set(PLUGINS "canvas" "toolbar" "optionsbar" "brush" "eraser" "rectangle" "ellipse" "line"
+			"brightness_filter" "negative_filter" "barelief_filter" "bluer_filter")
 foreach(plugin ${PLUGINS})
     add_dynamic_plugin(${plugin})
 endforeach()
@@ -64,7 +65,7 @@ include_directories( ../MyLibraries/headers/)
 # 		-Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -fcheck-new -fsized-deallocation
 # 		-fstrict-overflow -fno-omit-frame-pointer -fPIE -Werror=vla -flat-namespace)
 # -Wsuggest-override
-add_compile_options( -O3 -std=c++20)
+add_compile_options( -O3 -std=c++20 -fcolor-diagnostics)
 
 # add_compile_options( -fsanitize=address,alignment)
 # add_link_options( -fsanitize=address,alignment)

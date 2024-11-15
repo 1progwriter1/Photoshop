@@ -1,6 +1,7 @@
 #include <controller/controller.hpp>
 
 #include <cassert>
+#include <iostream>
 
 
 Controller::Controller( Model *init_model, IWindowContainer *init_root_window)

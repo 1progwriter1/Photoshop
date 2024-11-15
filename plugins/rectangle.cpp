@@ -69,7 +69,6 @@ bool Rectangle::update( const sfm::IRenderWindow *renderWindow, const sfm::Event
     } else if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
     {
         canvas_->cleanTempLayer();
-        std::cerr << "Draw rectangle ";
         drawRectangle( renderWindow, canvas_->getLayer( canvas_->getActiveLayerIndex()), false);
         draw_ = false;
         left_upper_edge_ = sfm::vec2i();

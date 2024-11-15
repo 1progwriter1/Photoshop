@@ -255,23 +255,23 @@ void Canvas::draw( IRenderWindow *renderWindow)
 {
     assert( renderWindow );
 
+    vec2i offset = CANVAS_SECTOR_POS - pos_;
+    sprite_->setTextureRect( sfm::IntRect( offset.x, offset.y, CANVAS_SECTOR_SIZE.x, CANVAS_SECTOR_SIZE.y));
+    sprite_->setPosition( CANVAS_SECTOR_POS.x, CANVAS_SECTOR_POS.y);
+
     for ( auto &layer : layers_ )
     {
-        Layer *cur_layer = dynamic_cast<Layer *>( layer.get());
-        assert( cur_layer );
+        Layer *cur_layer = static_cast<Layer *>( layer.get());
 
         texture_->update( cur_layer->pixels_.data());
         sprite_->setTexture( texture_.get());
-        sprite_->setPosition( pos_.x, pos_.y);
         sprite_->draw( renderWindow);
     }
 
-    Layer *cur_layer = dynamic_cast<Layer *>( temp_layer_.get());
-    assert( cur_layer );
+    Layer *cur_layer = static_cast<Layer *>( temp_layer_.get());
 
     texture_->update( cur_layer->pixels_.data());
     sprite_->setTexture( texture_.get());
-    sprite_->setPosition( pos_.x, pos_.y);
     sprite_->draw( renderWindow);
 
     VerticalScroll::draw( renderWindow);

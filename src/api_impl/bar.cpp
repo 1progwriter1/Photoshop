@@ -146,8 +146,17 @@ void Bar::draw(IRenderWindow* renderWindow)
 
     renderWindow->draw( main_shape_.get());
 
-    for ( auto &button : buttons_ )
+    // if ( getId() == kOptionsBarWindowId )
+    // {
+    //     std::cerr << "Amount of buttons: " << buttons_.size() << std::endl;
+    // }
+
+    for ( const auto &button : buttons_ )
     {
+        // if ( getId() == kOptionsBarWindowId )
+        // {
+        //     std::cerr << "Button to draw has id: " << button->getId() << std::endl;
+        // }
         button->draw( renderWindow);
         finishButtonDraw( renderWindow, button.get());
 
@@ -181,13 +190,29 @@ bool Bar::update(const IRenderWindow* renderWindow, const Event& event)
 
 void Bar::addWindow(std::unique_ptr<IWindow> window)
 {
+    if ( getId() == kOptionsBarWindowId )
+    {
+        std::cerr << "Added button has id: " << window->getId() << std::endl;
+    } else
+    {
+        std::cerr << "Added button not mine has id: " << window->getId() << std::endl;
+    }
     buttons_.push_back(  std::unique_ptr<IBarButton>( dynamic_cast<IBarButton *>( window.release())));
 }
 
 
 void Bar::removeWindow(wid_t id)
 {
-    assert( 0 && "Not implemented" );
+    auto iter = buttons_.begin();
+    for ( auto &button : buttons_ )
+    {
+        if ( button->getId() == id )
+        {
+            buttons_.erase( iter);
+            break;
+        }
+        iter++;
+    }
 }
 
 
