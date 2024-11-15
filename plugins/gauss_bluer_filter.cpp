@@ -1,9 +1,19 @@
 #include "bluer_filter.hpp"
 #include <cassert>
+#include <iostream>
 
 
 #include "../headers/windows_id.hpp"
 #include "../headers/api_impl/canvas.hpp"
+
+
+const std::array<float, 9> GAUSS_MATRIX =
+{
+    0.025, 0.1, 0.025,
+    0.1, 0.5, 0.1,
+    0.025, 0.1, 0.025
+};
+const float GAUSS_SUM = 1;
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
@@ -19,13 +29,13 @@ bool loadPlugin()
 
     std::unique_ptr<sfm::Texture> texture = std::make_unique<sfm::Texture>();
     std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
-    texture->loadFromFile("../images/bluer_filter48_48.png");
+    texture->loadFromFile("../images/gauss_bluer_filter48_48.png");
     sprite->setTexture( texture.get());
     sprite->setPosition( 36, 804);
 
-    std::unique_ptr<ABarButton> negative_filter = std::make_unique<BluerFilter>( kBluerFilterButtonId, texture, sprite);
-    negative_filter->setParent( toolbar);
-    toolbar->addWindow( std::move( negative_filter));
+    std::unique_ptr<ABarButton> gauss_bluer = std::make_unique<BluerFilter>( kGaussBluerFilterButtonId, texture, sprite);
+    gauss_bluer->setParent( toolbar);
+    toolbar->addWindow( std::move( gauss_bluer));
 
     return true;
 }
@@ -60,6 +70,10 @@ bool BluerFilter::update( const sfm::IRenderWindow *renderWindow, const sfm::Eve
 
     ILayer *layer = canvas_->getLayer( canvas_->getActiveLayerIndex());
     assert( layer );
+    assert( canvas_->insertEmptyLayer( 1) );
+    ILayer *new_layer = canvas_->getLayer( 1);
+    assert( new_layer );
+    assert( new_layer != layer );
 
     sfm::vec2u canvas_size = canvas_->getSize();
 
@@ -73,30 +87,30 @@ bool BluerFilter::update( const sfm::IRenderWindow *renderWindow, const sfm::Eve
             int from_y = std::max( 0, static_cast<int>( y - 1));
             int to_y = std::min( static_cast<int>( canvas_size.y - 1), static_cast<int>( y + 1));
 
-            int r = 0, g = 0, b = 0, a = 0;
+            float r = 0, g = 0, b = 0, a = 0;
 
             for ( int i = from_x; i <= to_x; i++ )
             {
                 for ( int j = from_y; j <= to_y; j++ )
                 {
                     sfm::Color color = layer->getPixel( sfm::vec2i( i, j));
-                    r += color.r;
-                    g += color.g;
-                    b += color.b;
-                    a += color.a;
+                    r += color.r * GAUSS_MATRIX[ (j - from_y) * 3 + (i - from_x)];
+                    g += color.g * GAUSS_MATRIX[ (j - from_y) * 3 + (i - from_x)];
+                    b += color.b * GAUSS_MATRIX[ (j - from_y) * 3 + (i - from_x)];
+                    a += color.a * GAUSS_MATRIX[ (j - from_y) * 3 + (i - from_x)];
                 }
             }
-            r /= 9;
-            g /= 9;
-            b /= 9;
-            a /= 9;
+            r /= GAUSS_SUM;
+            g /= GAUSS_SUM;
+            b /= GAUSS_SUM;
+            a /= GAUSS_SUM;
 
-            sfm::Color color( r, g, b, a);
+            sfm::Color color( static_cast<uint8_t>( r), static_cast<uint8_t>( g), static_cast<uint8_t>( b), static_cast<uint8_t>( a));
 
-            layer->setPixel( sfm::vec2i( x, y), color);
+            new_layer->setPixel( sfm::vec2i( x, y), color);
         }
     }
-
+    canvas_->removeLayer( 0);
     setState( IBarButton::State::Normal);
 
     return true;

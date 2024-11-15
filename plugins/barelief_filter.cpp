@@ -60,6 +60,10 @@ bool BareliefFilter::update( const sfm::IRenderWindow *renderWindow, const sfm::
 
     ILayer *layer = canvas_->getLayer( canvas_->getActiveLayerIndex());
     assert( layer );
+    canvas_->insertEmptyLayer( 1);
+    ILayer *new_layer = canvas_->getLayer( 1);
+    assert( new_layer );
+    assert( new_layer != layer );
 
     sfm::vec2u canvas_size = canvas_->getSize();
 
@@ -75,9 +79,11 @@ bool BareliefFilter::update( const sfm::IRenderWindow *renderWindow, const sfm::
             color.g = (255 - color_1.g + color_2.g) / 2;
             color.b = (255 - color_1.b + color_2.b) / 2;
             color.a = (255 - color_1.a + color_2.a) / 2;
-            layer->setPixel( sfm::vec2i( x, y), color);
+            new_layer->setPixel( sfm::vec2i( x, y), color);
         }
     }
+
+    canvas_->removeLayer( 0);
 
     setState( IBarButton::State::Normal);
 

@@ -34,7 +34,7 @@ function( add_dynamic_plugin plugin_name)
 endfunction()
 
 set(PLUGINS "canvas" "toolbar" "optionsbar" "brush" "eraser" "rectangle" "ellipse" "line"
-			"brightness_filter" "negative_filter" "barelief_filter" "bluer_filter")
+			"brightness_filter" "negative_filter" "barelief_filter" "bluer_filter" "gauss_bluer_filter")
 foreach(plugin ${PLUGINS})
     add_dynamic_plugin(${plugin})
 endforeach()

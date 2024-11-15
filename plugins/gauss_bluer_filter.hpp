@@ -1,5 +1,5 @@
-#ifndef PLUGIN_BLUER_FILTER
-#define PLUGIN_BLUER_FILTER
+#ifndef PLUGIN_GAUSS_BLUER_FILTER
+#define PLUGIN_GAUSS_BLUER_FILTER
 
 
 #include "../headers/api_impl/bar.hpp"
@@ -13,15 +13,16 @@ extern "C"
 }
 
 
-class BluerFilter : public ABarButton
+class GaussBluerFilter : public ABarButton
 {
     ICanvas *canvas_ = nullptr;
 public:
-    BluerFilter( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
+    GaussBluerFilter( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
 
     bool update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event) override;
     void draw( sfm::IRenderWindow *renderWindow) override;
 };
 
 
-#endif // PLUGIN_BLUER_FILTER
+
+#endif // PLUGIN_GAUSS_BLUER_FILTER
