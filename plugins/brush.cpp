@@ -67,6 +67,7 @@ bool Brush::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &ev
     }
     if ( !options_added_ )
     {
+        createOptions();
         addOptions();
         options_added_ = true;
     }
@@ -166,21 +167,21 @@ void Brush::drawInterpolatedPoints( ILayer *layer, sfm::vec2i new_point)
 
 void Brush::addOptions()
 {
-    std::cerr << "Add options\n";
     for ( auto &option : options_ )
     {
-        options_bar_->addWindow( std::unique_ptr<ABarButton>( option.get()));
+        options_bar_->addWindow( std::move( option));
     }
+    options_.clear();
 }
 
 
 void Brush::removeOptions()
 {
-    std::cerr << "Remove options\n";
-    for ( auto &option : options_ )
+    for ( auto &id : id_ )
     {
-        options_bar_->removeWindow( option->getId());
+        options_bar_->removeWindow( id);
     }
+    id_.clear();
 }
 
 
@@ -195,8 +196,9 @@ void Brush::createOptions()
     sprite->setTexture( texture.get());
     sprite->setPosition( button_pos.x, button_pos.y);
 
-    std::unique_ptr<ABarButton> button = std::make_unique<ColorButton>( kRedColorButtonId, this, texture, sprite);
+    std::unique_ptr<ABarButton> button = std::make_unique<ColorButton>( kRedColorButtonId, this, sfm::Color(255, 0, 0), texture, sprite);
     options_.push_back( std::move( button));
+    id_.push_back( kRedColorButtonId);
 
     button_pos += sfm::vec2i( 96, 0);
 
@@ -204,10 +206,11 @@ void Brush::createOptions()
     sprite = std::make_unique<sfm::Sprite>();
     texture->loadFromFile("../images/blue_color_button48_48.png");
     sprite->setTexture( texture.get());
-    sprite->setPosition( 36, 36);
+    sprite->setPosition( button_pos.x, button_pos.y);
 
-    button = std::make_unique<ColorButton>( kBlueColorButtonId, this, texture, sprite);
+    button = std::make_unique<ColorButton>( kBlueColorButtonId, this, sfm::Color(0, 0, 255), texture, sprite);
     options_.push_back( std::move( button));
+    id_.push_back( kBlueColorButtonId);
 
     button_pos += sfm::vec2i( 96, 0);
 
@@ -215,10 +218,11 @@ void Brush::createOptions()
     sprite = std::make_unique<sfm::Sprite>();
     texture->loadFromFile("../images/green_color_button48_48.png");
     sprite->setTexture( texture.get());
-    sprite->setPosition( 36, 36);
+    sprite->setPosition( button_pos.x, button_pos.y);
 
-    button = std::make_unique<ColorButton>( kGreenColorButtonId, this, texture, sprite);
+    button = std::make_unique<ColorButton>( kGreenColorButtonId, this, sfm::Color(0, 255, 0), texture, sprite);
     options_.push_back( std::move( button));
+    id_.push_back( kGreenColorButtonId);
 }
 
 
@@ -228,19 +232,42 @@ void Brush::setColor( const sfm::Color &new_color)
 }
 
 
-ColorButton::ColorButton( wid_t init_id, Brush *init_brush, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
-    :   ABarButton( init_id, init_texture, init_sprite), brush_( init_brush)
+ColorButton::ColorButton( wid_t init_id, Brush *init_brush, const sfm::Color &init_color,
+                            std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
+    :   ABarButton( init_id, init_texture, init_sprite), brush_( init_brush), color_( init_color)
 {}
 
 
 void ColorButton::draw( sfm::IRenderWindow *renderWindow)
 {
-    assert( 0 );
+    State state = getState();
+    if ( is_set_ )
+    {
+        setState( psapi::IBarButton::State::Press);
+    }
     ABarButton::draw( renderWindow);
+    setState( state);
 }
 
 
 bool ColorButton::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event)
 {
+    ABarButton::update(renderWindow, event);
+
+    if ( state_ == IBarButton::State::Press )
+    {
+        brush_->setColor( color_);
+        is_set_ = true;
+    } else if ( state_ == IBarButton::State::Normal )
+    {
+        is_set_ = false;
+    }
+
     return true;
+}
+
+
+const sfm::Color &Brush::getColor() const
+{
+    return color_;
 }

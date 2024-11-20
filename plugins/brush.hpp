@@ -14,11 +14,6 @@ extern "C"
 }
 
 
-const wid_t kRedColorButtonId = 10;
-const wid_t kBlueColorButtonId = 11;
-const wid_t kGreenColorButtonId = 12;
-
-
 class Brush : public ABarButton
 {
     std::deque<sfm::vec2i> points_;
@@ -30,6 +25,7 @@ class Brush : public ABarButton
 
     bool options_added_ = false;
     std::vector<std::unique_ptr<ABarButton>> options_;
+    std::vector<wid_t> id_;
 public:
     Brush( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
     ~Brush();
@@ -37,6 +33,7 @@ public:
     bool update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event) override;
     void draw( sfm::IRenderWindow *renderWindow) override;
     void setColor( const sfm::Color &new_color);
+    const sfm::Color &getColor() const;
 
 private:
     void drawInterpolatedPoints( ILayer *layer, sfm::vec2i new_point);
@@ -52,8 +49,10 @@ class ColorButton : public ABarButton
 {
     Brush *brush_;
     sfm::Color color_ = sfm::Color( 255, 0, 0);
+    bool is_set_ = false;
 public:
-    ColorButton( wid_t init_id, Brush *init_brush, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
+    ColorButton( wid_t init_id, Brush *init_brush, const sfm::Color &init_color,
+                std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
 
     void draw( sfm::IRenderWindow *renderWindow) override;
     bool update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event) override;

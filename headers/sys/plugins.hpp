@@ -14,8 +14,9 @@ static const char *PLUGINS_PATH[] =
 	"../build/libline.dylib",
 	"../build/libbrightness_filter.dylib",
 	"../build/libnegative_filter.dylib",
-	"../build/libbarelief_filter.dylib",
+	// "../build/libbarelief_filter.dylib",
 	"../build/libgauss_bluer_filter.dylib",
+	"../build/libcontrast_filter.dylib",
 };
 
 

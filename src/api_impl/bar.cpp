@@ -130,7 +130,7 @@ Bar::Bar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::
                                                     std::unique_ptr<sfm::RectangleShape> &onHover,
                                                     std::unique_ptr<sfm::RectangleShape> &pressed,
                                                     std::unique_ptr<sfm::RectangleShape> &released)
-    :   id_( init_id), size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().x))
+    :   id_( init_id), size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y))
 {
     main_shape_ = std::move( main_shape);
     normal_ = std::move( normal);
@@ -190,13 +190,6 @@ bool Bar::update(const IRenderWindow* renderWindow, const Event& event)
 
 void Bar::addWindow(std::unique_ptr<IWindow> window)
 {
-    if ( getId() == kOptionsBarWindowId )
-    {
-        std::cerr << "Added button has id: " << window->getId() << std::endl;
-    } else
-    {
-        std::cerr << "Added button not mine has id: " << window->getId() << std::endl;
-    }
     buttons_.push_back(  std::unique_ptr<IBarButton>( dynamic_cast<IBarButton *>( window.release())));
 }
 
