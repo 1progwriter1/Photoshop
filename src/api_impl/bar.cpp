@@ -164,27 +164,28 @@ void Bar::draw(IRenderWindow* renderWindow)
 }
 
 
-bool Bar::update(const IRenderWindow* renderWindow, const Event& event)
+std::unique_ptr<IAction> Bar::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
-    for ( auto &button : buttons_ )
-    {
-        if ( !button->update( renderWindow, event) )
-            return false;
-        if ( button->getState() == psapi::IBarButton::State::Press && button->getId() != last_pressed_id_ )
-        {
-            IWindow *prev_button = this->getWindowById( last_pressed_id_);
-            if ( prev_button )
-            {
-                IBarButton *button_ptr =  static_cast<IBarButton *>( prev_button);
-                if ( button_ptr->getState() == psapi::IBarButton::State::Press )
-                {
-                    button_ptr->setState( psapi::IBarButton::State::Normal);
-                }
-            }
-            last_pressed_id_ = button->getId();
-        }
-    }
-    return true;
+    // for ( auto &button : buttons_ )
+    // {
+    //     if ( !button->update( renderWindow, event) )
+    //         return nullptr;
+    //     if ( button->getState() == psapi::IBarButton::State::Press && button->getId() != last_pressed_id_ )
+    //     {
+    //         IWindow *prev_button = this->getWindowById( last_pressed_id_);
+    //         if ( prev_button )
+    //         {
+    //             IBarButton *button_ptr =  static_cast<IBarButton *>( prev_button);
+    //             if ( button_ptr->getState() == psapi::IBarButton::State::Press )
+    //             {
+    //                 button_ptr->setState( psapi::IBarButton::State::Normal);
+    //             }
+    //         }
+    //         last_pressed_id_ = button->getId();
+    //     }
+    // }
+    // return true;
+    return nullptr;
 }
 
 

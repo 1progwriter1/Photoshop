@@ -29,7 +29,7 @@ public:
     ~ABarButton() = default;
 
     virtual void draw(IRenderWindow* renderWindow) override;
-    virtual bool update(const IRenderWindow* renderWindow, const Event& event) override;
+    std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
     virtual wid_t getId() const override;
     virtual IWindow* getWindowById(wid_t id) override;
     virtual const IWindow* getWindowById(wid_t id) const override;
@@ -75,7 +75,8 @@ public:
     ~Bar() = default;
 
     void draw(IRenderWindow* renderWindow) override;
-    bool update(const IRenderWindow* renderWindow, const Event& event) override;
+    std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
+
     wid_t getId() const override;
     IWindow* getWindowById(wid_t id) override;
     const IWindow* getWindowById(wid_t id) const override;
@@ -89,7 +90,8 @@ public:
     void addWindow(std::unique_ptr<IWindow> window) override;
     void removeWindow(wid_t id) override;
 
-    ChildInfo getNextChildInfo() const override;
+    sfm::IntRect getNextChildInfo() const override;
+    bool unPressAllButtons() override;
     void finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const override;
 };
 

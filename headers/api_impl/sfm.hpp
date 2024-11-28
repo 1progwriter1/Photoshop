@@ -17,8 +17,6 @@ namespace sfm
 class RenderWindow : public IRenderWindow
 {
     sf::RenderWindow window_;
-    unsigned int width_;
-    unsigned int height_;
 
     float fps_ = NAN;
 

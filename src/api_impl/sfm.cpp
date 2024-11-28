@@ -84,7 +84,7 @@ const sf::RenderWindow &RenderWindow::getWindow() const
 
 vec2u RenderWindow::getSize() const
 {
-    return vec2u( width_, height_);
+    return vec2u( window_.getSize().x, window_.getSize().y);
 }
 
 

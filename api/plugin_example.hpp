@@ -4,8 +4,8 @@
 extern "C" {
 
 /* plugins must provide these two functions */
-bool   loadPlugin();
-void unloadPlugin();
+bool   onLoadPlugin();
+void onUnloadPlugin();
 
 }
 
