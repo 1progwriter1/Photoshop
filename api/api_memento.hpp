@@ -3,6 +3,10 @@
 
 #include <memory>
 
+namespace psapi
+{
+
+
 template<typename SnapshotType>
 class IMementable
 {
@@ -24,5 +28,8 @@ class ICanvasSnapshot
 public:
     virtual ~ICanvasSnapshot() = default;
 };
+
+
+}
 
 #endif // API_MEMENTO_HPP
