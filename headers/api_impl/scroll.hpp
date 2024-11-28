@@ -12,7 +12,6 @@ using psapi::sfm::vec2u;
 using psapi::sfm::vec2f;
 using psapi::sfm::RectangleShape;
 using psapi::sfm::Color;
-using psapi::sfm::Event;
 
 
 class Scrollable : psapi::sfm::Drawable
@@ -30,7 +29,7 @@ protected:
     std::unique_ptr<RectangleShape> scroll_bar_button_;
 
     bool isOnFocus(const vec2i &mouse_pos) const;
-    virtual int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const Event &event);
+    virtual int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event);
     bool isOnScrollButton(const vec2i &mouse_pos) const;
 
 public:
@@ -48,7 +47,7 @@ public:
 
     bool update(const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event, vec2i &pos) override;
 private:
-    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const Event &event) override;
+    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event) override;
 };
 
 
@@ -59,7 +58,7 @@ public:
 
     bool update(const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event, vec2i &pos) override;
 private:
-    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const Event &event) override;
+    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event) override;
 };
 
 

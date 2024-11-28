@@ -29,6 +29,12 @@ public:
 
     Color getPixel(sfm::vec2i pos) const override;
     void setPixel(sfm::vec2i pos, sfm::Color pixel) override;
+
+    drawable_id_t addDrawable(const sfm::Drawable *object) override;
+    void removeDrawable(drawable_id_t id) override;
+    void removeAllDrawables() override;
+
+    vec2u getSize() const override;
 };
 
 
@@ -69,26 +75,33 @@ public:
     bool removeLayer     (size_t index) override;
     bool insertEmptyLayer(size_t index) override;
 
-    void setPos  (sfm::vec2i pos)   override;
-    void setSize (sfm::vec2i size)  override;
-    void setScale(sfm::vec2f scale) override;
+    void setPos (sfm::vec2i pos)  override;
+    void setSize(sfm::vec2u size) override;
+    void setZoom(sfm::vec2f zoom) override;
 
     sfm::vec2i getMousePosition() const override;
-    bool isPressed()              const override;
 
-    bool isWindowContainer() const override;
+    virtual bool isPressedRightMouseButton() const override;
+    virtual bool isPressedLeftMouseButton()  const override;
+    virtual bool isPressedScrollButton()     const override;
+
     wid_t getId() const override;
     vec2i getPos() const override;
     vec2u getSize() const override;
+
     void setParent(const IWindow* parent) override;
+
+    bool isWindowContainer() const override;
     bool isActive() const override;
+
     void forceActivate() override;
     void forceDeactivate() override;
+
     IWindow *getWindowById( wid_t id) override;
     const IWindow *getWindowById( wid_t id) const override;
 
-    void draw( IRenderWindow *removeWindow) override;
-    bool update( const IRenderWindow *renderWindow, const Event &event) override;
+    void draw(IRenderWindow *removeWindow) override;
+    std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
 };
 
 

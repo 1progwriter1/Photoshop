@@ -1,7 +1,5 @@
 #include <api_impl/bar.hpp>
-#include <api_impl/sfm.hpp>
 #include <cassert>
-#include <iostream>
 
 
 void ABarButton::draw(IRenderWindow* renderWindow)
@@ -18,35 +16,29 @@ ABarButton::ABarButton(  wid_t init_id, std::unique_ptr<sfm::Texture> &init_text
 }
 
 
-bool ABarButton::update(const IRenderWindow* renderWindow, const Event& event)
+std::unique_ptr<IAction> ABarButton::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
-    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow);
-    sfm::vec2i button_pos = getPos();
+    assert( 0 && "Not implemented" );
 
-    sfm::vec2u size = getSize();
-    bool is_on_focus = button_pos.x <= mouse_pos.x && mouse_pos.x <= button_pos.x + size.x &&
-                        button_pos.y <= mouse_pos.y && mouse_pos.y <= button_pos.y + size.y;
-    if ( is_on_focus )
-    {
-        if ( event.type == sfm::Event::MouseButtonPressed )
-        {
-            state_ = (state_ != IBarButton::State::Press) ? IBarButton::State::Press : IBarButton::State::Released;
-        } else if ( state_ != IBarButton::State::Press )
-        {
-            state_ = psapi::IBarButton::State::Hover;
-        }
-    } else if ( state_ == psapi::IBarButton::State::Hover || state_ == psapi::IBarButton::State::Released )
-    {
-        state_ = psapi::IBarButton::State::Normal;
-    }
-
-    return true;
+    return nullptr;
 }
 
 
 wid_t ABarButton::getId() const
 {
     return id_;
+}
+
+
+void ABarButton::setSize(const vec2u &size)
+{
+    assert( 0 && "Not implemented" );
+}
+
+
+void ABarButton::setPos(const vec2i &pos)
+{
+    sprite_->setPosition( pos.x, pos.y);
 }
 
 
@@ -126,6 +118,136 @@ IBarButton::State ABarButton::getState() const
 }
 
 
+AOptionButton::AOptionButton(wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite, std::unique_ptr<IBar> &nested_bar)
+    :   id_(init_id), texture_(std::move(init_texture)), sprite_(std::move(init_sprite)) {}
+
+
+void AOptionButton::addOption(std::unique_ptr<IWindow> option)
+{
+    assert( option );
+
+    options_.push_back( std::move( option));
+}
+
+
+void AOptionButton::activateBar()
+{
+    is_bar_active_ = true;
+}
+
+
+void AOptionButton::deactivateBar()
+{
+    is_bar_active_ = false;
+}
+
+
+IBar *AOptionButton::getBar()
+{
+    return bar_.get();
+}
+
+
+const IBar *AOptionButton::getBar() const
+{
+    return bar_.get();
+}
+
+
+void AOptionButton::draw(IRenderWindow* renderWindow)
+{
+    renderWindow->draw( sprite_.get());
+}
+
+
+std::unique_ptr<IAction> AOptionButton::createAction(const IRenderWindow* renderWindow, const Event& event)
+{
+    assert( 0 && "Not implemented" );
+
+    return nullptr;
+}
+
+
+wid_t AOptionButton::getId() const
+{
+    return id_;
+}
+
+
+IWindow* AOptionButton::getWindowById(wid_t id)
+{
+    assert( 0 && "Not implemented" );
+
+    return nullptr;
+}
+
+
+const IWindow* AOptionButton::getWindowById(wid_t id) const
+{
+    assert( 0 && "Not implemented" );
+
+    return nullptr;
+}
+
+
+vec2i AOptionButton::getPos() const
+{
+    vec2f pos = sprite_->getPosition();
+    return vec2i( static_cast<int>( pos.x), static_cast<int>( pos.y));
+}
+
+
+vec2u AOptionButton::getSize() const
+{
+    return sprite_->getSize();
+}
+
+
+void AOptionButton::setParent(const IWindow* parent)
+{
+    parent_ = dynamic_cast<const IBar *>( parent);
+    assert( parent_ );
+}
+
+
+void AOptionButton::forceActivate()
+{
+    assert( 0 && "Not implemented" );
+}
+
+
+void AOptionButton::forceDeactivate()
+{
+    assert( 0 && "Not implemented" );
+}
+
+
+bool AOptionButton::isActive() const
+{
+    assert( 0 && "Not implemented" );
+
+    return false;
+}
+
+
+bool AOptionButton::isWindowContainer() const
+{
+    return false;
+}
+
+
+void AOptionButton::setState(State state)
+{
+    state_ = state;
+}
+
+
+IBarButton::State AOptionButton::getState() const
+{
+    return state_;
+}
+
+
 Bar::Bar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::unique_ptr<sfm::RectangleShape> &normal,
                                                     std::unique_ptr<sfm::RectangleShape> &onHover,
                                                     std::unique_ptr<sfm::RectangleShape> &pressed,
@@ -146,17 +268,8 @@ void Bar::draw(IRenderWindow* renderWindow)
 
     renderWindow->draw( main_shape_.get());
 
-    // if ( getId() == kOptionsBarWindowId )
-    // {
-    //     std::cerr << "Amount of buttons: " << buttons_.size() << std::endl;
-    // }
-
     for ( const auto &button : buttons_ )
     {
-        // if ( getId() == kOptionsBarWindowId )
-        // {
-        //     std::cerr << "Button to draw has id: " << button->getId() << std::endl;
-        // }
         button->draw( renderWindow);
         finishButtonDraw( renderWindow, button.get());
 
@@ -166,25 +279,8 @@ void Bar::draw(IRenderWindow* renderWindow)
 
 std::unique_ptr<IAction> Bar::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
-    // for ( auto &button : buttons_ )
-    // {
-    //     if ( !button->update( renderWindow, event) )
-    //         return nullptr;
-    //     if ( button->getState() == psapi::IBarButton::State::Press && button->getId() != last_pressed_id_ )
-    //     {
-    //         IWindow *prev_button = this->getWindowById( last_pressed_id_);
-    //         if ( prev_button )
-    //         {
-    //             IBarButton *button_ptr =  static_cast<IBarButton *>( prev_button);
-    //             if ( button_ptr->getState() == psapi::IBarButton::State::Press )
-    //             {
-    //                 button_ptr->setState( psapi::IBarButton::State::Normal);
-    //             }
-    //         }
-    //         last_pressed_id_ = button->getId();
-    //     }
-    // }
-    // return true;
+    assert( 0 && "Not implemented" );
+
     return nullptr;
 }
 
@@ -288,14 +384,6 @@ bool Bar::isWindowContainer() const
 }
 
 
-ChildInfo Bar::getNextChildInfo() const
-{
-    assert( 0 && "Not implemented" );
-
-    return ChildInfo();
-}
-
-
 void Bar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
 {
     vec2i pos = button->getPos();
@@ -322,3 +410,169 @@ void Bar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button
 
     }
 }
+
+
+sfm::Color ColorPalette::getColor() const
+{
+    return color_;
+}
+
+
+float ThicknessBar::getThickness() const
+{
+    return thickness_;
+}
+
+
+float OpacityBar::getOpacity() const
+{
+    return opacity_;
+}
+
+
+InstrumentsBar::InstrumentsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape)
+    :   id_( init_id), main_shape_(std::move(main_shape)),
+        size_( main_shape->getSize()),
+        pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y))
+{}
+
+
+void InstrumentsBar::draw(IRenderWindow* renderWindow)
+{
+    assert( renderWindow );
+
+    renderWindow->draw( main_shape_.get());
+
+    for ( const auto &instrument : instruments_ )
+    {
+        instrument->draw( renderWindow);
+    }
+}
+
+
+std::unique_ptr<IAction> InstrumentsBar::createAction(const IRenderWindow* renderWindow, const Event& event)
+{
+    assert( 0 && "Not implemented" );
+
+    return nullptr;
+}
+
+
+wid_t InstrumentsBar::getId() const
+{
+    return id_;
+}
+
+
+const IWindow* InstrumentsBar::getWindowById(wid_t id) const
+{
+    for ( const auto &instrument : instruments_ )
+    {
+        if ( instrument->getId() == id )
+        {
+            return instrument.get();
+        }
+    }
+    return nullptr;
+}
+
+
+IWindow* InstrumentsBar::getWindowById(wid_t id)
+{
+    for ( auto &instrument : instruments_ )
+    {
+        if ( instrument->getId() == id )
+        {
+            return instrument.get();
+        }
+    }
+    return nullptr;
+}
+
+
+vec2i InstrumentsBar::getPos() const
+{
+    return pos_;
+}
+
+
+vec2u InstrumentsBar::getSize() const
+{
+    return size_;
+}
+
+
+void InstrumentsBar::setParent(const IWindow* parent)
+{
+    parent_ = parent;
+}
+
+
+void InstrumentsBar::setPos(const vec2i &pos)
+{
+    pos_ = pos;
+
+    main_shape_->setPosition( pos);
+}
+
+
+void InstrumentsBar::setSize(const vec2u &size)
+{
+    size_ = size;
+
+    main_shape_->setSize( size);
+}
+
+
+void InstrumentsBar::forceActivate()
+{
+    is_active_ = true;
+}
+
+
+void InstrumentsBar::forceDeactivate()
+{
+    is_active_ = false;
+}
+
+
+bool InstrumentsBar::isActive() const
+{
+    return is_active_;
+}
+
+
+bool InstrumentsBar::isWindowContainer() const
+{
+    return true;
+}
+
+
+void InstrumentsBar::addWindow(std::unique_ptr<IWindow> window)
+{
+    IBarButton *button = dynamic_cast<IBarButton *>( window.release());
+    assert( button );
+
+    instruments_.push_back( std::unique_ptr<IBarButton>( button));
+}
+
+
+void InstrumentsBar::removeWindow(wid_t id)
+{
+    for ( auto it = instruments_.begin(); it != instruments_.end(); ++it )
+    {
+        if ( (*it)->getId() == id )
+        {
+            instruments_.erase( it);
+            return;
+        }
+    }
+}
+
+
+void InstrumentsBar::removeAllInstruments()
+{
+    instruments_.clear();
+}
+
+

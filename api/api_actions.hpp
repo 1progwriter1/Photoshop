@@ -8,7 +8,6 @@ namespace psapi
 
 class AActionController;
 
-class IRenderWindow;
 class Event;
 
 class IAction

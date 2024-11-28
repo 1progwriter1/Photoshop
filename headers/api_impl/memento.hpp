@@ -21,8 +21,8 @@ template<typename SnapShot>
 class AMementable : public psapi::IMementable<SnapShot>
 {
 public:
-    std::unique_ptr<SnapShot> save() override;
-    void restore(SnapShot* snapshot) override;
+    virtual std::unique_ptr<SnapShot> save() override;
+    virtual void restore(SnapShot* snapshot) override;
 };
 
 

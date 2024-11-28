@@ -11,14 +11,15 @@
 
 #include <cstdint>
 #include <memory>
-#include <vector>
 
 namespace psapi {
 
-namespace sfm {
-    class IRenderWindow;
-    class Event;
-} // namespace sfm
+// namespace sfm {
+//     class IRenderWindow;
+//     class Event;
+// } // namespace sfm
+
+using sfm::IRenderWindow;
 
 /**
  * @brief Alias for window identifier type.
