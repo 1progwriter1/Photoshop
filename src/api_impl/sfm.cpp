@@ -333,6 +333,18 @@ Color Image::getPixel(vec2u pos) const
 }
 
 
+vec2i Image::getPos() const
+{
+    return pos_;
+}
+
+
+void Image::setPos(const vec2i &pos)
+{
+    pos_ = pos;
+}
+
+
 bool Texture::create(unsigned int width, unsigned int height)
 {
     return texture_.create( width, height);
@@ -341,14 +353,14 @@ bool Texture::create(unsigned int width, unsigned int height)
 
 bool Texture::loadFromFile(const std::string& filename, const IntRect& area /*= IntRect()*/)
 {
-    sf::IntRect sf_area( area.top_x, area.top_y, area.width, area.height);
+    sf::IntRect sf_area(area.pos.x, area.pos.y, area.size.x, area.size.y);
     return texture_.loadFromFile( filename, sf_area);
 }
 
 
 bool Texture::loadFromMemory(const void* data, std::size_t size, const IntRect& area /*= IntRect()*/)
 {
-    sf::IntRect sf_area( area.top_x, area.top_y, area.width, area.height);
+    sf::IntRect sf_area( area.pos.x, area.pos.y, area.size.x, area.size.y);
     return texture_.loadFromMemory( data, size, sf_area);
 }
 
@@ -404,7 +416,8 @@ void Sprite::setTexture(const ITexture *texture, bool reset_rect /*= false*/)
 
 void Sprite::setTextureRect(const IntRect &rectangle)
 {
-    sf::IntRect sf_area( rectangle.top_x, rectangle.top_y, rectangle.width, rectangle.height);
+    sf::IntRect sf_area(rectangle.pos.x, rectangle.pos.y,
+                        rectangle.size.x, rectangle.size.y);
     sprite_.setTextureRect( sf_area);
 }
 
@@ -430,7 +443,7 @@ Color Sprite::getColor() const
 {
     assert( 0 && "Not implemented" );
 
-    return Color();
+    return Color(0, 0, 0, 0);
 }
 
 
@@ -462,10 +475,10 @@ IntRect Sprite::getGlobalBounds() const
 {
     sf::IntRect sf_rect = sprite_.getTextureRect();
     IntRect rect = {};
-    rect.top_x = sf_rect.left;
-    rect.top_y = sf_rect.top;
-    rect.height = sf_rect.height;
-    rect.width = sf_rect.width;
+    rect.pos.x = sf_rect.left;
+    rect.pos.y = sf_rect.top;
+    rect.size.x = sf_rect.height;
+    rect.size.y= sf_rect.width;
 
     return rect;
 }

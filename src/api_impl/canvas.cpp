@@ -5,7 +5,7 @@
 
 
 Layer::Layer( vec2u size, vec2i pos /*= vec2i()*/)
-    :   size_( size), pos_( pos), pixels_( size.x * size.y, Color()) {}
+    :   size_( size), pos_( pos), pixels_( size.x * size.y, Color(0, 0, 0, 0)) {}
 
 
 Color Layer::getPixel(sfm::vec2i pos) const
@@ -22,6 +22,54 @@ void Layer::setPixel(sfm::vec2i pos, sfm::Color pixel)
         return;
     }
     pixels_[pos.y * size_.x + pos.x] = pixel;
+}
+
+
+vec2u Layer::getSize() const
+{
+    return size_;
+}
+
+
+drawable_id_t Layer::addDrawable(std::unique_ptr<sfm::Drawable> object)
+{
+    assert( 0 && "Not implemented" );
+
+    drawables_.emplace_back(std::move(object));
+
+    return drawables_.size() - 1;
+}
+
+
+
+void Layer::removeDrawable(drawable_id_t id)
+{
+    assert( 0 && "Not implemented" );
+
+    auto iter = drawables_.begin();
+    std::advance(iter, id);
+
+    drawables_.erase(iter);
+}
+
+
+void Layer::removeAllDrawables()
+{
+    drawables_.clear();
+}
+
+
+std::unique_ptr<ILayerSnapshot> Layer::save()
+{
+    assert( 0 && "Not implemented" );
+
+    return nullptr;
+}
+
+
+void Layer::restore(ILayerSnapshot *snapshot)
+{
+    assert( 0 && "Not implemented" );
 }
 
 
@@ -159,7 +207,7 @@ void Canvas::setPos(sfm::vec2i pos)
 }
 
 
-void Canvas::setSize(sfm::vec2i size)
+void Canvas::setSize(sfm::vec2u size)
 {
     assert( size.x >= 0 && size.y >= 0 );
 
@@ -167,9 +215,9 @@ void Canvas::setSize(sfm::vec2i size)
 }
 
 
-void Canvas::setScale(sfm::vec2f scale)
+void Canvas::setZoom(sfm::vec2f zoom)
 {
-    scale_ = scale;
+    scale_ = zoom;
 }
 
 
@@ -181,7 +229,23 @@ sfm::vec2i Canvas::getMousePosition() const
 }
 
 
-bool Canvas::isPressed() const
+bool Canvas::isPressedLeftMouseButton() const
+{
+    assert( 0 && "Not implemented" );
+
+    return false;
+}
+
+
+bool Canvas::isPressedRightMouseButton() const
+{
+    assert( 0 && "Not implemented" );
+
+    return false;
+}
+
+
+bool Canvas::isPressedScrollButton() const
 {
     assert( 0 && "Not implemented" );
 
@@ -256,7 +320,7 @@ void Canvas::draw( IRenderWindow *renderWindow)
     assert( renderWindow );
 
     vec2i offset = CANVAS_SECTOR_POS - pos_;
-    sprite_->setTextureRect( sfm::IntRect( offset.x, offset.y, CANVAS_SECTOR_SIZE.x, CANVAS_SECTOR_SIZE.y));
+    sprite_->setTextureRect( sfm::IntRect(offset, CANVAS_SECTOR_SIZE));
     sprite_->setPosition( CANVAS_SECTOR_POS.x, CANVAS_SECTOR_POS.y);
 
     for ( auto &layer : layers_ )
@@ -276,15 +340,6 @@ void Canvas::draw( IRenderWindow *renderWindow)
 
     VerticalScroll::draw( renderWindow);
     HorizontalScroll::draw( renderWindow);
-}
-
-
-bool Canvas::update( const IRenderWindow *renderWindow, const Event &event)
-{
-    VerticalScroll::update( renderWindow, event, pos_);
-    HorizontalScroll::update( renderWindow, event, pos_);
-
-    return true;
 }
 
 
@@ -308,4 +363,26 @@ Canvas::Canvas( vec2i init_pos, vec2u init_size)
         }
     }
     active_layer_index_ = 0;
+}
+
+
+std::unique_ptr<IAction> Canvas::createAction(const IRenderWindow* renderWindow, const Event& event)
+{
+    assert( 0 && "Not implemented" );
+
+    return nullptr;
+}
+
+
+std::unique_ptr<ICanvasSnapshot> Canvas::save()
+{
+    assert( 0 && "Not implemented" );
+
+    return nullptr;
+}
+
+
+void Canvas::restore(ICanvasSnapshot* snapshot)
+{
+    assert( 0 && "Not implemented" );
 }

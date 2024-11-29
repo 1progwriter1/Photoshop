@@ -71,6 +71,8 @@ public:
 class Image : public IImage
 {
     sf::Image image_;
+
+    vec2i pos_ = vec2i();
 public:
     Image() = default;
     ~Image() = default;
@@ -89,6 +91,9 @@ public:
 
     Color getPixel(unsigned int x, unsigned int y) const override;
     Color getPixel(vec2u pos) const override;
+
+    vec2i getPos() const override;
+    void setPos(const vec2i &pos) override;
 };
 
 

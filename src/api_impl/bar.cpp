@@ -210,6 +210,18 @@ void AOptionButton::setParent(const IWindow* parent)
 }
 
 
+void AOptionButton::setPos(const vec2i &pos)
+{
+    sprite_->setPosition( pos.x, pos.y);
+}
+
+
+void AOptionButton::setSize(const vec2u &size)
+{
+    assert( 0 && "Not implemented" );
+}
+
+
 void AOptionButton::forceActivate()
 {
     assert( 0 && "Not implemented" );
@@ -309,6 +321,30 @@ void Bar::removeWindow(wid_t id)
 wid_t Bar::getId() const
 {
     return id_;
+}
+
+
+bool Bar::unPressAllButtons()
+{
+    for ( auto &button : buttons_ )
+    {
+        button->setState( IBarButton::State::Normal);
+    }
+    return true;
+}
+
+
+void Bar::setPos(const vec2i &pos)
+{
+    pos_ = pos;
+    main_shape_->setPosition( pos);
+}
+
+
+void Bar::setSize(const vec2u &size)
+{
+    size_ = size;
+    main_shape_->setSize( size);
 }
 
 

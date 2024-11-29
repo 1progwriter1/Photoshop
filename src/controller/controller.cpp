@@ -4,12 +4,26 @@
 #include <iostream>
 
 
+ActionsController *actions_controller = nullptr;
+
+
 Controller::Controller( Model *init_model, IWindowContainer *init_root_window)
     :   model_( init_model), root_window_( dynamic_cast<RootWindow *>( init_root_window)), last_event_( sfm::Event::None)
 {
     assert( init_model );
     assert( init_root_window );
     assert( root_window_ && "Failed to case WindowContainer to RootWindow" );
+
+    if ( !actions_controller )
+        actions_controller = new ActionsController();
+
+    actions_controller_ = *actions_controller;
+}
+
+
+Controller::~Controller()
+{
+    delete actions_controller;
 }
 
 
@@ -29,7 +43,7 @@ void Controller::getRequests()
             root_window_->getRenderWindow()->close();
         }
         last_event_ = event;
-        root_window_->update( root_window_->getRenderWindow(), last_event_);
+        actions_controller_.execute(root_window_->createAction(root_window_->getRenderWindow(), event));
     }
 }
 
@@ -44,5 +58,11 @@ void Controller::proceedView()
 
 void Controller::proceedModel()
 {
-    root_window_->update( root_window_->getRenderWindow(), last_event_);
+
+}
+
+
+AActionController *getActionController()
+{
+    return actions_controller;
 }

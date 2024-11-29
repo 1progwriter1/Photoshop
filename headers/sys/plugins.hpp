@@ -4,15 +4,15 @@
 
 static const char *PLUGINS_PATH[] =
 {
-	"../build/libcanvas.dylib",
+	// "../build/libcanvas.dylib",
 	"../build/libtoolbar.dylib",
-	"../build/liboptionsbar.dylib",
-	"../build/libbrush.dylib",
-	"../build/liberaser.dylib",
-	"../build/librectangle.dylib",
-	"../build/libellipse.dylib",
-	"../build/libline.dylib",
-	"../build/libfilter.dylib",
+	// "../build/liboptionsbar.dylib",
+	// "../build/libbrush.dylib",
+	// "../build/liberaser.dylib",
+	// "../build/librectangle.dylib",
+	// "../build/libellipse.dylib",
+	// "../build/libline.dylib",
+	// "../build/libfilter.dylib",
 	// "../build/libbrightness_filter.dylib",
 	// "../build/libnegative_filter.dylib",
 	// "../build/libbarelief_filter.dylib",

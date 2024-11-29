@@ -22,6 +22,8 @@ class Layer : public ILayer
 
     std::vector<Color> pixels_;
 
+    std::list<std::unique_ptr<sfm::Drawable>> drawables_;
+
     friend class Canvas;
 public:
     Layer( vec2u size, vec2i pos = vec2i());
@@ -30,11 +32,14 @@ public:
     Color getPixel(sfm::vec2i pos) const override;
     void setPixel(sfm::vec2i pos, sfm::Color pixel) override;
 
-    drawable_id_t addDrawable(const sfm::Drawable *object) override;
+    drawable_id_t addDrawable(std::unique_ptr<sfm::Drawable> drawable) override;
     void removeDrawable(drawable_id_t id) override;
     void removeAllDrawables() override;
 
     vec2u getSize() const override;
+
+    std::unique_ptr<ILayerSnapshot> save() override;
+    void restore(ILayerSnapshot *snapshot) override;
 };
 
 
@@ -102,6 +107,9 @@ public:
 
     void draw(IRenderWindow *removeWindow) override;
     std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
+
+    std::unique_ptr<ICanvasSnapshot> save() override;
+    void restore(ICanvasSnapshot *snapshot) override;
 };
 
 

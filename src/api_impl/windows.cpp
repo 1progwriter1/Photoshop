@@ -14,11 +14,6 @@ bool IWindowContainer::isWindowContainer() const
 }
 
 
-IWindow::~IWindow()
-{
-
-}
-
 bool AWindow::isActive() const
 {
     return is_active_;
@@ -74,26 +69,24 @@ const IWindow *AWindow::getWindowById( wid_t id) const
 }
 
 
+void AWindow::setPos( const vec2i &pos)
+{
+    pos_ = pos;
+}
+
+
+void AWindow::setSize( const vec2u &size)
+{
+    size_ = size;
+}
+
+
 void AWindowContainer::draw( sfm::IRenderWindow *renderWindow)
 {
     for ( auto &window : windows_ )
     {
         window->draw( renderWindow);
     }
-}
-
-
-bool AWindowContainer::update( const IRenderWindow* renderWindow, const Event& event)
-{
-    assert( renderWindow );
-
-    for ( auto &window : windows_ )
-    {
-        if ( !window->update( renderWindow, event) )
-            return false;
-    }
-
-    return true;
 }
 
 
@@ -143,69 +136,16 @@ void AWindowContainer::removeWindow( wid_t id)
 }
 
 
+std::unique_ptr<IAction> AWindowContainer::createAction( const IRenderWindow *renderWindow, const Event &event)
+{
+    assert( 0 && "createAction is not implemented" );
+    return nullptr;
+}
+
+
 bool AWindowContainer::isWindowContainer() const
 {
     return true;
-}
-
-
-void AWindowVector::draw( IRenderWindow *renderWindow)
-{
-    for ( auto &window : windows_ )
-    {
-        window->draw( renderWindow);
-    }
-}
-
-
-bool AWindowVector::update( const IRenderWindow *renderWindow, const Event &event)
-{
-    assert( 0 && "Not implemented" );
-
-    return true;
-}
-
-
-void AWindowVector::addWindow( std::unique_ptr<IWindow> window)
-{
-    windows_.push_back( std::move( window));
-}
-
-
-void AWindowVector::removeWindow( wid_t id)
-{
-    size_t w_cnt = windows_.size();
-    for ( size_t i = 0; i < w_cnt; i++ )
-    {
-        if ( windows_[i]->getId() == id )
-            windows_.erase( windows_.begin() + i);
-    }
-}
-
-
-IWindow *AWindowVector::getWindowById( wid_t id)
-{
-    for ( auto &window : windows_ )
-    {
-        if ( window->getId() == id )
-        {
-            window->getWindowById( id);
-        }
-    }
-    return nullptr;
-}
-
-
-const IWindow *AWindowVector::getWindowById( wid_t id) const
-{
-    for ( auto &window : windows_ )
-    {
-        if ( window->getId() == id )
-        {
-            window->getWindowById( id);
-        }
-    }
-    return nullptr;
 }
 
 
@@ -260,6 +200,18 @@ vec2u RootWindow::getSize() const
 void RootWindow::setParent(const IWindow *parent)
 {
     throw MY_EXCEPTION( "you cannot set parent for RootWindow", nullptr);
+}
+
+
+void RootWindow::setPos(const vec2i &pos)
+{
+    pos_ = pos;
+}
+
+
+void RootWindow::setSize(const vec2u &size)
+{
+    size_ = size;
 }
 
 

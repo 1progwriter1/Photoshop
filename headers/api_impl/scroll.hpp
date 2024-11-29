@@ -13,6 +13,8 @@ using psapi::sfm::vec2f;
 using psapi::sfm::RectangleShape;
 using psapi::sfm::Color;
 
+using psapi::sfm::Event;
+
 
 class Scrollable : psapi::sfm::Drawable
 {
@@ -29,14 +31,14 @@ protected:
     std::unique_ptr<RectangleShape> scroll_bar_button_;
 
     bool isOnFocus(const vec2i &mouse_pos) const;
-    virtual int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event);
+    virtual int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const Event &event);
     bool isOnScrollButton(const vec2i &mouse_pos) const;
 
 public:
     virtual ~Scrollable() {}
 
     void draw(psapi::sfm::IRenderWindow *renderWindow) const override;
-    virtual bool update(const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event, vec2i &pos) = 0;
+    virtual bool update(const psapi::sfm::IRenderWindow *renderWindow, const Event &event, vec2i &pos) = 0;
 };
 
 
@@ -45,9 +47,9 @@ class HorizontalScroll : public Scrollable
 public:
     HorizontalScroll( vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size);
 
-    bool update(const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event, vec2i &pos) override;
+    bool update(const psapi::sfm::IRenderWindow *renderWindow, const Event &event, vec2i &pos) override;
 private:
-    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event) override;
+    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const Event &event) override;
 };
 
 
@@ -56,9 +58,9 @@ class VerticalScroll : public Scrollable
 public:
     VerticalScroll( vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size);
 
-    bool update(const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event, vec2i &pos) override;
+    bool update(const psapi::sfm::IRenderWindow *renderWindow, const Event &event, vec2i &pos) override;
 private:
-    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const psapi::sfm::Event &event) override;
+    int getOffset( const psapi::sfm::IRenderWindow *renderWindow, const Event &event) override;
 };
 
 
