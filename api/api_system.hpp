@@ -144,7 +144,7 @@ Vec2D<T> operator*(const Vec2D<T> &x, const Vec2D<T> &y)
 template<typename T>
 Vec2D<T> operator*(const Vec2D<T> &x, double cf)
 {
-    return Vec2D<T>(static_cast<T>(static_cast<double>(x.x) * cf), 
+    return Vec2D<T>(static_cast<T>(static_cast<double>(x.x) * cf),
                     static_cast<T>(static_cast<double>(x.y) * cf));
 }
 
@@ -158,12 +158,28 @@ Vec2D<T> operator*(double cf, const Vec2D<T> &x)
 
 struct Color
 {
+    enum class Type
+    {
+        Black,
+        White,
+        Red,
+        Green,
+        Blue,
+        Yellow,
+        Magenta,
+        Cyan,
+        Transparent,
+    };
+
+    Color getStandardColor(Type color) const;
+
     uint8_t r = 0;
     uint8_t g = 0;
     uint8_t b = 0;
     uint8_t a = 0;
 
     Color(uint8_t init_r, uint8_t init_g, uint8_t init_b, uint8_t init_a = 255u);
+    Color() = default;
 
     Color &operator+=(const Color &color);
     Color &operator*=(const Color &color);
@@ -172,6 +188,7 @@ struct Color
     Color &operator*=(const float cf);
 
 };
+
 
 Color mix(const Color &x, const Color &y);
 

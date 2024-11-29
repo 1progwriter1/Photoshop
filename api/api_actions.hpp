@@ -6,9 +6,9 @@
 namespace psapi
 {
 
+
 class AActionController;
 
-class Event;
 
 class IAction
 {
@@ -57,10 +57,16 @@ protected:
     {
         return action->redo(IAction::Key());
     }
+    bool isUndoableAction(IAction* action)
+    {
+        return action->isUndoable(IAction::Key());
+    }
 };
 
 AActionController* getActionController();
 
+
 } // namespace psapi
+
 
 #endif // API_ACTIONS_HPP

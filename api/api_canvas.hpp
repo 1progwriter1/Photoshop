@@ -14,7 +14,8 @@ const wid_t kCanvasWindowId = 100;
 
 using drawable_id_t = int64_t;
 
-class ILayer : public IMementable<ILayerSnapshot> {
+class ILayer : public IMementable<ILayerSnapshot>
+{
 public:
     virtual ~ILayer() = default;
 
@@ -24,7 +25,7 @@ public:
     /**
      * @brief This functions adds drawable object and returns id of added shape
      */
-    virtual drawable_id_t addDrawable(const sfm::Drawable *object) = 0;
+    virtual drawable_id_t addDrawable(std::unique_ptr<sfm::Drawable> object) = 0;
 
     /**
      * @brief Removes drawable object using id. Other id stay valid
@@ -39,7 +40,8 @@ public:
     virtual sfm::vec2u getSize() const = 0;
 };
 
-class ICanvas : public IWindow, public IMementable<ICanvasSnapshot> {
+class ICanvas : public IWindow, public IMementable<ICanvasSnapshot>
+{
 public:
     virtual ~ICanvas() = default;
 
@@ -87,12 +89,6 @@ public:
      * @param index - index of layer after which new layer will be inserted
      */
     virtual bool insertEmptyLayer(size_t index) = 0;
-
-    /**
-     * @brief Set the position, set the size object
-     */
-    virtual void setPos  (sfm::vec2i pos)   = 0;
-    virtual void setSize (sfm::vec2u size)  = 0;
 
     /**
      * @brief Zoom canvas

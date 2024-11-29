@@ -6,6 +6,7 @@
 #include <list>
 #include <api_impl/sfm.hpp>
 #include <SFML/Graphics.hpp>
+#include <api_impl/actions.hpp>
 
 
 using namespace psapi;
@@ -61,7 +62,7 @@ public:
 };
 
 
-class RootWindow : public AWindowContainer
+class RootWindow : public IRootWindow
 {
     const unsigned int kRootWindowWidth  = 1600;
     const unsigned int kRootWindowHeight = 900;
@@ -71,6 +72,9 @@ class RootWindow : public AWindowContainer
     bool is_active_ = true;
     vec2u size_ = vec2u(kRootWindowWidth, kRootWindowHeight);
     vec2i pos_ = vec2i(0, 0);
+    std::vector<std::unique_ptr<IWindow>> windows_;
+
+    layer_id_t active_layer_id_ = 0;
 
     RootWindow();
 
@@ -82,7 +86,7 @@ public:
     IRenderWindow *getRenderWindow();
     const IRenderWindow *getRenderWindow() const;
 
-    static IWindowContainer *getInstance();
+    static IRootWindow *getInstance();
 
     IWindow *getWindowById( wid_t id) override;
     const IWindow *getWindowById( wid_t id) const override;
@@ -99,8 +103,28 @@ public:
     void forceDeactivate() override;
 
     bool isActive() const override;
-    void drawChildren( IRenderWindow *renderWindow) override;
 
+    void addWindow(std::unique_ptr<IWindow> window) override;
+    void removeWindow(wid_t id) override;
+
+    bool isWindowContainer() const override;
+
+    void draw(IRenderWindow *renderWindow) override;
+    std::unique_ptr<IAction> createAction(const IRenderWindow *renderWindow, const Event &event) override;
+
+    layer_id_t decreaseLayerId() override;
+    layer_id_t increaseLayerId() override;
+    layer_id_t getUpperLayerId() const override;
+};
+
+
+class RootWindowAction : public AAction
+{
+    std::vector<std::unique_ptr<IWindow>> *windows_;
+public:
+    RootWindowAction(std::vector<std::unique_ptr<IWindow>> *windows, const IRenderWindow *renderWindow, const Event &event);
+    bool execute(const Key &key) override;
+    bool isUndoable(const Key &key) override;
 };
 
 

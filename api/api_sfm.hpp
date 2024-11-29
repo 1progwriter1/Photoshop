@@ -147,6 +147,8 @@ public:
     virtual void setFont(const IFont* font)           = 0;
     virtual void setCharacterSize(unsigned int size)  = 0;
     virtual void setStyle(uint32_t style)             = 0;
+    virtual void setPos(const vec2f &pos)             = 0;
+    virtual void setSize(const vec2f &size)           = 0;
     virtual void setFillColor(const Color* color)     = 0;
     virtual void setOutlineColor(const Color* color)  = 0;
     virtual void setOutlineThickness(float thickness) = 0;

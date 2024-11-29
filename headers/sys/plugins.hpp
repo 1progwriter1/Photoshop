@@ -4,9 +4,9 @@
 
 static const char *PLUGINS_PATH[] =
 {
-	// "../build/libcanvas.dylib",
+	"../build/libcanvas.dylib",
 	"../build/libtoolbar.dylib",
-	// "../build/liboptionsbar.dylib",
+	"../build/liboptionsbar.dylib",
 	// "../build/libbrush.dylib",
 	// "../build/liberaser.dylib",
 	// "../build/librectangle.dylib",

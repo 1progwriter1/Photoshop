@@ -12,14 +12,12 @@
 #include <cstdint>
 #include <memory>
 
-namespace psapi {
+namespace psapi
+{
 
-// namespace sfm {
-//     class IRenderWindow;
-//     class Event;
-// } // namespace sfm
 
 using sfm::IRenderWindow;
+using sfm::Event;
 
 /**
  * @brief Alias for window identifier type.
@@ -167,11 +165,6 @@ public:
     virtual bool isWindowContainer() const override;
 };
 
-/**
- * @brief Retrieves the root window of the application.
- * @return A pointer to the root window container.
- */
-IWindowContainer* getRootWindow();
 
 /**
  * @brief Function pointer type for general-purpose functions.
@@ -184,6 +177,28 @@ using generalFunction = void* (*)(void*);
  * @return A pointer to the function, or nullptr if not found.
  */
 generalFunction getGeneralFunction(const std::string& name);
+
+
+using layer_id_t = int64_t;
+
+class IRootWindow : public IWindowContainer
+{
+public:
+    virtual ~IRootWindow() = default;
+
+    virtual layer_id_t getUpperLayerId() const = 0;
+    virtual layer_id_t increaseLayerId() = 0;
+    virtual layer_id_t decreaseLayerId() = 0;
+};
+
+
+/**
+ * @brief Retrieves the root window of the application.
+ * @return A pointer to the root window container.
+ */
+IRootWindow* getRootWindow();
+
+
 
 } // namespace psapi
 

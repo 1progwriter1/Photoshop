@@ -27,6 +27,7 @@ vec2u vec2dToVec2u(vec2d v)
     return vec2u(static_cast<unsigned>(v.x), static_cast<unsigned>(v.y));
 }
 
+
 static uint8_t findAverage(uint8_t a, uint8_t b)
 {
     return static_cast<uint8_t>((static_cast<int>(a) + static_cast<int>(b)) / 2);
@@ -46,6 +47,7 @@ static uint8_t subColors(uint8_t a, uint8_t b)
 {
     return static_cast<uint8_t>(clampColors(static_cast<int>(a) - static_cast<int>(b)));
 }
+
 
 Color::Color(uint8_t init_r, uint8_t init_g, uint8_t init_b, uint8_t init_a /*= 255u*/)
 :   r(init_r), g(init_g), b(init_b), a(init_a) {}

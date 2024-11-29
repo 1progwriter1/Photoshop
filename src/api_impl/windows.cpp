@@ -138,7 +138,6 @@ void AWindowContainer::removeWindow( wid_t id)
 
 std::unique_ptr<IAction> AWindowContainer::createAction( const IRenderWindow *renderWindow, const Event &event)
 {
-    assert( 0 && "createAction is not implemented" );
     return nullptr;
 }
 
@@ -172,14 +171,14 @@ IRenderWindow *RootWindow::getRenderWindow()
 }
 
 
-IWindowContainer *RootWindow::getInstance()
+IRootWindow *RootWindow::getInstance()
 {
     static RootWindow window;
     return &window;
 }
 
 
-IWindowContainer *psapi::getRootWindow()
+IRootWindow *psapi::getRootWindow()
 {
     return RootWindow::getInstance();
 }
@@ -239,12 +238,6 @@ bool RootWindow::isActive() const
 }
 
 
-void RootWindow::drawChildren( IRenderWindow *renderWindow)
-{
-    assert( 0 &&"Not implemented" );
-}
-
-
 IWindow *RootWindow::getWindowById( wid_t id)
 {
     if ( id == kRootWindowId )  return this;
@@ -262,7 +255,6 @@ IWindow *RootWindow::getWindowById( wid_t id)
 
 const IWindow *RootWindow::getWindowById( wid_t id) const
 {
-    assert( 0 && "here" );
     if ( id == kRootWindowId )  return this;
 
     for ( auto &window : windows_ )
@@ -273,4 +265,86 @@ const IWindow *RootWindow::getWindowById( wid_t id) const
         }
     }
     return nullptr;
+}
+
+
+void RootWindow::draw(sfm::IRenderWindow *renderWindow)
+{
+    assert( renderWindow );
+
+    for ( auto &window : windows_ )
+    {
+        window->draw( renderWindow);
+    }
+}
+
+
+std::unique_ptr<IAction> RootWindow::createAction(const IRenderWindow *renderWindow, const Event &event)
+{
+    return std::make_unique<RootWindowAction>(&windows_, renderWindow, event);
+}
+
+
+layer_id_t RootWindow::getUpperLayerId() const
+{
+    return active_layer_id_;
+}
+
+
+layer_id_t RootWindow::increaseLayerId()
+{
+    return ++active_layer_id_;
+}
+
+
+layer_id_t RootWindow::decreaseLayerId()
+{
+    return --active_layer_id_;
+}
+
+
+bool RootWindow::isWindowContainer() const
+{
+    return true;
+}
+
+
+void RootWindow::addWindow(std::unique_ptr<IWindow> window)
+{
+    windows_.insert( windows_.end(), std::move( window));
+}
+
+
+void RootWindow::removeWindow(wid_t id)
+{
+    auto iter = windows_.begin();
+    for ( auto &window : windows_ )
+    {
+        if ( window->getId() == id )
+        {
+            windows_.erase( iter);
+            break;
+        }
+        iter++;
+    }
+}
+
+
+RootWindowAction::RootWindowAction(std::vector<std::unique_ptr<IWindow>> *windows, const IRenderWindow *renderWindow, const Event &event)
+    :   AAction(renderWindow, event), windows_( windows) {}
+
+
+bool RootWindowAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool RootWindowAction::execute(const Key &key)
+{
+    for ( auto &window : *windows_ )
+    {
+        // psapi::getActionController()->execute();
+    }
+    return true;
 }

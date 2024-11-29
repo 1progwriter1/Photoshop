@@ -201,23 +201,29 @@ bool Canvas::insertEmptyLayer(size_t index)
 }
 
 
-void Canvas::setPos(sfm::vec2i pos)
+void Canvas::setPos(const sfm::vec2i &pos)
 {
     pos_ = pos;
 }
 
 
-void Canvas::setSize(sfm::vec2u size)
+void Canvas::setSize(const sfm::vec2u &size)
 {
     assert( size.x >= 0 && size.y >= 0 );
 
-    size_ = vec2u( static_cast<unsigned int>( size.x), static_cast<unsigned int>( size.y));
+    size_ = size;
 }
 
 
 void Canvas::setZoom(sfm::vec2f zoom)
 {
     scale_ = zoom;
+}
+
+
+Color Canvas::getCanvasBaseColor() const
+{
+    return Color();
 }
 
 

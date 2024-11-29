@@ -80,10 +80,6 @@ public:
     bool removeLayer     (size_t index) override;
     bool insertEmptyLayer(size_t index) override;
 
-    void setPos (sfm::vec2i pos)  override;
-    void setSize(sfm::vec2u size) override;
-    void setZoom(sfm::vec2f zoom) override;
-
     sfm::vec2i getMousePosition() const override;
 
     virtual bool isPressedRightMouseButton() const override;
@@ -93,8 +89,12 @@ public:
     wid_t getId() const override;
     vec2i getPos() const override;
     vec2u getSize() const override;
+    Color getCanvasBaseColor() const override;
 
     void setParent(const IWindow* parent) override;
+    void setZoom(sfm::vec2f zoom) override;
+    void setSize(const vec2u &size) override;
+    void setPos(const vec2i &pos) override;
 
     bool isWindowContainer() const override;
     bool isActive() const override;

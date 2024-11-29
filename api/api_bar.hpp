@@ -3,7 +3,8 @@
 
 #include "api_photoshop.hpp"
 
-namespace psapi {
+namespace psapi
+{
 
 const wid_t kToolBarWindowId    = 101;
 const wid_t kOptionsBarWindowId = 102;
@@ -15,6 +16,12 @@ const wid_t kOptionFilterId = 201;
 const wid_t kHelpOptionId   = 202;
 const wid_t kOptionLayerId  = 203;
 const wid_t kOptionToolsId  = 204;
+
+
+const wid_t kColorPaletteId = 300;
+const wid_t kOpacityBarId   = 301;
+const wid_t kThicknessBarId = 302;
+
 
 class IBar;
 
@@ -52,7 +59,8 @@ public:
 };
 
 
-class IBar : public IWindowContainer {
+class IBar : public IWindowContainer
+{
 public:
     virtual void finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const = 0;
 
@@ -67,6 +75,8 @@ class IColorPalette : public IWindow
 {
 public:
     virtual sfm::Color getColor() const = 0;
+
+    static std::unique_ptr<IColorPalette> create();
 };
 
 
@@ -74,6 +84,8 @@ class IOpacityBar : public IWindow
 {
 public:
     virtual float getOpacity() const = 0;
+
+    static std::unique_ptr<IOpacityBar> create();
 };
 
 
@@ -81,6 +93,8 @@ class IThicknessBar : public IWindow
 {
 public:
     virtual float getThickness() const = 0;
+
+    static std::unique_ptr<IThicknessBar> create();
 };
 
 /**

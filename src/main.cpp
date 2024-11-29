@@ -3,26 +3,23 @@
 #include <sys/my_exceptions.hpp>
 #include <api_impl/windows.hpp>
 #include <sys/plugins.hpp>
-#include <cassert>
 
 
 int main()
 {
 	try
 	{
-		Model model;
-		Controller ctrl( &model, psapi::getRootWindow());
+		Controller ctrl(psapi::getRootWindow());
 
-		actionPlugins( "loadPlugin", true);
+		actionPlugins("loadPlugin", true);
 
 		while ( ctrl.inProgress() )
 		{
 			ctrl.getRequests();
-			ctrl.proceedModel();
 			ctrl.proceedView();
 		}
 
-		actionPlugins( "unloadPlugin", false);
+		actionPlugins("unloadPlugin", false);
 
 	} catch ( my_std::exception &exc )
 	{
