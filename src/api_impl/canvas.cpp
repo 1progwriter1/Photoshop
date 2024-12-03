@@ -325,10 +325,6 @@ void Canvas::draw( IRenderWindow *renderWindow)
 {
     assert( renderWindow );
 
-    vec2i offset = CANVAS_SECTOR_POS - pos_;
-    sprite_->setTextureRect( sfm::IntRect(offset, CANVAS_SECTOR_SIZE));
-    sprite_->setPosition( CANVAS_SECTOR_POS.x, CANVAS_SECTOR_POS.y);
-
     for ( auto &layer : layers_ )
     {
         Layer *cur_layer = static_cast<Layer *>( layer.get());
@@ -344,20 +340,21 @@ void Canvas::draw( IRenderWindow *renderWindow)
     sprite_->setTexture( texture_.get());
     sprite_->draw( renderWindow);
 
-    VerticalScroll::draw( renderWindow);
-    HorizontalScroll::draw( renderWindow);
+    v_scroll_.draw( renderWindow);
+    h_scroll_.draw( renderWindow);
 }
 
 
 Canvas::Canvas( vec2i init_pos, vec2u init_size)
-    :   VerticalScroll( CANVAS_SECTOR_POS, CANVAS_SECTOR_SIZE, init_pos, init_size),
-        HorizontalScroll( CANVAS_SECTOR_POS, CANVAS_SECTOR_SIZE, init_pos, init_size),
-        is_active_( true), parent_( nullptr), size_( init_size), pos_( init_pos), temp_layer_( std::make_unique<Layer>( init_size, init_pos))
+    :   is_active_( true), parent_( nullptr), size_( init_size), pos_( init_pos), temp_layer_( std::make_unique<Layer>( init_size, init_pos)),
+        v_scroll_( psapi::getCanvasIntRect().pos, psapi::getCanvasIntRect().size, init_pos, init_size),
+        h_scroll_( psapi::getCanvasIntRect().pos, psapi::getCanvasIntRect().size, init_pos, init_size)
 {
     texture_ = sfm::ITexture::create();
-    texture_->create( init_size.x, init_size.y);
+    texture_->create( init_size.x - 20, init_size.y - 20);
 
     sprite_ = sfm::ISprite::create();
+    sprite_->setPosition(static_cast<float>(init_pos.x), static_cast<float>(init_pos.y + 20));
 
     insertLayer( 0, std::make_unique<Layer>( init_size, init_pos));
     for ( int x = 0; x < init_size.x; x++ )
@@ -374,9 +371,7 @@ Canvas::Canvas( vec2i init_pos, vec2u init_size)
 
 std::unique_ptr<IAction> Canvas::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
-    assert( 0 && "Not implemented" );
-
-    return nullptr;
+    return std::make_unique<CanvasAction>(this, renderWindow, event);
 }
 
 
@@ -392,3 +387,24 @@ void Canvas::restore(ICanvasSnapshot* snapshot)
 {
     assert( 0 && "Not implemented" );
 }
+
+
+CanvasAction::CanvasAction(Canvas* canvas, const IRenderWindow* renderWindow, const Event& event)
+    :   AAction(renderWindow, event) ,canvas_(canvas) {}
+
+
+bool CanvasAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool CanvasAction::execute(const Key &key)
+{
+    canvas_->h_scroll_.update(render_window_, event_, canvas_->pos_);
+    canvas_->v_scroll_.update(render_window_, event_, canvas_->pos_);
+
+    return true;
+}
+
+

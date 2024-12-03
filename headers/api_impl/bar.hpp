@@ -5,6 +5,7 @@
 #include <api_bar.hpp>
 #include <list>
 #include <api_sfm.hpp>
+#include <api_impl/actions.hpp>
 #include <api_impl/sfm.hpp>
 
 
@@ -23,6 +24,7 @@ protected:
 
     const IBar *parent_;
 
+    friend class BarButtonAction;
 public:
     ABarButton( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
     ~ABarButton() = default;
@@ -106,6 +108,7 @@ class Bar : public IBar
 
     vec2u size_;
     vec2i pos_;
+    vec2u buttons_size_;
 
     bool is_active_;
 
@@ -121,6 +124,7 @@ class Bar : public IBar
 
     wid_t last_pressed_id_ = -1;
 
+    friend class BarAction;
 public:
     Bar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
                                                             std::unique_ptr<sfm::RectangleShape> &onHover,
@@ -160,6 +164,8 @@ class ColorPalette : public IColorPalette
     sfm::Color color_ = sfm::Color(0, 0, 0);
 public:
     sfm::Color getColor() const override;
+
+
 };
 
 
@@ -218,6 +224,28 @@ public:
     void removeWindow(wid_t id) override;
 
     void removeAllInstruments() override;
+};
+
+
+class BarAction : public AAction
+{
+    Bar *bar_;
+public:
+    BarAction(Bar *bar, const IRenderWindow *renderWindow, const Event &event);
+
+    bool execute(const Key &key) override;
+    bool isUndoable(const Key &key) override;
+};
+
+
+class BarButtonAction : public AAction
+{
+    ABarButton *button_;
+public:
+    BarButtonAction(ABarButton *button, const IRenderWindow *renderWindow, const Event &event);
+
+    bool execute(const Key &key) override;
+    bool isUndoable(const Key &key) override;
 };
 
 

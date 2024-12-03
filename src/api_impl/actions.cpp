@@ -22,6 +22,10 @@ bool AAction::execute(const Key& key)
 }
 
 
+AUndoableAction::AUndoableAction(const IRenderWindow *render_window, const Event &event)
+    :   render_window_(render_window), event_(event) {}
+
+
 bool AUndoableAction::undo(const Key& key)
 {
     assert( 0 && "Not implemented" );
@@ -36,9 +40,8 @@ bool AUndoableAction::redo(const Key& key)
 }
 
 
-bool ActionsController::execute(std::unique_ptr<IAction> action)
+bool ActionController::execute(std::unique_ptr<IAction> action)
 {
-    std::unique_ptr<int> n = std::make_unique<int>(10);
     bool res = actionExecute(action.get());
     if ( isUndoableAction(action.get()) )
     {
@@ -53,7 +56,7 @@ bool ActionsController::execute(std::unique_ptr<IAction> action)
 }
 
 
-bool ActionsController::undo()
+bool ActionController::undo()
 {
     std::unique_ptr<psapi::IUndoableAction> action = std::move(done_actions_.back());
     bool res = actionUndo(done_actions_.back().get());
@@ -67,7 +70,7 @@ bool ActionsController::undo()
 }
 
 
-bool ActionsController::redo()
+bool ActionController::redo()
 {
     std::unique_ptr<psapi::IUndoableAction> action = std::move(undone_actions_.back());
     bool res = actionRedo(undone_actions_.back().get());
@@ -78,4 +81,17 @@ bool ActionsController::redo()
         done_actions_.pop_front();
 
     return res;
+}
+
+
+psapi::AActionController *ActionController::getInstance()
+{
+    static ActionController instance;
+    return &instance;
+}
+
+
+psapi::AActionController *psapi::getActionController()
+{
+    return ActionController::getInstance();
 }

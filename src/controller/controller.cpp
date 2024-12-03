@@ -4,23 +4,11 @@
 #include <cassert>
 
 
-ActionsController *actions_controller = nullptr;
-
-
 Controller::Controller(IWindowContainer *init_root_window)
     :   root_window_( dynamic_cast<RootWindow *>( init_root_window)), last_event_( sfm::Event::None)
 {
     assert( init_root_window );
     assert( root_window_ && "Failed to case WindowContainer to RootWindow" );
-
-    if ( !actions_controller )
-        actions_controller = new ActionsController();
-}
-
-
-Controller::~Controller()
-{
-    delete actions_controller;
 }
 
 
@@ -50,10 +38,4 @@ void Controller::proceedView()
     root_window_->getRenderWindow()->clear();
     root_window_->draw(root_window_->getRenderWindow());
     root_window_->getRenderWindow()->display();
-}
-
-
-AActionController *psapi::getActionController()
-{
-    return actions_controller;
 }

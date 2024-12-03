@@ -7,6 +7,35 @@
 using namespace psapi;
 
 
+sfm::vec2i psapi::getScreenSize()
+{
+    return psapi::getRootWindow()->getSize();
+}
+
+
+sfm::IntRect psapi::getToolbarIntRect()
+{
+    return sfm::IntRect( sfm::vec2i( 0, 0), sfm::vec2u( 84, psapi::getScreenSize().y));
+}
+
+
+sfm::IntRect psapi::getCanvasIntRect()
+{
+    return sfm::IntRect( sfm::vec2i( 84, 84), sfm::vec2u( psapi::getScreenSize().x - 84 * 2, psapi::getScreenSize().y - 84));
+}
+
+
+sfm::IntRect psapi::getOptionsBarIntRect()
+{
+    return sfm::IntRect( sfm::vec2i( 84, 0), sfm::vec2u(psapi::getScreenSize().x - 84 * 2, 84));
+}
+
+
+sfm::IntRect psapi::getInstrumentOptionsIntRect()
+{
+    return sfm::IntRect( sfm::vec2i( psapi::getScreenSize().x - 84, 0), sfm::vec2u( 84, psapi::getScreenSize().y));
+}
+
 
 bool IWindowContainer::isWindowContainer() const
 {
@@ -344,7 +373,7 @@ bool RootWindowAction::execute(const Key &key)
 {
     for ( auto &window : *windows_ )
     {
-        // psapi::getActionController()->execute();
+        psapi::getActionController()->execute(window->createAction(render_window_, event_));
     }
     return true;
 }

@@ -1,5 +1,6 @@
 #include <api_impl/bar.hpp>
 #include <cassert>
+#include <iostream>
 
 
 void ABarButton::draw(IRenderWindow* renderWindow)
@@ -18,9 +19,7 @@ ABarButton::ABarButton(  wid_t init_id, std::unique_ptr<sfm::Texture> &init_text
 
 std::unique_ptr<IAction> ABarButton::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
-    assert( 0 && "Not implemented" );
-
-    return nullptr;
+    return std::make_unique<BarButtonAction>(this, renderWindow, event);
 }
 
 
@@ -32,7 +31,7 @@ wid_t ABarButton::getId() const
 
 void ABarButton::setSize(const vec2u &size)
 {
-    assert( 0 && "Not implemented" );
+    sprite_->setTextureRect(sfm::IntRect(sfm::vec2dToVec2u(sprite_->getPosition()), size));
 }
 
 
@@ -264,8 +263,18 @@ Bar::Bar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::
                                                     std::unique_ptr<sfm::RectangleShape> &onHover,
                                                     std::unique_ptr<sfm::RectangleShape> &pressed,
                                                     std::unique_ptr<sfm::RectangleShape> &released)
-    :   id_( init_id), size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y))
+    :   id_( init_id), size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y)),
+    buttons_size_(normal->getSize())
 {
+    assert( buttons_size_.x == released->getSize().x );
+    assert( buttons_size_.y == released->getSize().y );
+
+    assert( buttons_size_.x == pressed->getSize().x );
+    assert( buttons_size_.y == pressed->getSize().y );
+
+    assert( buttons_size_.x == onHover->getSize().x );
+    assert( buttons_size_.y == onHover->getSize().y );
+
     main_shape_ = std::move( main_shape);
     normal_ = std::move( normal);
     onHover_ = std::move( onHover);
@@ -291,15 +300,18 @@ void Bar::draw(IRenderWindow* renderWindow)
 
 std::unique_ptr<IAction> Bar::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
-    assert( 0 && "Not implemented" );
-
-    return nullptr;
+    return std::make_unique<BarAction>(this, renderWindow, event);
 }
 
 
 void Bar::addWindow(std::unique_ptr<IWindow> window)
 {
-    buttons_.push_back(  std::unique_ptr<IBarButton>( dynamic_cast<IBarButton *>( window.release())));
+    window->setSize(buttons_size_);
+    vec2i w_pos = pos_;
+    w_pos.x += (size_.x - buttons_size_.x) / 2;
+    w_pos.y += ((size_.x - buttons_size_.x) / 2 + buttons_size_.y) * buttons_.size() + (size_.x - buttons_size_.x) / 2;
+    window->setPos( w_pos);
+    buttons_.push_back( std::unique_ptr<IBarButton>( dynamic_cast<IBarButton *>( window.release())));
 }
 
 
@@ -612,3 +624,72 @@ void InstrumentsBar::removeAllInstruments()
 }
 
 
+BarAction::BarAction(Bar *bar, const IRenderWindow *renderWindow, const Event &event)
+    :   AAction(renderWindow, event), bar_(bar) {}
+
+
+
+bool BarAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool BarAction::execute(const Key &key)
+{
+    for ( auto &button : bar_->buttons_ )
+    {
+        if ( !psapi::getActionController()->execute(button->createAction(render_window_, event_)) )
+            return false;
+
+        if ( button->getState() == psapi::IBarButton::State::Press && button->getId() != bar_->last_pressed_id_ )
+        {
+            IWindow *prev_button = bar_->getWindowById( bar_->last_pressed_id_);
+            if ( prev_button )
+            {
+                IBarButton *button_ptr =  static_cast<IBarButton *>( prev_button);
+                if ( button_ptr->getState() == psapi::IBarButton::State::Press )
+                {
+                    button_ptr->setState( psapi::IBarButton::State::Normal);
+                }
+            }
+            bar_->last_pressed_id_ = button->getId();
+        }
+    }
+    return true;
+}
+
+
+BarButtonAction::BarButtonAction(ABarButton *button, const IRenderWindow *renderWindow, const Event &event)
+    :   AAction(renderWindow, event), button_(button) {}
+
+
+bool BarButtonAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool BarButtonAction::execute(const Key &key)
+{
+    sfm::vec2i mouse_pos = sfm::Mouse::getPosition(render_window_);
+    sfm::vec2i button_pos = button_->getPos();
+
+    sfm::vec2u size = button_->getSize();
+    bool is_on_focus = button_pos.x <= mouse_pos.x && mouse_pos.x <= button_pos.x + size.x &&
+                        button_pos.y <= mouse_pos.y && mouse_pos.y <= button_pos.y + size.y;
+    if ( is_on_focus )
+    {
+        if ( event_.type == sfm::Event::MouseButtonPressed )
+        {
+            button_->state_ = (button_->state_ != IBarButton::State::Press) ? IBarButton::State::Press : IBarButton::State::Released;
+        } else if ( button_->state_ != IBarButton::State::Press )
+        {
+            button_->state_ = psapi::IBarButton::State::Hover;
+        }
+    } else if ( button_->state_ == psapi::IBarButton::State::Hover || button_->state_ == psapi::IBarButton::State::Released )
+    {
+        button_->state_ = psapi::IBarButton::State::Normal;
+    }
+    return true;
+}

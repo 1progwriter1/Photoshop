@@ -24,15 +24,17 @@ class Brush : public ABarButton
     sfm::Color color_ = sfm::Color( 255, 0, 0);
 
     bool options_added_ = false;
-    std::vector<std::unique_ptr<ABarButton>> options_;
+    std::vector<std::unique_ptr<IWindow>> options_;
     std::vector<wid_t> id_;
+
+    friend class BrushAction;
 public:
-    Brush( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
+    Brush(wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
     ~Brush();
 
-    bool update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event) override;
-    void draw( sfm::IRenderWindow *renderWindow) override;
-    void setColor( const sfm::Color &new_color);
+    std::unique_ptr<IAction> createAction(const IRenderWindow *renderWindow, const Event &event) override;
+    void draw(sfm::IRenderWindow *renderWindow) override;
+    void setColor(const sfm::Color &new_color);
     const sfm::Color &getColor() const;
 
 private:
@@ -45,18 +47,19 @@ private:
 };
 
 
-class ColorButton : public ABarButton
+
+class BrushAction : public AUndoableAction
 {
     Brush *brush_;
-    sfm::Color color_ = sfm::Color( 255, 0, 0);
-    bool is_set_ = false;
+    sfm::vec2i last_pos_ = sfm::vec2i( 0, 0);
 public:
-    ColorButton( wid_t init_id, Brush *init_brush, const sfm::Color &init_color,
-                std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
+    BrushAction( Brush *init_brush, const IRenderWindow *render_window, const Event &event);
 
-    void draw( sfm::IRenderWindow *renderWindow) override;
-    bool update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event) override;
+    bool undo(const Key &key) override;
+    bool redo(const Key &key) override;
+
+    bool isUndoable(const Key &key) override;
+    bool execute(const Key &key) override;
 };
-
 
 #endif // PLUGIN_BRUSH

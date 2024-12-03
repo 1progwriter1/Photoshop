@@ -19,7 +19,10 @@ bool loadPlugin()
 
     kRootWindowPtr = psapi::getRootWindow();
 
-    std::unique_ptr<psapi::ICanvas> canvas = std::make_unique<Canvas>( psapi::vec2i( 120, 0), psapi::vec2u( 1480 * 2, 900 * 3));
+    sfm::IntRect rect = psapi::getCanvasIntRect();
+    rect.size.x *= 2;
+    rect.size.y *= 3;
+    std::unique_ptr<psapi::ICanvas> canvas = std::make_unique<Canvas>(rect.pos, rect.size);
 
     kRootWindowPtr->addWindow( std::move( canvas));
 

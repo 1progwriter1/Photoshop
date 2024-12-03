@@ -11,8 +11,8 @@ using namespace psapi;
 
 using sfm::Color;
 
-const sfm::vec2u CANVAS_SECTOR_SIZE = vec2u( 1480, 790);
-const sfm::vec2i CANVAS_SECTOR_POS = vec2i( 120, 110);
+const sfm::vec2u CANVAS_SECTOR_SIZE = psapi::getCanvasIntRect().size;
+const sfm::vec2i CANVAS_SECTOR_POS = psapi::getCanvasIntRect().pos;
 
 
 class Layer : public ILayer
@@ -43,7 +43,7 @@ public:
 };
 
 
-class Canvas : public ICanvas, public VerticalScroll, public HorizontalScroll
+class Canvas : public ICanvas
 {
     std::list<std::unique_ptr<ILayer>> layers_;
     std::unique_ptr<ILayer> temp_layer_;
@@ -59,6 +59,11 @@ class Canvas : public ICanvas, public VerticalScroll, public HorizontalScroll
 
     std::unique_ptr<sfm::ITexture> texture_;
     std::unique_ptr<sfm::ISprite> sprite_;
+
+    HorizontalScroll h_scroll_;
+    VerticalScroll v_scroll_;
+
+    friend class CanvasAction;
 public:
     Canvas( vec2i init_pos, vec2u init_size);
     ~Canvas() = default;
@@ -110,6 +115,17 @@ public:
 
     std::unique_ptr<ICanvasSnapshot> save() override;
     void restore(ICanvasSnapshot *snapshot) override;
+};
+
+
+class CanvasAction : public AAction
+{
+    Canvas *canvas_;
+public:
+    CanvasAction(Canvas *canvas, const IRenderWindow *renderWindow, const Event &event);
+
+    bool execute(const Key &key) override;
+    bool isUndoable(const Key &key) override;
 };
 
 

@@ -28,20 +28,33 @@ public:
 
 class AUndoableAction : public psapi::IUndoableAction
 {
+protected:
+    const IRenderWindow *render_window_;
+    const Event &event_;
 public:
+    AUndoableAction(const IRenderWindow *render_window, const Event &event);
+
     virtual bool undo(const Key& key) override;
     virtual bool redo(const Key& key) override;
 };
 
 
-class ActionsController : public psapi::AActionController
+class ActionController : public psapi::AActionController
 {
     std::deque<std::unique_ptr<IUndoableAction>> done_actions_;
     std::deque<std::unique_ptr<IUndoableAction>> undone_actions_;
+
+    ActionController() = default;
+
+    ActionController(ActionController &controller) = delete;
+    ActionController &operator=( const ActionController &controller) = delete;
+
 public:
     bool execute(std::unique_ptr<IAction> action) override;
     bool undo() override;
     bool redo() override;
+
+    static psapi::AActionController *getInstance();
 };
 
 

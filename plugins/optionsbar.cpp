@@ -20,12 +20,14 @@ bool loadPlugin()
 {
     kRootWindowPtr = psapi::getRootWindow();
 
+    sfm::IntRect rect = psapi::getOptionsBarIntRect();
+
     std::unique_ptr<sfm::RectangleShape> main = std::make_unique<sfm::RectangleShape>();
-    main->setPosition( sfm::vec2i( 120, 10));
-    main->setSize( sfm::vec2u( 1470, 90));
+    main->setPosition( sfm::vec2i( rect.pos + sfm::vec2i( 5, 5)));
+    main->setSize( sfm::vec2u( rect.size - sfm::vec2u( 10, 10)));
     main->setFillColor( sfm::Color( 204, 255, 255));
     main->setOutlineColor( sfm::Color( 51, 153, 255));
-    main->setOutlineThickness( 10);
+    main->setOutlineThickness( 5);
 
     std::unique_ptr<sfm::RectangleShape> normal = std::make_unique<sfm::RectangleShape>();
     normal->setSize( vec2u( 48, 48));

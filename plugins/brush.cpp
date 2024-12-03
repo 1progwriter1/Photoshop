@@ -21,7 +21,6 @@ bool loadPlugin()
     std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
     texture->loadFromFile("../images/brush48_48.png");
     sprite->setTexture( texture.get());
-    sprite->setPosition( 36, 36);
 
     std::unique_ptr<ABarButton> brush = std::make_unique<Brush>( kBrushButtonId, texture, sprite);
     brush->setParent( toolbar);
@@ -52,38 +51,11 @@ Brush::~Brush()
 }
 
 
-bool Brush::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event)
+std::unique_ptr<IAction> Brush::createAction(const IRenderWindow *renderWindow, const Event &event)
 {
-    ABarButton::update( renderWindow, event);
+    psapi::getActionController()->execute(ABarButton::createAction(renderWindow, event));
 
-    if ( getState() != IBarButton::State::Press )
-    {
-        if ( options_added_ )
-        {
-            removeOptions();
-            options_added_ = false;
-        }
-        return true;
-    }
-    if ( !options_added_ )
-    {
-        createOptions();
-        addOptions();
-        options_added_ = true;
-    }
-
-    if ( !( sfm::Mouse::isButtonPressed( sfm::Mouse::Button::Left) || sfm::Mouse::isButtonPressed( sfm::Mouse::Button::Right) ) )
-    {
-        points_.clear();
-        return true;
-    }
-
-    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow);
-    sfm::vec2i relative_pos = mouse_pos - canvas_->getPos();
-
-    drawInterpolatedPoints( canvas_->getLayer( canvas_->getActiveLayerIndex()), relative_pos);
-
-    return true;
+    return std::make_unique<BrushAction>( this, renderWindow, event);
 }
 
 
@@ -95,6 +67,7 @@ void Brush::draw( sfm::IRenderWindow *renderWindow)
 
 void Brush::drawPoint( ILayer *layer, sfm::vec2i pos)
 {
+    std::cerr << "drawPoint " << pos.x << ' ' << pos.y << '\n';
     int radius = 2;
     int radius2 = 4;
 
@@ -160,69 +133,31 @@ void Brush::drawInterpolatedPoints( ILayer *layer, sfm::vec2i new_point)
     {
         drawPoint( layer, interpolate( p0, p1, p2, p3, t - size_t( t)));
     }
-
     points_.pop_front();
 }
 
 
 void Brush::addOptions()
 {
-    for ( auto &option : options_ )
-    {
-        options_bar_->addWindow( std::move( option));
-    }
-    options_.clear();
+    // for ( auto &option : options_ )
+    // {
+    //     options_bar_->addWindow( std::move( option));
+    // }
+    // options_.clear();
 }
 
 
 void Brush::removeOptions()
 {
-    for ( auto &id : id_ )
-    {
-        options_bar_->removeWindow( id);
-    }
-    id_.clear();
+    // static_cast<InstrumentsBar *>(psapi::getRootWindow()->getWindowById(kInstrumentsBarId))->removeAllInstruments();
 }
 
 
 
 void Brush::createOptions()
 {
-    sfm::vec2i button_pos = options_bar_->getPos() + sfm::vec2i( 26, 26);
-
-    std::unique_ptr<sfm::Texture> texture = std::make_unique<sfm::Texture>();
-    std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
-    texture->loadFromFile("../images/red_color_button48_48.png");
-    sprite->setTexture( texture.get());
-    sprite->setPosition( button_pos.x, button_pos.y);
-
-    std::unique_ptr<ABarButton> button = std::make_unique<ColorButton>( kRedColorButtonId, this, sfm::Color(255, 0, 0), texture, sprite);
-    options_.push_back( std::move( button));
-    id_.push_back( kRedColorButtonId);
-
-    button_pos += sfm::vec2i( 96, 0);
-
-    texture = std::make_unique<sfm::Texture>();
-    sprite = std::make_unique<sfm::Sprite>();
-    texture->loadFromFile("../images/blue_color_button48_48.png");
-    sprite->setTexture( texture.get());
-    sprite->setPosition( button_pos.x, button_pos.y);
-
-    button = std::make_unique<ColorButton>( kBlueColorButtonId, this, sfm::Color(0, 0, 255), texture, sprite);
-    options_.push_back( std::move( button));
-    id_.push_back( kBlueColorButtonId);
-
-    button_pos += sfm::vec2i( 96, 0);
-
-    texture = std::make_unique<sfm::Texture>();
-    sprite = std::make_unique<sfm::Sprite>();
-    texture->loadFromFile("../images/green_color_button48_48.png");
-    sprite->setTexture( texture.get());
-    sprite->setPosition( button_pos.x, button_pos.y);
-
-    button = std::make_unique<ColorButton>( kGreenColorButtonId, this, sfm::Color(0, 255, 0), texture, sprite);
-    options_.push_back( std::move( button));
-    id_.push_back( kGreenColorButtonId);
+    // std::unique_ptr<ColorPalette> color_palette = std::make_unique<ColorPalette>();
+    // options_.push_back( std::move( color_palette));
 }
 
 
@@ -232,42 +167,66 @@ void Brush::setColor( const sfm::Color &new_color)
 }
 
 
-ColorButton::ColorButton( wid_t init_id, Brush *init_brush, const sfm::Color &init_color,
-                            std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
-    :   ABarButton( init_id, init_texture, init_sprite), brush_( init_brush), color_( init_color)
-{}
-
-
-void ColorButton::draw( sfm::IRenderWindow *renderWindow)
+const sfm::Color &Brush::getColor() const
 {
-    State state = getState();
-    if ( is_set_ )
-    {
-        setState( psapi::IBarButton::State::Press);
-    }
-    ABarButton::draw( renderWindow);
-    setState( state);
+    return color_;
 }
 
 
-bool ColorButton::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event)
-{
-    ABarButton::update(renderWindow, event);
+BrushAction::BrushAction(Brush *init_brush, const IRenderWindow *render_window, const Event &event)
+    :   AUndoableAction(render_window, event), brush_(init_brush) {}
 
-    if ( state_ == IBarButton::State::Press )
-    {
-        brush_->setColor( color_);
-        is_set_ = true;
-    } else if ( state_ == IBarButton::State::Normal )
-    {
-        is_set_ = false;
-    }
+
+bool BrushAction::undo(const Key &key)
+{
+    std::cout << "Undo brush";
 
     return true;
 }
 
 
-const sfm::Color &Brush::getColor() const
+bool BrushAction::redo(const Key &key)
 {
-    return color_;
+    std::cout << "Redo brush";
+
+    return true;
+}
+
+
+bool BrushAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool BrushAction::execute(const Key &key)
+{
+    if ( brush_->getState() != IBarButton::State::Press )
+    {
+        if ( brush_->options_added_   )
+        {
+            brush_->removeOptions();
+            brush_->options_added_ = false;
+        }
+        return true;
+    }
+    if ( !brush_->options_added_ )
+    {
+        brush_->createOptions();
+        brush_->addOptions();
+        brush_->options_added_ = true;
+    }
+
+    if ( !( sfm::Mouse::isButtonPressed( sfm::Mouse::Button::Left) || sfm::Mouse::isButtonPressed( sfm::Mouse::Button::Right) ) )
+    {
+        brush_->points_.clear();
+        return true;
+    }
+
+    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( render_window_);
+    sfm::vec2i relative_pos = mouse_pos - brush_->canvas_->getPos();
+
+    brush_->drawInterpolatedPoints( brush_->canvas_->getLayer( brush_->canvas_->getActiveLayerIndex()), relative_pos);
+
+    return true;
 }

@@ -19,9 +19,11 @@ bool loadPlugin()
 {
     kRootWindowPtr = psapi::getRootWindow();
 
+    sfm::IntRect rect = psapi::getInstrumentOptionsIntRect();
+
     std::unique_ptr<sfm::RectangleShape> main = std::make_unique<sfm::RectangleShape>();
-    main->setPosition( psapi::getToolbarIntRect().pos + vec2i(5, 5));
-    main->setSize( psapi::getToolbarIntRect().size - vec2u(10, 10));
+    main->setPosition( sfm::vec2i( rect.pos + sfm::vec2i( 5, 5)));
+    main->setSize( sfm::vec2u( rect.size - sfm::vec2u( 10, 10)));
     main->setFillColor( sfm::Color( 204, 255, 255));
     main->setOutlineColor( sfm::Color( 51, 153, 255));
     main->setOutlineThickness( 5);
@@ -50,11 +52,13 @@ bool loadPlugin()
     released->setOutlineColor( sfm::Color( 153, 204, 255));
     released->setOutlineThickness( 5);
 
-    std::unique_ptr<psapi::IBar> bar = std::make_unique<Bar>( kToolBarWindowId, main,
+    std::unique_ptr<psapi::IBar> bar = std::make_unique<Bar>( kInstrumentsBarId, main,
                                                                 normal,
                                                                 onHover,
                                                                 pressed,
                                                                 released);
+
+    bar->setParent( kRootWindowPtr);
 
     kRootWindowPtr->addWindow( std::move( bar));
 

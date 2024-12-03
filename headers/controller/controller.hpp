@@ -13,8 +13,7 @@ class Controller
 
     sfm::Event last_event_;
 public:
-    Controller( IWindowContainer *init_root);
-    ~Controller();
+    Controller(IWindowContainer *init_root);
 
     bool inProgress();
     void getRequests();
