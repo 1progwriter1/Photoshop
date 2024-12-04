@@ -117,11 +117,11 @@ IBarButton::State ABarButton::getState() const
 }
 
 
-AOptionButton::AOptionButton(wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite, std::unique_ptr<IBar> &nested_bar)
+AMenuButton::AMenuButton(wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite, std::unique_ptr<IBar> &nested_bar)
     :   id_(init_id), texture_(std::move(init_texture)), sprite_(std::move(init_sprite)) {}
 
 
-void AOptionButton::addOption(std::unique_ptr<IWindow> option)
+void AMenuButton::addMenuItem(std::unique_ptr<IWindow> option)
 {
     assert( option );
 
@@ -129,37 +129,37 @@ void AOptionButton::addOption(std::unique_ptr<IWindow> option)
 }
 
 
-void AOptionButton::activateBar()
+void AMenuButton::activateMenu()
 {
     is_bar_active_ = true;
 }
 
 
-void AOptionButton::deactivateBar()
+void AMenuButton::deactivateMenu()
 {
     is_bar_active_ = false;
 }
 
 
-IBar *AOptionButton::getBar()
+IBar *AMenuButton::getMenu()
 {
     return bar_.get();
 }
 
 
-const IBar *AOptionButton::getBar() const
+const IBar *AMenuButton::getMenu() const
 {
     return bar_.get();
 }
 
 
-void AOptionButton::draw(IRenderWindow* renderWindow)
+void AMenuButton::draw(IRenderWindow* renderWindow)
 {
     renderWindow->draw( sprite_.get());
 }
 
 
-std::unique_ptr<IAction> AOptionButton::createAction(const IRenderWindow* renderWindow, const Event& event)
+std::unique_ptr<IAction> AMenuButton::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
     assert( 0 && "Not implemented" );
 
@@ -167,13 +167,13 @@ std::unique_ptr<IAction> AOptionButton::createAction(const IRenderWindow* render
 }
 
 
-wid_t AOptionButton::getId() const
+wid_t AMenuButton::getId() const
 {
     return id_;
 }
 
 
-IWindow* AOptionButton::getWindowById(wid_t id)
+IWindow* AMenuButton::getWindowById(wid_t id)
 {
     assert( 0 && "Not implemented" );
 
@@ -181,7 +181,7 @@ IWindow* AOptionButton::getWindowById(wid_t id)
 }
 
 
-const IWindow* AOptionButton::getWindowById(wid_t id) const
+const IWindow* AMenuButton::getWindowById(wid_t id) const
 {
     assert( 0 && "Not implemented" );
 
@@ -189,51 +189,51 @@ const IWindow* AOptionButton::getWindowById(wid_t id) const
 }
 
 
-vec2i AOptionButton::getPos() const
+vec2i AMenuButton::getPos() const
 {
     vec2f pos = sprite_->getPosition();
     return vec2i( static_cast<int>( pos.x), static_cast<int>( pos.y));
 }
 
 
-vec2u AOptionButton::getSize() const
+vec2u AMenuButton::getSize() const
 {
     return sprite_->getSize();
 }
 
 
-void AOptionButton::setParent(const IWindow* parent)
+void AMenuButton::setParent(const IWindow* parent)
 {
     parent_ = dynamic_cast<const IBar *>( parent);
     assert( parent_ );
 }
 
 
-void AOptionButton::setPos(const vec2i &pos)
+void AMenuButton::setPos(const vec2i &pos)
 {
     sprite_->setPosition( pos.x, pos.y);
 }
 
 
-void AOptionButton::setSize(const vec2u &size)
+void AMenuButton::setSize(const vec2u &size)
 {
     assert( 0 && "Not implemented" );
 }
 
 
-void AOptionButton::forceActivate()
+void AMenuButton::forceActivate()
 {
     assert( 0 && "Not implemented" );
 }
 
 
-void AOptionButton::forceDeactivate()
+void AMenuButton::forceDeactivate()
 {
     assert( 0 && "Not implemented" );
 }
 
 
-bool AOptionButton::isActive() const
+bool AMenuButton::isActive() const
 {
     assert( 0 && "Not implemented" );
 
@@ -241,19 +241,19 @@ bool AOptionButton::isActive() const
 }
 
 
-bool AOptionButton::isWindowContainer() const
+bool AMenuButton::isWindowContainer() const
 {
     return false;
 }
 
 
-void AOptionButton::setState(State state)
+void AMenuButton::setState(State state)
 {
     state_ = state;
 }
 
 
-IBarButton::State AOptionButton::getState() const
+IBarButton::State AMenuButton::getState() const
 {
     return state_;
 }
@@ -466,39 +466,57 @@ sfm::Color ColorPalette::getColor() const
 }
 
 
-float ThicknessBar::getThickness() const
+void ColorPalette::setColor(const sfm::Color &color)
+{
+    color_ = color;
+}
+
+
+float ThicknessOption::getThickness() const
 {
     return thickness_;
 }
 
 
-float OpacityBar::getOpacity() const
+void ThicknessOption::setThickness(float thickness)
+{
+    thickness_ = thickness;
+}
+
+
+float OpacityOption::getOpacity() const
 {
     return opacity_;
 }
 
 
-InstrumentsBar::InstrumentsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape)
+void OpacityOption::setOpacity(float opacity)
+{
+    opacity_ = opacity;
+}
+
+
+OptionsBar::OptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape)
     :   id_( init_id), main_shape_(std::move(main_shape)),
         size_( main_shape->getSize()),
         pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y))
 {}
 
 
-void InstrumentsBar::draw(IRenderWindow* renderWindow)
+void OptionsBar::draw(IRenderWindow* renderWindow)
 {
     assert( renderWindow );
 
     renderWindow->draw( main_shape_.get());
 
-    for ( const auto &instrument : instruments_ )
+    for ( const auto &option : options_ )
     {
-        instrument->draw( renderWindow);
+        option->draw( renderWindow);
     }
 }
 
 
-std::unique_ptr<IAction> InstrumentsBar::createAction(const IRenderWindow* renderWindow, const Event& event)
+std::unique_ptr<IAction> OptionsBar::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
     assert( 0 && "Not implemented" );
 
@@ -506,57 +524,57 @@ std::unique_ptr<IAction> InstrumentsBar::createAction(const IRenderWindow* rende
 }
 
 
-wid_t InstrumentsBar::getId() const
+wid_t OptionsBar::getId() const
 {
     return id_;
 }
 
 
-const IWindow* InstrumentsBar::getWindowById(wid_t id) const
+const IWindow* OptionsBar::getWindowById(wid_t id) const
 {
-    for ( const auto &instrument : instruments_ )
+    for ( const auto &option : options_ )
     {
-        if ( instrument->getId() == id )
+        if ( option->getId() == id )
         {
-            return instrument.get();
+            return option.get();
         }
     }
     return nullptr;
 }
 
 
-IWindow* InstrumentsBar::getWindowById(wid_t id)
+IWindow* OptionsBar::getWindowById(wid_t id)
 {
-    for ( auto &instrument : instruments_ )
+    for ( auto &option : options_ )
     {
-        if ( instrument->getId() == id )
+        if ( option->getId() == id )
         {
-            return instrument.get();
+            return option.get();
         }
     }
     return nullptr;
 }
 
 
-vec2i InstrumentsBar::getPos() const
+vec2i OptionsBar::getPos() const
 {
     return pos_;
 }
 
 
-vec2u InstrumentsBar::getSize() const
+vec2u OptionsBar::getSize() const
 {
     return size_;
 }
 
 
-void InstrumentsBar::setParent(const IWindow* parent)
+void OptionsBar::setParent(const IWindow* parent)
 {
     parent_ = parent;
 }
 
 
-void InstrumentsBar::setPos(const vec2i &pos)
+void OptionsBar::setPos(const vec2i &pos)
 {
     pos_ = pos;
 
@@ -564,7 +582,7 @@ void InstrumentsBar::setPos(const vec2i &pos)
 }
 
 
-void InstrumentsBar::setSize(const vec2u &size)
+void OptionsBar::setSize(const vec2u &size)
 {
     size_ = size;
 
@@ -572,55 +590,55 @@ void InstrumentsBar::setSize(const vec2u &size)
 }
 
 
-void InstrumentsBar::forceActivate()
+void OptionsBar::forceActivate()
 {
     is_active_ = true;
 }
 
 
-void InstrumentsBar::forceDeactivate()
+void OptionsBar::forceDeactivate()
 {
     is_active_ = false;
 }
 
 
-bool InstrumentsBar::isActive() const
+bool OptionsBar::isActive() const
 {
     return is_active_;
 }
 
 
-bool InstrumentsBar::isWindowContainer() const
+bool OptionsBar::isWindowContainer() const
 {
     return true;
 }
 
 
-void InstrumentsBar::addWindow(std::unique_ptr<IWindow> window)
+void OptionsBar::addWindow(std::unique_ptr<IWindow> window)
 {
     IBarButton *button = dynamic_cast<IBarButton *>( window.release());
     assert( button );
 
-    instruments_.push_back( std::unique_ptr<IBarButton>( button));
+    options_.push_back( std::unique_ptr<IBarButton>( button));
 }
 
 
-void InstrumentsBar::removeWindow(wid_t id)
+void OptionsBar::removeWindow(wid_t id)
 {
-    for ( auto it = instruments_.begin(); it != instruments_.end(); ++it )
+    for ( auto it = options_.begin(); it != options_.end(); ++it )
     {
         if ( (*it)->getId() == id )
         {
-            instruments_.erase( it);
+            options_.erase( it);
             return;
         }
     }
 }
 
 
-void InstrumentsBar::removeAllInstruments()
+void OptionsBar::removeAllOptions()
 {
-    instruments_.clear();
+    options_.clear();
 }
 
 

@@ -4,8 +4,8 @@
 #include <iostream>
 
 
-Layer::Layer( vec2u size, vec2i pos /*= vec2i()*/)
-    :   size_( size), pos_( pos), pixels_( size.x * size.y, Color(0, 0, 0, 0)) {}
+Layer::Layer( Canvas *canvas, vec2u size, vec2i pos /*= vec2i()*/)
+    :   size_( size), pos_( pos), pixels_( size.x * size.y, Color(0, 0, 0, 0)), canvas_(canvas) {}
 
 
 Color Layer::getPixel(sfm::vec2i pos) const
@@ -17,10 +17,12 @@ Color Layer::getPixel(sfm::vec2i pos) const
 
 void Layer::setPixel(sfm::vec2i pos, sfm::Color pixel)
 {
-    if ( !(pos.x >= 0 && size_.x > pos.x && pos.y >= 0 && size_.y > pos.y) )
+    sfm::IntRect rect = getCanvasIntRect();
+    if ( !(pos.x >= 0 && rect.size.x > pos.x && pos.y >= 0 && rect.size.y > pos.y) )
     {
         return;
     }
+    pos += rect.pos - canvas_->getPos();
     pixels_[pos.y * size_.x + pos.x] = pixel;
 }
 
@@ -120,11 +122,12 @@ const ILayer* Canvas::getTempLayer() const
 
 void Canvas::cleanTempLayer()
 {
+    Layer *layer = static_cast<Layer *>(temp_layer_.get());
     for ( int x = 0; x < size_.x; x++ )
     {
         for ( int y = 0; y < size_.y; y++ )
         {
-            temp_layer_->setPixel( vec2i( x, y), sfm::Color(0, 0, 0, 0));
+            layer->pixels_[y * size_.x + x] = sfm::Color();
         }
     }
 }
@@ -152,6 +155,9 @@ bool Canvas::insertLayer(size_t index, std::unique_ptr<ILayer> layer)
 {
     size_t cur_index = 0;
     auto iter = layers_.begin();
+    if ( layer->getSize().x != size_.x || layer->getSize().y != size_.y )
+        return false;
+
     for ( auto &cur_layer : layers_ )
     {
         if ( cur_index == index )
@@ -184,12 +190,12 @@ bool Canvas::insertEmptyLayer(size_t index)
     if ( layers_.size() < index )
         return false;
 
-    std::unique_ptr<ILayer> new_layer = std::make_unique<Layer>( size_, pos_);
+    std::unique_ptr<Layer> new_layer = std::make_unique<Layer>( this, size_, pos_);
     for ( int x = 0; x < size_.x; x++ )
     {
         for ( int y = 0; y < size_.y; y++ )
         {
-            new_layer->setPixel( vec2i( x, y), sfm::Color(0, 0, 0, 0));
+            new_layer->pixels_[y * size_.x + x] = sfm::Color();
         }
     }
 
@@ -204,6 +210,7 @@ bool Canvas::insertEmptyLayer(size_t index)
 void Canvas::setPos(const sfm::vec2i &pos)
 {
     pos_ = pos;
+    layers_.begin();
 }
 
 
@@ -331,6 +338,7 @@ void Canvas::draw( IRenderWindow *renderWindow)
 
         texture_->update( cur_layer->pixels_.data());
         sprite_->setTexture( texture_.get());
+        sprite_->setPosition(pos_.x, pos_.y);
         sprite_->draw( renderWindow);
     }
 
@@ -339,6 +347,7 @@ void Canvas::draw( IRenderWindow *renderWindow)
     texture_->update( cur_layer->pixels_.data());
     sprite_->setTexture( texture_.get());
     sprite_->draw( renderWindow);
+    sprite_->setPosition(pos_.x, pos_.y);
 
     v_scroll_.draw( renderWindow);
     h_scroll_.draw( renderWindow);
@@ -346,25 +355,28 @@ void Canvas::draw( IRenderWindow *renderWindow)
 
 
 Canvas::Canvas( vec2i init_pos, vec2u init_size)
-    :   is_active_( true), parent_( nullptr), size_( init_size), pos_( init_pos), temp_layer_( std::make_unique<Layer>( init_size, init_pos)),
-        v_scroll_( psapi::getCanvasIntRect().pos, psapi::getCanvasIntRect().size, init_pos, init_size),
-        h_scroll_( psapi::getCanvasIntRect().pos, psapi::getCanvasIntRect().size, init_pos, init_size)
+    :   is_active_( true), parent_( nullptr), size_( init_size - vec2u(20, 20)), pos_( init_pos + sfm::vec2i(0, 20)), temp_layer_( nullptr),
+        v_scroll_( psapi::getCanvasIntRect().pos, psapi::getCanvasIntRect().size, pos_, size_),
+        h_scroll_( psapi::getCanvasIntRect().pos, psapi::getCanvasIntRect().size, pos_, size_)
 {
     texture_ = sfm::ITexture::create();
-    texture_->create( init_size.x - 20, init_size.y - 20);
+    texture_->create( size_.x, size_.y);
 
     sprite_ = sfm::ISprite::create();
-    sprite_->setPosition(static_cast<float>(init_pos.x), static_cast<float>(init_pos.y + 20));
+    sprite_->setPosition(static_cast<float>(pos_.x), static_cast<float>(pos_.y));
 
-    insertLayer( 0, std::make_unique<Layer>( init_size, init_pos));
-    for ( int x = 0; x < init_size.x; x++ )
+    std::unique_ptr<Layer> layer = std::make_unique<Layer>( this, size_, pos_);
+    std::unique_ptr<Layer> temp_layer = std::make_unique<Layer>( this, size_, pos_);
+    for ( int x = 0; x < size_.x; x++ )
     {
-        for ( int y = 0; y < init_size.y; y++ )
+        for ( int y = 0; y < size_.y; y++ )
         {
-            layers_.front()->setPixel( vec2i( x, y), sfm::Color( 255, 255, 255, 255));
-            temp_layer_->setPixel( vec2i( x, y), sfm::Color(0, 0, 0, 0));
+            layer->pixels_[y * size_.x + x] = sfm::Color(255, 255, 255, 255);
+            temp_layer->pixels_[y * size_.x + x] = sfm::Color(0, 0, 0, 0);
         }
     }
+    insertLayer( 0, std::move(layer));
+    temp_layer_ = std::move(temp_layer);
     active_layer_index_ = 0;
 }
 

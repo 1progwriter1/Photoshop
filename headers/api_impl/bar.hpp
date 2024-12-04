@@ -53,7 +53,7 @@ public:
 };
 
 
-class AOptionButton : public IOptionButton
+class AMenuButton : public IMenuButton
 {
 protected:
     std::unique_ptr<sfm::Texture> texture_;
@@ -68,15 +68,15 @@ protected:
 
     const IBar *parent_ = nullptr;
 public:
-    AOptionButton( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite, std::unique_ptr<IBar> &nested_bar);
+    AMenuButton( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite, std::unique_ptr<IBar> &nested_bar);
 
-    virtual void addOption(std::unique_ptr<IWindow> option) override;
+    virtual void addMenuItem(std::unique_ptr<IWindow> option) override;
 
-    virtual void activateBar() override;
-    virtual void deactivateBar() override;
+    virtual void activateMenu() override;
+    virtual void deactivateMenu() override;
 
-    virtual IBar *getBar() override;
-    virtual const IBar *getBar() const override;
+    virtual IBar *getMenu() override;
+    virtual const IBar *getMenu() const override;
 
     virtual void draw(IRenderWindow* renderWindow) override;
     std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
@@ -164,30 +164,31 @@ class ColorPalette : public IColorPalette
     sfm::Color color_ = sfm::Color(0, 0, 0);
 public:
     sfm::Color getColor() const override;
-
-
+    void setColor(const sfm::Color &color) override;
 };
 
 
-class ThicknessBar : public IThicknessBar
+class ThicknessOption : public IThicknessOption
 {
     float thickness_ = 0;
 public:
     float getThickness() const override;
+    void setThickness(float thickness) override;
 };
 
 
-class OpacityBar : public IOpacityBar
+class OpacityOption : public IOpacityOption
 {
     float opacity_ = 0;
 public:
     float getOpacity() const override;
+    void setOpacity(float opacity) override;
 };
 
 
-class InstrumentsBar : public IInstrumentsBar
+class OptionsBar : public IOptionsBar
 {
-    wid_t id_ = kInstrumentsBarId;
+    wid_t id_ = kOptionsBarWindowId;
 
     std::unique_ptr<sfm::RectangleShape> main_shape_;
     vec2u size_;
@@ -197,9 +198,9 @@ class InstrumentsBar : public IInstrumentsBar
 
     const IWindow *parent_ = nullptr;
 
-    std::list<std::unique_ptr<IBarButton>> instruments_;
+    std::list<std::unique_ptr<IBarButton>> options_;
 public:
-    InstrumentsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape);
+    OptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape);
 
     void draw(IRenderWindow* renderWindow) override;
     std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
@@ -223,7 +224,7 @@ public:
     void addWindow(std::unique_ptr<IWindow> window) override;
     void removeWindow(wid_t id) override;
 
-    void removeAllInstruments() override;
+    void removeAllOptions() override;
 };
 
 

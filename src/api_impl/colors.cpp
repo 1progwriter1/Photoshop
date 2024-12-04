@@ -5,7 +5,7 @@
 using psapi::sfm::Color;
 
 
-Color Color::getStandardColor(Color::Type type) const
+Color Color::getStandardColor(Color::Type type)
 {
     switch ( type )
     {

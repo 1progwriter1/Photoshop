@@ -7,7 +7,7 @@
 using namespace psapi;
 
 
-sfm::vec2i psapi::getScreenSize()
+sfm::vec2u psapi::getScreenSize()
 {
     return psapi::getRootWindow()->getSize();
 }

@@ -1,45 +1,44 @@
 #include <api_impl/scroll.hpp>
 #include <cassert>
+#include <api_photoshop.hpp>
 #include <iostream>
 
 
 VerticalScroll::VerticalScroll(vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size)
 {
-    sector_pos_ = sector_pos;
-    sector_size_ = sector_size;
+    pos_ = vec2i( sector_pos.x - 20 + sector_size.x, sector_pos.y + 20);
+    size_ = vec2u( 20, sector_size.y - 20);
     window_size_ = window_size;
+    window_pos_ = window_pos;
 
     scroll_bar_ = std::make_unique<RectangleShape>();
-    scroll_bar_->setPosition( vec2i( sector_pos.x - 20 + sector_size.x, sector_pos.y));
-    scroll_bar_->setSize( vec2u( 20, sector_size.y));
+    scroll_bar_->setPosition( pos_);
+    scroll_bar_->setSize( size_);
     scroll_bar_->setFillColor( Color( 128, 128, 128));
 
     scroll_bar_button_ = std::make_unique<RectangleShape>();
-    scroll_bar_button_->setPosition( vec2i( sector_pos.x - 20 + sector_size.x, sector_pos.y));
-    scroll_bar_button_->setSize( vec2u( 20, sector_size.y / (static_cast<float>( window_size.y) / static_cast<float>( sector_size.y))));
+    scroll_bar_button_->setPosition( pos_);
+    scroll_bar_button_->setSize( vec2u( 20, size_.y * (static_cast<float>( size_.y) / static_cast<float>( window_size.y))));
     scroll_bar_button_->setFillColor( Color( 192, 192, 192));
-
-    ratio_ = static_cast<float>( window_size.y) / static_cast<float>( sector_size.y);
 }
 
 
 HorizontalScroll::HorizontalScroll( vec2i sector_pos, vec2u sector_size, vec2i window_pos, vec2u window_size)
 {
-    sector_pos_ = sector_pos;
-    sector_size_ = sector_size;
+    pos_ = sector_pos;
+    size_ = vec2u( sector_size.x - 20, 20);
     window_size_ = window_size;
+    window_pos_ = window_pos;
 
     scroll_bar_ = std::make_unique<RectangleShape>();
-    scroll_bar_->setPosition( vec2i( sector_pos.x, sector_pos.y));
-    scroll_bar_->setSize( vec2u( sector_size.x, 20));
+    scroll_bar_->setPosition(pos_);
+    scroll_bar_->setSize(size_);
     scroll_bar_->setFillColor( Color(128, 128, 128));
 
     scroll_bar_button_ = std::make_unique<RectangleShape>();
-    scroll_bar_button_->setPosition( vec2i( sector_pos.x, sector_pos.y));
-    scroll_bar_button_->setSize( vec2u( sector_size.x / (static_cast<float>( window_size.x) / static_cast<float>( sector_size.x)), 20));
+    scroll_bar_button_->setPosition( pos_);
+    scroll_bar_button_->setSize( vec2u( size_.x * (static_cast<float>( size_.x) / static_cast<float>( window_size.x)), 20));
     scroll_bar_button_->setFillColor( Color( 192, 192, 192));
-
-    ratio_ = static_cast<float>( window_size.x) / static_cast<float>( sector_size.x);
 }
 
 
@@ -64,12 +63,11 @@ bool VerticalScroll::update(const psapi::sfm::IRenderWindow *renderWindow, const
     vec2f button_pos = scroll_bar_button_->getPosition();
     int new_pos = button_pos.y - offset;
 
-    new_pos = std::max<int>( scroll_bar_->getPosition().y, new_pos);
-    new_pos = std::min<int>( scroll_bar_->getSize().y + scroll_bar_->getPosition().y - scroll_bar_button_->getSize().y, new_pos);
+    new_pos = std::max<int>( pos_.y, new_pos);
+    new_pos = std::min<int>( size_.y + pos_.y - scroll_bar_button_->getSize().y, new_pos);
 
     scroll_bar_button_->setPosition( vec2f( button_pos.x, new_pos));
-    pos.y = -static_cast<float>( new_pos - sector_pos_.y) / sector_size_.y * static_cast<float>( window_size_.y) + sector_pos_.y;
-
+    pos.y = -static_cast<float>( new_pos - pos_.y) / size_.y * static_cast<float>( window_size_.y) + pos_.y;
     return true;
 }
 
@@ -124,7 +122,7 @@ bool HorizontalScroll::update(const psapi::sfm::IRenderWindow *renderWindow, con
     new_pos = std::min<int>( scroll_bar_->getSize().x + scroll_bar_->getPosition().x - scroll_bar_button_->getSize().x, new_pos);
 
     scroll_bar_button_->setPosition( vec2f( new_pos, button_pos.y));
-    pos.x = -static_cast<float>( new_pos - sector_pos_.x) / sector_size_.x * static_cast<float>( window_size_.x) + sector_pos_.x;
+    pos.x = -static_cast<float>( new_pos - pos_.x) / size_.x * static_cast<float>( window_size_.x) + pos_.x;
 
     return true;
 }
@@ -132,8 +130,8 @@ bool HorizontalScroll::update(const psapi::sfm::IRenderWindow *renderWindow, con
 
 bool Scrollable::isOnFocus(const vec2i &mouse_pos) const
 {
-    return sector_pos_.x <= mouse_pos.x && mouse_pos.x < sector_pos_.x + sector_size_.x &&
-         sector_pos_.y <= mouse_pos.y && mouse_pos.y < sector_pos_.y + sector_size_.y;
+    return window_pos_.x <= mouse_pos.x && mouse_pos.x < window_pos_.x + window_size_.x &&
+         window_pos_.y <= mouse_pos.y && mouse_pos.y < window_pos_.y + window_size_.y;
 }
 
 

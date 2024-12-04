@@ -19,13 +19,13 @@ using psapi::sfm::Event;
 class Scrollable : psapi::sfm::Drawable
 {
 protected:
-    vec2i sector_pos_;
-    vec2u sector_size_;
+    vec2i pos_;
+    vec2u size_;
     vec2u window_size_;
+    vec2i window_pos_;
 
     bool is_moved_ = false;
     vec2i last_mouse_pos_ = vec2i();
-    float ratio_;
 
     std::unique_ptr<RectangleShape> scroll_bar_;
     std::unique_ptr<RectangleShape> scroll_bar_button_;

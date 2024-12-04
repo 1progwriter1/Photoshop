@@ -52,7 +52,7 @@ bool loadPlugin()
     released->setOutlineColor( sfm::Color( 153, 204, 255));
     released->setOutlineThickness( 5);
 
-    std::unique_ptr<psapi::IBar> bar = std::make_unique<Bar>( kInstrumentsBarId, main,
+    std::unique_ptr<psapi::IBar> bar = std::make_unique<Bar>( kOptionsBarWindowId, main,
                                                                 normal,
                                                                 onHover,
                                                                 pressed,

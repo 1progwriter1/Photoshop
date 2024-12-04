@@ -171,7 +171,7 @@ struct Color
         Transparent,
     };
 
-    Color getStandardColor(Type color) const;
+    static Color getStandardColor(Type color);
 
     uint8_t r = 0;
     uint8_t g = 0;

@@ -14,6 +14,8 @@ using sfm::Color;
 const sfm::vec2u CANVAS_SECTOR_SIZE = psapi::getCanvasIntRect().size;
 const sfm::vec2i CANVAS_SECTOR_POS = psapi::getCanvasIntRect().pos;
 
+class Canvas;
+
 
 class Layer : public ILayer
 {
@@ -23,10 +25,11 @@ class Layer : public ILayer
     std::vector<Color> pixels_;
 
     std::list<std::unique_ptr<sfm::Drawable>> drawables_;
+    Canvas *canvas_;
 
     friend class Canvas;
 public:
-    Layer( vec2u size, vec2i pos = vec2i());
+    Layer( Canvas *canvas, vec2u size, vec2i pos = vec2i());
     ~Layer() = default;
 
     Color getPixel(sfm::vec2i pos) const override;

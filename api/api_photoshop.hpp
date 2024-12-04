@@ -50,7 +50,7 @@ sfm::IntRect getInstrumentOptionsIntRect();
  *
  * @return psapi::sfm::vec2i
  */
-psapi::sfm::vec2i getScreenSize();
+psapi::sfm::vec2u getScreenSize();
 
 /**
  * @brief Interface representing a basic window.

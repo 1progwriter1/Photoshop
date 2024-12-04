@@ -67,7 +67,6 @@ void Brush::draw( sfm::IRenderWindow *renderWindow)
 
 void Brush::drawPoint( ILayer *layer, sfm::vec2i pos)
 {
-    std::cerr << "drawPoint " << pos.x << ' ' << pos.y << '\n';
     int radius = 2;
     int radius2 = 4;
 
@@ -224,7 +223,7 @@ bool BrushAction::execute(const Key &key)
     }
 
     sfm::vec2i mouse_pos = sfm::Mouse::getPosition( render_window_);
-    sfm::vec2i relative_pos = mouse_pos - brush_->canvas_->getPos();
+    sfm::vec2i relative_pos = mouse_pos - psapi::getCanvasIntRect().pos;
 
     brush_->drawInterpolatedPoints( brush_->canvas_->getLayer( brush_->canvas_->getActiveLayerIndex()), relative_pos);
 
