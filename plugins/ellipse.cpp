@@ -1,6 +1,7 @@
 #include "ellipse.hpp"
 
 #include <cassert>
+#include <iostream>
 #include "../headers/windows_id.hpp"
 #include "../headers/api_impl/canvas.hpp"
 
@@ -20,7 +21,7 @@ bool loadPlugin()
     std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
     texture->loadFromFile("../images/ellipse48_48.png");
     sprite->setTexture( texture.get());
-    sprite->setPosition( 36, 324);
+    sprite->setPosition( 10, 20);
 
     std::unique_ptr<ABarButton> ellipse = std::make_unique<Ellipse>( kEllipseButtonId, texture, sprite);
     toolbar->addWindow( std::move( ellipse));
@@ -42,43 +43,6 @@ Ellipse::Ellipse( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, st
 
     layer_ = canvas_->getTempLayer();
     assert( layer_ && "Failed to get temp layer" );
-}
-
-
-
-bool Ellipse::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event)
-{
-    ABarButton::update( renderWindow, event);
-
-    if ( state_ != psapi::IBarButton::State::Press )
-    {
-        return true;
-    }
-    if ( event.type == sfm::Event::MouseButtonPressed && isOnCanvas( sfm::Mouse::getPosition( renderWindow)) )
-    {
-        draw_ = true;
-        left_upper_edge_ = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
-        last_mouse_pos_ = left_upper_edge_;
-    } else if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
-    {
-        canvas_->cleanTempLayer();
-        drawEllipse( renderWindow, canvas_->getLayer( canvas_->getActiveLayerIndex()), false);
-        draw_ = false;
-        left_upper_edge_ = sfm::vec2i();
-        return true;
-    }
-
-    if ( draw_ )
-    {
-        sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
-        if ( std::abs( new_mouse_pos.x - last_mouse_pos_.x) >= 10 || std::abs( new_mouse_pos.y - last_mouse_pos_.y) >= 10 )
-        {
-            last_mouse_pos_ = new_mouse_pos;
-            drawEllipse( renderWindow, layer_, true);
-        }
-    }
-
-    return true;
 }
 
 
@@ -113,6 +77,18 @@ void Ellipse::drawEllipse( const sfm::IRenderWindow *renderWindow, ILayer *layer
 }
 
 
+void Ellipse::updateState(const IRenderWindow *renderWindow, const Event &event)
+{
+    getActionController()->execute(ABarButton::createAction(renderWindow, event));
+}
+
+
+std::unique_ptr<IAction> Ellipse::createAction(const IRenderWindow *renderWindow, const Event &event)
+{
+    return std::make_unique<EllipseAction>(this, renderWindow, event);
+}
+
+
 bool Ellipse::isOnCanvas( sfm::vec2i mouse_pos)
 {
     sfm::vec2i relative_pos = mouse_pos - canvas_->getPos();
@@ -131,4 +107,64 @@ bool Ellipse::isOnEllipse( sfm::vec2i pos, sfm::vec2u size2, sfm::vec2i center)
     sfm::vec2f center_f = sfm::vec2f( center.x, center.y);
 
     return delta_x * delta_x / size2_f.x + delta_y * delta_y / size2_f.y <= 0.25;
+}
+
+
+EllipseAction::EllipseAction(Ellipse *ellipse, const IRenderWindow *renderWindow, const Event &event)
+    :   AUndoableAction(renderWindow, event), ellipse_(ellipse) {}
+
+
+bool EllipseAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool EllipseAction::redo(const Key &key)
+{
+    std::cout << "Redo ellipse\n";
+    return true;
+}
+
+
+bool EllipseAction::undo(const Key &key)
+{
+    std::cout << "Undo ellipse\n";
+    return true;
+}
+
+
+bool EllipseAction::execute(const Key &key)
+{
+    ellipse_->updateState(render_window_, event_);
+
+    if ( ellipse_->state_ != psapi::IBarButton::State::Press )
+    {
+        return true;
+    }
+    if ( event_.type == sfm::Event::MouseButtonPressed && ellipse_->isOnCanvas( sfm::Mouse::getPosition( render_window_)) )
+    {
+        ellipse_->draw_ = true;
+        ellipse_->left_upper_edge_ = sfm::Mouse::getPosition( render_window_) - CANVAS_SECTOR_POS;
+        ellipse_->last_mouse_pos_ = ellipse_->left_upper_edge_;
+    } else if ( event_.type == sfm::Event::MouseButtonReleased && ellipse_->draw_ )
+    {
+        ellipse_->canvas_->cleanTempLayer();
+        ellipse_->drawEllipse( render_window_, ellipse_->canvas_->getLayer( ellipse_->canvas_->getActiveLayerIndex()), false);
+        ellipse_->draw_ = false;
+        ellipse_->left_upper_edge_ = sfm::vec2i();
+        return true;
+    }
+
+    if ( ellipse_->draw_ )
+    {
+        sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition( render_window_) - ellipse_->canvas_->getPos();
+        if ( std::abs( new_mouse_pos.x - ellipse_->last_mouse_pos_.x) >= 10 || std::abs( new_mouse_pos.y - ellipse_->last_mouse_pos_.y) >= 10 )
+        {
+            ellipse_->last_mouse_pos_ = new_mouse_pos;
+            ellipse_->drawEllipse( render_window_, ellipse_->layer_, true);
+        }
+    }
+
+    return true;
 }

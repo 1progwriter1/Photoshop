@@ -306,6 +306,7 @@ std::unique_ptr<IAction> ABar::createAction(const IRenderWindow* renderWindow, c
 
 void ABar::addWindow(std::unique_ptr<IWindow> window)
 {
+    window->setPos( vec2i());
     window->setSize(buttons_size_);
     vec2i pos = calculateNextPos(window->getPos());
     window->setPos(pos);

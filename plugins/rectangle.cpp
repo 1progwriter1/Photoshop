@@ -66,58 +66,6 @@ std::unique_ptr<IAction> Rectangle::createAction(const IRenderWindow *renderWind
 }
 
 
-// bool Rectangle::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event)
-// {
-//     ABarButton::update( renderWindow, event);
-//
-//     if ( getState() != IBarButton::State::Press )
-//     {
-//         if ( options_added_ )
-//         {
-//             removeOptions();
-//             options_added_ = false;
-//         }
-//         return true;
-//     }
-//     if ( !options_added_ )
-//     {
-//         createOptions();
-//         addOptions();
-//         options_added_ = true;
-//     }
-//
-//     if ( state_ != psapi::IBarButton::State::Press )
-//     {
-//         return true;
-//     }
-//     if ( event.type == sfm::Event::MouseButtonPressed && isOnCanvas( sfm::Mouse::getPosition( renderWindow)) )
-//     {
-//         draw_ = true;
-//         left_upper_edge_ = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
-//         last_mouse_pos_ = left_upper_edge_;
-//     } else if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
-//     {
-//         canvas_->cleanTempLayer();
-//         drawRectangle( renderWindow, canvas_->getLayer( canvas_->getActiveLayerIndex()), false);
-//         draw_ = false;
-//         left_upper_edge_ = sfm::vec2i();
-//         return true;
-//     }
-//
-//     if ( draw_ )
-//     {
-//         sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
-//         if ( std::abs( new_mouse_pos.x - last_mouse_pos_.x) >= 10 || std::abs( new_mouse_pos.y - last_mouse_pos_.y) >= 10 )
-//         {
-//             last_mouse_pos_ = new_mouse_pos;
-//             drawRectangle( renderWindow, layer_, true);
-//         }
-//     }
-//
-//     return true;
-// }
-
-
 void Rectangle::drawRectangle( const sfm::IRenderWindow *renderWindow, ILayer *layer, bool is_temp_layer)
 {
     assert( renderWindow );
@@ -173,21 +121,13 @@ const sfm::Color &Rectangle::getColor() const
 
 void Rectangle::addOptions()
 {
-    // for ( auto &option : options_ )
-    // {
-    //     options_bar_->addWindow( std::move( option));
-    // }
-    // options_.clear();
+
 }
 
 
 void Rectangle::removeOptions()
 {
-    // for ( auto &id : id_ )
-    // {
-    //     options_bar_->removeWindow( id);
-    // }
-    // id_.clear();
+
 }
 
 

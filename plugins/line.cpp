@@ -1,5 +1,6 @@
 #include "line.hpp"
 #include <cassert>
+#include <iostream>
 #include "../headers/windows_id.hpp"
 
 
@@ -49,37 +50,15 @@ void Line::draw( sfm::IRenderWindow *renderWindow)
 }
 
 
-bool Line::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event)
+void Line::updateState(const IRenderWindow *renderWindow, const Event &event)
 {
-    ABarButton::update( renderWindow, event);
+    getActionController()->execute(ABarButton::createAction(renderWindow, event));
+}
 
-    if ( state_ != psapi::IBarButton::State::Press )
-    {
-        return true;
-    }
-    if ( event.type == sfm::Event::MouseButtonPressed && isOnCanvas( sfm::Mouse::getPosition( renderWindow)) )
-    {
-        draw_ = true;
-        begin_pos_ = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
-        last_mouse_pos_ = begin_pos_;
-    } else if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
-    {
-        drawLine( renderWindow, canvas_->getLayer( canvas_->getActiveLayerIndex()), false);
-        draw_ = false;
-        begin_pos_ = sfm::vec2i();
-        return true;
-    }
 
-    if ( draw_ )
-    {
-        sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_->getPos();
-        if ( std::abs( new_mouse_pos.x - last_mouse_pos_.x) >= 10 || std::abs( new_mouse_pos.y - last_mouse_pos_.y) >= 10 )
-        {
-            last_mouse_pos_ = new_mouse_pos;
-            drawLine( renderWindow, layer_, true);
-        }
-    }
-    return true;
+std::unique_ptr<IAction> Line::createAction(const IRenderWindow *renderWindow, const Event &event)
+{
+    return std::make_unique<LineAction>(this, renderWindow, event);
 }
 
 
@@ -128,4 +107,62 @@ void Line::drawLine( const sfm::IRenderWindow *renderWindow, ILayer *layer, bool
             }
         }
     }
+}
+
+
+LineAction::LineAction(Line *line, const IRenderWindow *renderWindow, const Event &event)
+    :   AUndoableAction(renderWindow, event), line_(line) {}
+
+
+bool LineAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool LineAction::redo(const Key &key)
+{
+    std::cout << "Redo line\n";
+    return true;
+}
+
+
+bool LineAction::undo(const Key &key)
+{
+    std::cout << "Undo line\n";
+    return true;
+}
+
+
+bool LineAction::execute(const Key &key)
+{
+    line_->updateState(render_window_, event_);
+
+    if ( line_->state_ != psapi::IBarButton::State::Press )
+    {
+        return true;
+    }
+    if ( event_.type == sfm::Event::MouseButtonPressed && line_->isOnCanvas( sfm::Mouse::getPosition( render_window_)) )
+    {
+        line_->draw_ = true;
+        line_->begin_pos_ = sfm::Mouse::getPosition( render_window_) - CANVAS_SECTOR_POS;
+        line_->last_mouse_pos_ = line_->begin_pos_;
+    } else if ( event_.type == sfm::Event::MouseButtonReleased && line_->draw_ )
+    {
+        line_->drawLine( render_window_, line_->canvas_->getLayer( line_->canvas_->getActiveLayerIndex()), false);
+        line_->draw_ = false;
+        line_->begin_pos_ = sfm::vec2i();
+        return true;
+    }
+
+    if ( line_->draw_ )
+    {
+        sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition( render_window_) - line_->canvas_->getPos();
+        if ( std::abs( new_mouse_pos.x - line_->last_mouse_pos_.x) >= 10 || std::abs( new_mouse_pos.y - line_->last_mouse_pos_.y) >= 10 )
+        {
+            line_->last_mouse_pos_ = new_mouse_pos;
+            line_->drawLine( render_window_, line_->layer_, true);
+        }
+    }
+    return true;
 }
