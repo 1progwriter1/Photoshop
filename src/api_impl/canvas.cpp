@@ -4,32 +4,40 @@
 #include <iostream>
 
 
-Layer::Layer( Canvas *canvas, vec2u size, vec2i pos /*= vec2i()*/)
-    :   size_( size), pos_( pos), pixels_( size.x * size.y, Color(0, 0, 0, 0)), canvas_(canvas) {}
+Layer::Layer(Canvas *canvas)
+    :   canvas_(canvas)
+{
+    assert( canvas_ );
+    rect_ = canvas_->getActualRect();
+    vec2u size = canvas_->getSize();
+    pixels_.resize( size.x * size.y, Color(0, 0, 0, 0));
+}
 
 
 Color Layer::getPixel(sfm::vec2i pos) const
 {
-    assert( pos.x >= 0 && size_.x > pos.x && pos.y >= 0 && size_.y > pos.y );
-    return pixels_[pos.y * size_.x + pos.x];
+    if  ( !(pos.x >= rect_.pos.x && rect_.size.x + rect_.pos.x > pos.x &&
+            pos.y >= rect_.pos.y && rect_.size.y + rect_.pos.x > pos.y ) )
+        return Color();
+    return pixels_[pos.y * canvas_->getSize().x + pos.x];
 }
 
 
 void Layer::setPixel(sfm::vec2i pos, sfm::Color pixel)
 {
-    sfm::IntRect rect = getCanvasIntRect();
-    if ( !(pos.x >= 0 && rect.size.x > pos.x && pos.y >= 0 && rect.size.y > pos.y) )
-    {
+    pos -= rect_.pos - psapi::getCanvasIntRect().pos;
+    if  ( !(pos.x >= 0 && rect_.size.x > pos.x &&
+            pos.y >= 0 && rect_.size.y > pos.y ) )
         return;
-    }
-    pos += rect.pos - canvas_->getPos();
-    pixels_[pos.y * size_.x + pos.x] = pixel;
+
+    pos += rect_.pos - canvas_->getPos();
+    pixels_[pos.y * canvas_->getSize().x + pos.x] = pixel;
 }
 
 
 vec2u Layer::getSize() const
 {
-    return size_;
+    return canvas_->getSize();
 }
 
 
@@ -190,7 +198,7 @@ bool Canvas::insertEmptyLayer(size_t index)
     if ( layers_.size() < index )
         return false;
 
-    std::unique_ptr<Layer> new_layer = std::make_unique<Layer>( this, size_, pos_);
+    std::unique_ptr<Layer> new_layer = std::make_unique<Layer>(this);
     for ( int x = 0; x < size_.x; x++ )
     {
         for ( int y = 0; y < size_.y; y++ )
@@ -362,17 +370,21 @@ Canvas::Canvas( vec2i init_pos, vec2u init_size)
     texture_ = sfm::ITexture::create();
     texture_->create( size_.x, size_.y);
 
+    actual_rect_ = psapi::getCanvasIntRect();
+    actual_rect_.pos += vec2i(0, 20);
+    actual_rect_.size -= vec2u(20, 20);
+
     sprite_ = sfm::ISprite::create();
     sprite_->setPosition(static_cast<float>(pos_.x), static_cast<float>(pos_.y));
 
-    std::unique_ptr<Layer> layer = std::make_unique<Layer>( this, size_, pos_);
-    std::unique_ptr<Layer> temp_layer = std::make_unique<Layer>( this, size_, pos_);
+    std::unique_ptr<Layer> layer = std::make_unique<Layer>( this);
+    std::unique_ptr<Layer> temp_layer = std::make_unique<Layer>( this);
     for ( int x = 0; x < size_.x; x++ )
     {
         for ( int y = 0; y < size_.y; y++ )
         {
-            layer->pixels_[y * size_.x + x] = sfm::Color(255, 255, 255, 255);
-            temp_layer->pixels_[y * size_.x + x] = sfm::Color(0, 0, 0, 0);
+            layer->pixels_[y * size_.x + x] = sfm::Color::getStandardColor(psapi::sfm::Color::Type::White);
+            temp_layer->pixels_[y * size_.x + x] = sfm::Color::getStandardColor(sfm::Color::Type::Transparent);
         }
     }
     insertLayer( 0, std::move(layer));
@@ -419,4 +431,9 @@ bool CanvasAction::execute(const Key &key)
     return true;
 }
 
+
+sfm::IntRect Canvas::getActualRect() const
+{
+    return actual_rect_;
+}
 

@@ -104,6 +104,7 @@ public:
 
 class Bar : public IBar
 {
+protected:
     wid_t id_;
 
     vec2u size_;
@@ -130,7 +131,7 @@ public:
                                                             std::unique_ptr<sfm::RectangleShape> &onHover,
                                                             std::unique_ptr<sfm::RectangleShape> &pressed,
                                                             std::unique_ptr<sfm::RectangleShape> &released);
-    ~Bar() = default;
+    virtual ~Bar() = default;
 
     void draw(IRenderWindow* renderWindow) override;
     std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
@@ -156,6 +157,8 @@ public:
 
     bool unPressAllButtons() override;
     void finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const override;
+
+    virtual vec2i calculateNextPos(vec2i init_pos);
 };
 
 

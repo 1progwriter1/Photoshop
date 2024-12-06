@@ -44,6 +44,7 @@ private:
     void addOptions();
     void removeOptions();
     void createOptions();
+    void updateState(const IRenderWindow *render_window, const Event &event);
 };
 
 

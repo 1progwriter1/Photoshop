@@ -16,11 +16,28 @@ extern "C"
 class Eraser : public ABarButton
 {
     ICanvas *canvas_;
+
+    friend class EraserAction;
 public:
     Eraser( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
 
     void draw( sfm::IRenderWindow *renderWindow) override;
-    bool update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event) override;
+    std::unique_ptr<IAction> createAction(const IRenderWindow *renderWindow, const Event &event) override;
+private:
+    void updateState(const IRenderWindow *render_window, const Event &event);
+};
+
+
+class EraserAction : public AUndoableAction
+{
+    Eraser *eraser_;
+public:
+    EraserAction(Eraser *eraser, const IRenderWindow *renderWindow, const Event &event);
+
+    bool execute(const Key &key) override;
+    bool undo(const Key &key) override;
+    bool redo(const Key &key) override;
+    bool isUndoable(const Key &key) override;
 };
 
 

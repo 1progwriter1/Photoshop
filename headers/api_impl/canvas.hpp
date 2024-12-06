@@ -19,17 +19,15 @@ class Canvas;
 
 class Layer : public ILayer
 {
-    vec2i pos_;
-    vec2u size_;
+    Canvas *canvas_;
+    sfm::IntRect rect_;
 
     std::vector<Color> pixels_;
-
     std::list<std::unique_ptr<sfm::Drawable>> drawables_;
-    Canvas *canvas_;
 
     friend class Canvas;
 public:
-    Layer( Canvas *canvas, vec2u size, vec2i pos = vec2i());
+    Layer(Canvas *canvas);
     ~Layer() = default;
 
     Color getPixel(sfm::vec2i pos) const override;
@@ -57,6 +55,7 @@ class Canvas : public ICanvas
 
     vec2u size_;
     vec2i pos_;
+    sfm::IntRect actual_rect_;
     vec2f scale_ = vec2f( 1, 1);
     vec2i mouse_pos_ = vec2i( 0, 0);
 
@@ -97,6 +96,7 @@ public:
     wid_t getId() const override;
     vec2i getPos() const override;
     vec2u getSize() const override;
+    sfm::IntRect getActualRect() const;
     Color getCanvasBaseColor() const override;
 
     void setParent(const IWindow* parent) override;

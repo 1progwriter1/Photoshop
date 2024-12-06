@@ -9,7 +9,7 @@ static const char *PLUGINS_PATH[] =
 	"../build/liboptionsbar.dylib",
 	"../build/libbrush.dylib",
 	"../build/libinstrumentsbar.dylib",
-	// "../build/liberaser.dylib",
+	"../build/liberaser.dylib",
 	// "../build/librectangle.dylib",
 	// "../build/libellipse.dylib",
 	// "../build/libline.dylib",

@@ -307,10 +307,8 @@ std::unique_ptr<IAction> Bar::createAction(const IRenderWindow* renderWindow, co
 void Bar::addWindow(std::unique_ptr<IWindow> window)
 {
     window->setSize(buttons_size_);
-    vec2i w_pos = pos_;
-    w_pos.x += (size_.x - buttons_size_.x) / 2;
-    w_pos.y += ((size_.x - buttons_size_.x) / 2 + buttons_size_.y) * buttons_.size() + (size_.x - buttons_size_.x) / 2;
-    window->setPos( w_pos);
+    vec2i pos = calculateNextPos(window->getPos());
+    window->setPos(pos);
     buttons_.push_back( std::unique_ptr<IBarButton>( dynamic_cast<IBarButton *>( window.release())));
 }
 
@@ -411,6 +409,12 @@ void Bar::setParent(const IWindow* parent)
 void Bar::forceActivate()
 {
     is_active_ = true;
+}
+
+
+vec2i Bar::calculateNextPos(vec2i init_pos)
+{
+    return init_pos;
 }
 
 

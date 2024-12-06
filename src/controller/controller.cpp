@@ -30,6 +30,8 @@ void Controller::getRequests()
         last_event_ = event;
         psapi::getActionController()->execute(root_window_->createAction(root_window_->getRenderWindow(), event));
     }
+    event.type = Event::EventType::None;
+    psapi::getActionController()->execute(root_window_->createAction(root_window_->getRenderWindow(), event));
 }
 
 

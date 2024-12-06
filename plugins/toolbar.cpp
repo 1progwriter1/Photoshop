@@ -1,15 +1,6 @@
-#include "../api/api_photoshop.hpp"
-#include "../api/api_bar.hpp"
-#include "../headers/api_impl/bar.hpp"
+#include "toolbar.hpp"
+#include <iostream>
 #include <memory>
-
-
-extern "C"
-{
-
-
-bool loadPlugin();
-void unloadPlugin();
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
@@ -50,7 +41,7 @@ bool loadPlugin()
     released->setOutlineColor( sfm::Color( 153, 204, 255));
     released->setOutlineThickness( 5);
 
-    std::unique_ptr<psapi::IBar> bar = std::make_unique<Bar>( kToolBarWindowId, main,
+    std::unique_ptr<psapi::IBar> bar = std::make_unique<ToolBar>( kToolBarWindowId, main,
                                                                 normal,
                                                                 onHover,
                                                                 pressed,
@@ -68,4 +59,20 @@ void unloadPlugin()
 }
 
 
+ToolBar::ToolBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
+                                                            std::unique_ptr<sfm::RectangleShape> &onHover,
+                                                            std::unique_ptr<sfm::RectangleShape> &pressed,
+                                                            std::unique_ptr<sfm::RectangleShape> &released)
+    :   Bar(init_id, main_shape, normal, onHover, pressed, released) {}
+
+
+sfm::vec2i ToolBar::calculateNextPos(sfm::vec2i init_pos)
+{
+    size_t cnt_buttons = buttons_.size();
+    int offset = (size_.x - buttons_size_.x) / 2 + pos_.x;
+
+    sfm::vec2i pos = sfm::vec2i(offset, offset);
+    pos.y += cnt_buttons * (buttons_size_.y + offset);
+
+    return pos;
 }

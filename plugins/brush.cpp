@@ -53,8 +53,6 @@ Brush::~Brush()
 
 std::unique_ptr<IAction> Brush::createAction(const IRenderWindow *renderWindow, const Event &event)
 {
-    psapi::getActionController()->execute(ABarButton::createAction(renderWindow, event));
-
     return std::make_unique<BrushAction>( this, renderWindow, event);
 }
 
@@ -172,6 +170,12 @@ const sfm::Color &Brush::getColor() const
 }
 
 
+void Brush::updateState(const IRenderWindow *render_window, const Event &event)
+{
+    getActionController()->execute(ABarButton::createAction(render_window, event));
+}
+
+
 BrushAction::BrushAction(Brush *init_brush, const IRenderWindow *render_window, const Event &event)
     :   AUndoableAction(render_window, event), brush_(init_brush) {}
 
@@ -200,6 +204,8 @@ bool BrushAction::isUndoable(const Key &key)
 
 bool BrushAction::execute(const Key &key)
 {
+    brush_->updateState(render_window_, event_);
+
     if ( brush_->getState() != IBarButton::State::Press )
     {
         if ( brush_->options_added_   )

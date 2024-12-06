@@ -1,5 +1,6 @@
 #include "eraser.hpp"
 #include <cassert>
+#include <iostream>
 #include "../headers/windows_id.hpp"
 
 
@@ -18,7 +19,6 @@ bool loadPlugin()
     std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
     texture->loadFromFile("../images/eraser48_48.png");
     sprite->setTexture( texture.get());
-    sprite->setPosition( 36, 132);
 
     std::unique_ptr<ABarButton> eraser = std::make_unique<Eraser>( kEraserButtonId, texture, sprite);
     eraser->setParent( toolbar);
@@ -41,15 +41,57 @@ Eraser::Eraser( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std:
 }
 
 
-bool Eraser::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &event)
+std::unique_ptr<IAction> Eraser::createAction(const IRenderWindow *renderWindow, const Event &event)
 {
-    ABarButton::update( renderWindow, event);
+    return std::make_unique<EraserAction>(this, renderWindow, event);
+}
 
-    if ( getState() != psapi::IBarButton::State::Press )
+
+void Eraser::draw( sfm::IRenderWindow *renderWindow)
+{
+    ABarButton::draw(renderWindow);
+}
+
+
+void Eraser::updateState(const IRenderWindow *renderWindow, const Event &event)
+{
+    getActionController()->execute(ABarButton::createAction(renderWindow, event));
+}
+
+
+EraserAction::EraserAction(Eraser *eraser, const IRenderWindow *renderWindow, const Event &event)
+    :   AUndoableAction(renderWindow, event), eraser_(eraser) {}
+
+
+bool EraserAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool EraserAction::redo(const Key &key)
+{
+    std::cout << "Redo eraser\n";
+    return true;
+}
+
+
+bool EraserAction::undo(const Key &key)
+{
+    std::cout << "Undo eraser\n";
+    return true;
+}
+
+
+bool EraserAction::execute(const Key &key)
+{
+    eraser_->updateState(render_window_, event_);
+
+    if ( eraser_->getState() != psapi::IBarButton::State::Press )
         return true;
 
-    sfm::vec2u size = canvas_->getSize();
-    ILayer *cur_layer = canvas_->getLayer( canvas_->getActiveLayerIndex());
+    sfm::vec2u size = eraser_->canvas_->getSize();
+    ILayer *cur_layer = eraser_->canvas_->getLayer( eraser_->canvas_->getActiveLayerIndex());
     assert( cur_layer );
 
     for ( unsigned int x = 0; x < size.x; x++ )
@@ -59,15 +101,7 @@ bool Eraser::update( const sfm::IRenderWindow *renderWindow, const sfm::Event &e
             cur_layer->setPixel( vec2i( x, y), sfm::Color( 255, 255, 255, 255));
         }
     }
-
-    setState( psapi::IBarButton::State::Normal);
+    eraser_->setState(psapi::IBarButton::State::Normal);
 
     return true;
-}
-
-
-void Eraser::draw( sfm::IRenderWindow *renderWindow)
-{
-    ABarButton::draw( renderWindow);
-    parent_->finishButtonDraw( renderWindow, this);
 }
