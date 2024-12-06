@@ -25,7 +25,7 @@ Color Layer::getPixel(sfm::vec2i pos) const
 
 void Layer::setPixel(sfm::vec2i pos, sfm::Color pixel)
 {
-    pos -= rect_.pos - psapi::getCanvasIntRect().pos;
+    pos -= rect_.pos - canvas_->getActualRect().pos;
     if  ( !(pos.x >= 0 && rect_.size.x > pos.x &&
             pos.y >= 0 && rect_.size.y > pos.y ) )
         return;

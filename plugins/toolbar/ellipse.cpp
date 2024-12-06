@@ -21,10 +21,9 @@ bool loadPlugin()
     std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
     texture->loadFromFile("../images/ellipse48_48.png");
     sprite->setTexture( texture.get());
-    sprite->setPosition( 10, 20);
 
     std::unique_ptr<ABarButton> ellipse = std::make_unique<Ellipse>( kEllipseButtonId, texture, sprite);
-    toolbar->addWindow( std::move( ellipse));
+    toolbar->addWindow( std::move(ellipse));
 
     return true;
 }
@@ -43,6 +42,10 @@ Ellipse::Ellipse( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, st
 
     layer_ = canvas_->getTempLayer();
     assert( layer_ && "Failed to get temp layer" );
+
+    canvas_rect_ = psapi::getCanvasIntRect();
+    canvas_rect_.pos += vec2i(0, 20);
+    canvas_rect_.size -= vec2u(20, 20);
 }
 
 
@@ -51,26 +54,24 @@ void Ellipse::drawEllipse( const sfm::IRenderWindow *renderWindow, ILayer *layer
     assert( renderWindow );
     assert( layer );
 
-    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
+    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_rect_.pos;
     sfm::vec2u size( std::abs( mouse_pos.x - left_upper_edge_.x), std::abs( mouse_pos.y - left_upper_edge_.y));
     sfm::vec2u size2 = size * size;
-    sfm::vec2u canvas_size = canvas_->getSize();
 
     int center_x = std::min( mouse_pos.x, left_upper_edge_.x) + size.x / 2;
     int center_y = std::min( mouse_pos.y, left_upper_edge_.y) + size.y / 2;
 
-    sfm::vec2i offset = CANVAS_SECTOR_POS - canvas_->getPos();
     sfm::Color rect_color( 0, 0, 150);
-    for ( int x = 0; x < CANVAS_SECTOR_SIZE.x; x++ )
+    for ( int x = 0; x < canvas_rect_.size.x; x++ )
     {
-        for ( int y = 0; y < CANVAS_SECTOR_SIZE.y; y++ )
+        for ( int y = 0; y < canvas_rect_.size.y; y++ )
         {
             if ( isOnEllipse( sfm::vec2i( x, y), size2, sfm::vec2i( center_x, center_y)) )
             {
-                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), rect_color);
+                layer->setPixel( sfm::vec2i( x, y), rect_color);
             } else if ( is_temp_layer )
             {
-                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), sfm::Color(0, 0, 0, 0));
+                layer->setPixel( sfm::vec2i( x, y), sfm::Color(0, 0, 0, 0));
             }
         }
     }
@@ -91,11 +92,8 @@ std::unique_ptr<IAction> Ellipse::createAction(const IRenderWindow *renderWindow
 
 bool Ellipse::isOnCanvas( sfm::vec2i mouse_pos)
 {
-    sfm::vec2i relative_pos = mouse_pos - canvas_->getPos();
-    sfm::vec2u canvas_size = canvas_->getSize();
-
-    return 0 <= relative_pos.x && relative_pos.x < static_cast<int>( canvas_size.x) &&
-           0 <= relative_pos.y && relative_pos.y < static_cast<int>( canvas_size.y);
+    return canvas_rect_.pos.x <= mouse_pos.x && mouse_pos.x < canvas_rect_.pos.x + canvas_rect_.size.x &&
+           canvas_rect_.pos.y <= mouse_pos.y && mouse_pos.y < canvas_rect_.pos.y + canvas_rect_.size.y;
 }
 
 bool Ellipse::isOnEllipse( sfm::vec2i pos, sfm::vec2u size2, sfm::vec2i center)
@@ -142,29 +140,31 @@ bool EllipseAction::execute(const Key &key)
     {
         return true;
     }
-    if ( event_.type == sfm::Event::MouseButtonPressed && ellipse_->isOnCanvas( sfm::Mouse::getPosition( render_window_)) )
+    static bool is_front = false;
+    if ( event_.type == sfm::Event::None )
     {
+        is_front = true;
+    }
+    if ( event_.type == sfm::Event::MouseButtonPressed && ellipse_->isOnCanvas( sfm::Mouse::getPosition( render_window_)) && is_front )
+    {
+        is_front = false;
         ellipse_->draw_ = true;
-        ellipse_->left_upper_edge_ = sfm::Mouse::getPosition( render_window_) - CANVAS_SECTOR_POS;
+        ellipse_->left_upper_edge_ = sfm::Mouse::getPosition(render_window_) - ellipse_->canvas_rect_.pos;
         ellipse_->last_mouse_pos_ = ellipse_->left_upper_edge_;
     } else if ( event_.type == sfm::Event::MouseButtonReleased && ellipse_->draw_ )
     {
         ellipse_->canvas_->cleanTempLayer();
         ellipse_->drawEllipse( render_window_, ellipse_->canvas_->getLayer( ellipse_->canvas_->getActiveLayerIndex()), false);
         ellipse_->draw_ = false;
-        ellipse_->left_upper_edge_ = sfm::vec2i();
+        ellipse_->left_upper_edge_ = {};
         return true;
     }
-
-    if ( ellipse_->draw_ )
+    if ( ellipse_->draw_ && is_front )
     {
-        sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition( render_window_) - ellipse_->canvas_->getPos();
-        if ( std::abs( new_mouse_pos.x - ellipse_->last_mouse_pos_.x) >= 10 || std::abs( new_mouse_pos.y - ellipse_->last_mouse_pos_.y) >= 10 )
-        {
-            ellipse_->last_mouse_pos_ = new_mouse_pos;
-            ellipse_->drawEllipse( render_window_, ellipse_->layer_, true);
-        }
+        is_front = false;
+        sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition(render_window_) - ellipse_->canvas_rect_.pos;
+        ellipse_->last_mouse_pos_ = new_mouse_pos;
+        ellipse_->drawEllipse( render_window_, ellipse_->layer_, true);
     }
-
     return true;
 }

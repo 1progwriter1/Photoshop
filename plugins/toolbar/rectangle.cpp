@@ -44,6 +44,10 @@ Rectangle::Rectangle( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture
     layer_ = canvas_->getTempLayer();
     assert( layer_ && "Failed to get temp layer" );
     assert( options_bar_ && "Failed to cast to options bar" );
+
+    canvas_rect_ = psapi::getCanvasIntRect();
+    canvas_rect_.pos += vec2i(0, 20);
+    canvas_rect_.size -= vec2u(20, 20);
 }
 
 
@@ -71,25 +75,22 @@ void Rectangle::drawRectangle( const sfm::IRenderWindow *renderWindow, ILayer *l
     assert( renderWindow );
     assert( layer );
 
-    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
+    sfm::vec2i mouse_pos = sfm::Mouse::getPosition( renderWindow) - canvas_rect_.pos;
     sfm::vec2u size( std::abs( mouse_pos.x - left_upper_edge_.x), std::abs( mouse_pos.y - left_upper_edge_.y));
-    sfm::vec2u canvas_size = canvas_->getSize();
 
     int edge_x = std::min( mouse_pos.x, left_upper_edge_.x);
     int edge_y = std::min( mouse_pos.y, left_upper_edge_.y);
 
-    sfm::vec2i offset = CANVAS_SECTOR_POS - canvas_->getPos();
-
-    for ( int x = 0; x < CANVAS_SECTOR_SIZE.x; x++ )
+    for ( int x = 0; x < canvas_rect_.size.x; x++ )
     {
-        for ( int y = 0; y < CANVAS_SECTOR_SIZE.y; y++ )
+        for ( int y = 0; y < canvas_rect_.size.y; y++ )
         {
             if ( x >= edge_x && x < edge_x + size.x && y >= edge_y && y < edge_y + size.y )
             {
-                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), color_);
+                layer->setPixel( sfm::vec2i( x, y), color_);
             } else if ( is_temp_layer )
             {
-                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), sfm::Color(0, 0, 0, 0));
+                layer->setPixel( sfm::vec2i( x, y), sfm::Color(0, 0, 0, 0));
             }
         }
     }
@@ -98,11 +99,8 @@ void Rectangle::drawRectangle( const sfm::IRenderWindow *renderWindow, ILayer *l
 
 bool Rectangle::isOnCanvas( sfm::vec2i mouse_pos)
 {
-    sfm::vec2i relative_pos = mouse_pos - canvas_->getPos();
-    sfm::vec2u canvas_size = canvas_->getSize();
-
-    return 0 <= relative_pos.x && relative_pos.x < static_cast<int>( canvas_size.x) &&
-           0 <= relative_pos.y && relative_pos.y < static_cast<int>( canvas_size.y);
+    return canvas_rect_.pos.x <= mouse_pos.x && mouse_pos.x < canvas_rect_.pos.x + canvas_rect_.size.x &&
+           canvas_rect_.pos.y <= mouse_pos.y && mouse_pos.y < canvas_rect_.pos.y + canvas_rect_.size.y;
 }
 
 
@@ -182,14 +180,20 @@ bool RectangleAction::execute(const Key &key)
         rectangle_->options_added_ = true;
     }
 
+    static bool is_front = false;
+    if ( event_.type == sfm::Event::None )
+    {
+        is_front = true;
+    }
     if ( rectangle_->state_ != psapi::IBarButton::State::Press )
     {
         return true;
     }
-    if ( event_.type == sfm::Event::MouseButtonPressed && rectangle_->isOnCanvas( sfm::Mouse::getPosition( render_window_)) )
+    if ( event_.type == sfm::Event::MouseButtonPressed && rectangle_->isOnCanvas( sfm::Mouse::getPosition( render_window_)) && is_front )
     {
+        is_front = false;
         rectangle_->draw_ = true;
-        rectangle_->left_upper_edge_ = sfm::Mouse::getPosition( render_window_) - CANVAS_SECTOR_POS;
+        rectangle_->left_upper_edge_ = sfm::Mouse::getPosition( render_window_) - rectangle_->canvas_rect_.pos;
         rectangle_->last_mouse_pos_ = rectangle_->left_upper_edge_;
     } else if ( event_.type == sfm::Event::MouseButtonReleased && rectangle_->draw_ )
     {
@@ -200,14 +204,12 @@ bool RectangleAction::execute(const Key &key)
         return true;
     }
 
-    if ( rectangle_->draw_ )
+    if ( rectangle_->draw_ && is_front )
     {
+        is_front = false;
         sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition( render_window_) - rectangle_->canvas_->getPos();
-        if ( std::abs( new_mouse_pos.x - rectangle_->last_mouse_pos_.x) >= 10 || std::abs( new_mouse_pos.y - rectangle_->last_mouse_pos_.y) >= 10 )
-        {
-            rectangle_->last_mouse_pos_ = new_mouse_pos;
-            rectangle_->drawRectangle( render_window_, rectangle_->layer_, true);
-        }
+        rectangle_->last_mouse_pos_ = new_mouse_pos;
+        rectangle_->drawRectangle( render_window_, rectangle_->layer_, true);
     }
 
     return true;

@@ -16,10 +16,11 @@ extern "C"
 class Ellipse : public ABarButton
 {
     bool draw_ = false;
-    sfm::vec2i left_upper_edge_ = sfm::vec2i();
-    sfm::vec2i last_mouse_pos_ = sfm::vec2i();
+    sfm::vec2i left_upper_edge_ = {};
+    sfm::vec2i last_mouse_pos_ = {};
     ILayer *layer_ = nullptr;
     ICanvas *canvas_ = nullptr;
+    sfm::IntRect canvas_rect_ = {};
 
     friend class EllipseAction;
 public:

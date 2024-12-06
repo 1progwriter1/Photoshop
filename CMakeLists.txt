@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.10)
+cmake_minimum_required( VERSION 3.30)
 
 set( CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -15,36 +15,6 @@ file( GLOB_RECURSE SRC_DYLIB src/api_impl/*.cpp src/sys/my_exceptions.cpp)
 add_library( ${DYLIB} SHARED ${SRC_DYLIB})
 add_executable( ${TARGET} ${SOURCES})
 
-
-set(PLUGIN_INSTALL_DIR /Users/ivanvodolazenko/VSProjects/Photoshop/plugins/)
-
-function( add_dynamic_plugin plugin_name)
-	set( plugin_src "../plugins/${plugin_name}.cpp")
-	if(NOT EXISTS ${plugin_src})
-        message(FATAL_ERROR "Source file ${plugin_scr} does not exist.")
-    endif()
-	add_library( ${plugin_name} SHARED ${plugin_src})
-
-	# set_target_properties( ${plugin_name} PROPERTIES OUTPUT_NAME "${plugin_name}")
-
-	target_link_directories( ${plugin_name} PRIVATE /opt/homebrew/lib/)
-	target_link_libraries( ${plugin_name} PRIVATE sfml-graphics sfml-window sfml-system)
-	target_link_directories( ${plugin_name} PRIVATE build/)
-	target_link_libraries( ${plugin_name} PRIVATE api_photoshop)
-endfunction()
-
-set(PLUGINS "canvas" "toolbar" "optionsbar" "brush" "eraser" "rectangle" "ellipse" "line"
-			"brightness_filter" "negative_filter" "barelief_filter" "bluer_filter" "gauss_bluer_filter"
-			"contrast_filter" "filter" "menubar")
-foreach(plugin ${PLUGINS})
-    add_dynamic_plugin(${plugin})
-endforeach()
-
-
-
-
-
-
 target_link_directories( ${DYLIB} PRIVATE /opt/homebrew/lib/)
 target_link_directories( ${DYLIB} PRIVATE build/)
 target_link_libraries( ${DYLIB} PRIVATE sfml-graphics sfml-window sfml-system)
@@ -58,6 +28,48 @@ include_directories( headers)
 include_directories( api)
 include_directories( /opt/homebrew/include/)
 include_directories( ../MyLibraries/headers/)
+
+# set(PLUGINS "canvas" "toolbar" "optionsbar" "brush" "eraser" "rectangle" "ellipse" "line"
+# 			"brightness_filter" "negative_filter" "barelief_filter" "bluer_filter" "gauss_bluer_filter"
+# 			"contrast_filter" "filter" "menubar")
+
+
+set(LIBRARIES
+    "canvas+${CMAKE_SOURCE_DIR}/plugins/canvas.cpp"
+    "toolbar+${CMAKE_SOURCE_DIR}/plugins/toolbar/toolbar.cpp"
+    "optionsbar+${CMAKE_SOURCE_DIR}/plugins/optionsbar/optionsbar.cpp"
+    "brush+${CMAKE_SOURCE_DIR}/plugins/toolbar/brush.cpp"
+    "eraser+${CMAKE_SOURCE_DIR}/plugins/toolbar/eraser.cpp"
+    "rectangle+${CMAKE_SOURCE_DIR}/plugins/toolbar/rectangle.cpp"
+    "ellipse+${CMAKE_SOURCE_DIR}/plugins/toolbar/ellipse.cpp"
+    "line+${CMAKE_SOURCE_DIR}/plugins/toolbar/line.cpp"
+    "menubar+${CMAKE_SOURCE_DIR}/plugins/menubar/menubar.cpp"
+)
+
+set(MY_STRING "canvas.cpp toolbar.cpp optionsbar.cpp")
+
+
+foreach(LIB_DATA ${LIBRARIES})
+
+	string(REPLACE "+" ";" PARTS ${LIB_DATA})
+	list(LENGTH PARTS NUM_PARTS)
+
+    if(NOT NUM_PARTS EQUAL 2)
+        message(FATAL_ERROR "LIBRARIES format is incorrect: ${LIB_DATA}")
+    endif()
+
+    list(GET PARTS 0 LIB_NAME)
+    list(GET PARTS 1 SRC_FILE)
+
+	# message(FATAL_ERROR "${LIB_NAME}    ${SRC_FILE}")
+
+    add_library(${LIB_NAME} SHARED ${SRC_FILE})
+	target_link_directories( ${LIB_NAME} PRIVATE /opt/homebrew/lib/)
+	target_link_directories( ${LIB_NAME} PRIVATE build/)
+	target_link_libraries( ${LIB_NAME} PRIVATE sfml-graphics sfml-window sfml-system)
+	target_link_libraries( ${LIB_NAME} PRIVATE api_photoshop)
+
+endforeach()
 
 # add_compile_options( -ggdb3 -std=c++20 -O3 -Wall -Wextra -Weffc++ -Wc++14-compat -Wmissing-declarations -Wcast-qual
 # 		-Wchar-subscripts -Wconversion -Wctor-dtor-privacy -Wempty-body -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat=2 -Winline

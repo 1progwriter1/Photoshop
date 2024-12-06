@@ -15,10 +15,10 @@ extern "C"
 
 class Rectangle : public ABarButton
 {
-    sfm::vec2i left_upper_edge_ = sfm::vec2i();
-    sfm::vec2u rect_size_ = sfm::vec2u();
-    sfm::vec2i last_mouse_pos_ = sfm::vec2i();
+    sfm::vec2i left_upper_edge_ = {};
+    sfm::vec2i last_mouse_pos_ = {};
     sfm::Color color_ = sfm::Color( 255, 0, 0);
+    sfm::IntRect canvas_rect_ = {};
 
     bool draw_ = false;
 

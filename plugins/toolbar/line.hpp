@@ -17,8 +17,9 @@ extern "C"
 class Line : public ABarButton
 {
     sfm::RectangleShape shape_;
-    sfm::vec2i begin_pos_ = sfm::vec2i();
-    sfm::vec2i last_mouse_pos_ = sfm::vec2i();
+    sfm::vec2i begin_pos_ = {};
+    sfm::vec2i last_mouse_pos_ = {};
+    sfm::IntRect canvas_rect_ = {};
 
     bool draw_ = false;
 

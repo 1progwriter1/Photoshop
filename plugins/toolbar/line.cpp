@@ -19,7 +19,6 @@ bool loadPlugin()
     std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
     texture->loadFromFile("../images/line48_48.png");
     sprite->setTexture( texture.get());
-    sprite->setPosition( 36, 420);
 
     std::unique_ptr<ABarButton> line = std::make_unique<Line>( kLineButtonId, texture, sprite);
     line->setParent( toolbar);
@@ -40,6 +39,10 @@ Line::Line( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::uni
     assert( canvas_ && "Failed to cast to canvas" );
     layer_ = canvas_->getTempLayer();
     assert( layer_ && "Failed to get temp layer" );
+
+    canvas_rect_ = psapi::getCanvasIntRect();
+    canvas_rect_.pos += vec2i(0, 20);
+    canvas_rect_.size -= vec2u(20, 20);
 }
 
 
@@ -72,11 +75,8 @@ void Line::setAngleAndLength( sfm::vec2i begin_pos, sfm::vec2i end_pos)
 
 bool Line::isOnCanvas( sfm::vec2i mouse_pos)
 {
-    sfm::vec2i relative_pos = mouse_pos - canvas_->getPos();
-    sfm::vec2u canvas_size = canvas_->getSize();
-
-    return 0 <= relative_pos.x && relative_pos.x < static_cast<int>( canvas_size.x) &&
-           0 <= relative_pos.y && relative_pos.y < static_cast<int>( canvas_size.y);
+    return canvas_rect_.pos.x <= mouse_pos.x && mouse_pos.x < canvas_rect_.pos.x + canvas_rect_.size.x &&
+           canvas_rect_.pos.y <= mouse_pos.y && mouse_pos.y < canvas_rect_.pos.y + canvas_rect_.size.y;
 }
 
 
@@ -86,24 +86,24 @@ void Line::drawLine( const sfm::IRenderWindow *renderWindow, ILayer *layer, bool
     {
         canvas_->cleanTempLayer();
     }
-    sfm::vec2i end_pos = sfm::Mouse::getPosition( renderWindow) - CANVAS_SECTOR_POS;
+    sfm::vec2i end_pos = sfm::Mouse::getPosition( renderWindow) - canvas_rect_.pos;
 
     setAngleAndLength( begin_pos_, end_pos);
 
     const sfm::IImage *image = shape_.getImage();
-    sfm::vec2i offset = CANVAS_SECTOR_POS - canvas_->getPos();
+
     sfm::Color line_color = sfm::Color( 255, 0, 127);
-    for ( size_t x = 0; x < CANVAS_SECTOR_SIZE.x; x++ )
+    for ( size_t x = 0; x < canvas_rect_.size.x; x++ )
     {
-        for ( size_t y = 0; y < CANVAS_SECTOR_SIZE.y; y++ )
+        for ( size_t y = 0; y < canvas_rect_.size.y; y++ )
         {
             sfm::Color color = image->getPixel( x, y);
             if ( color.a != 0 )
             {
-                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), line_color);
+                layer->setPixel( sfm::vec2i( x, y), line_color);
             } else if ( is_temp_layer )
             {
-                layer->setPixel( sfm::vec2i( x + offset.x, y + offset.y), sfm::Color( 0, 0, 0, 0));
+                layer->setPixel( sfm::vec2i( x, y), sfm::Color( 0, 0, 0, 0));
             }
         }
     }
@@ -142,10 +142,16 @@ bool LineAction::execute(const Key &key)
     {
         return true;
     }
-    if ( event_.type == sfm::Event::MouseButtonPressed && line_->isOnCanvas( sfm::Mouse::getPosition( render_window_)) )
+    static bool is_front = false;
+    if ( event_.type == sfm::Event::None )
     {
+        is_front = true;
+    }
+    if ( event_.type == sfm::Event::MouseButtonPressed && line_->isOnCanvas( sfm::Mouse::getPosition( render_window_)) && is_front )
+    {
+        is_front = false;
         line_->draw_ = true;
-        line_->begin_pos_ = sfm::Mouse::getPosition( render_window_) - CANVAS_SECTOR_POS;
+        line_->begin_pos_ = sfm::Mouse::getPosition( render_window_) - line_->canvas_rect_.pos;
         line_->last_mouse_pos_ = line_->begin_pos_;
     } else if ( event_.type == sfm::Event::MouseButtonReleased && line_->draw_ )
     {
@@ -155,14 +161,12 @@ bool LineAction::execute(const Key &key)
         return true;
     }
 
-    if ( line_->draw_ )
+    if ( line_->draw_ && is_front )
     {
+        is_front = false;
         sfm::vec2i new_mouse_pos = sfm::Mouse::getPosition( render_window_) - line_->canvas_->getPos();
-        if ( std::abs( new_mouse_pos.x - line_->last_mouse_pos_.x) >= 10 || std::abs( new_mouse_pos.y - line_->last_mouse_pos_.y) >= 10 )
-        {
-            line_->last_mouse_pos_ = new_mouse_pos;
-            line_->drawLine( render_window_, line_->layer_, true);
-        }
+        line_->last_mouse_pos_ = new_mouse_pos;
+        line_->drawLine( render_window_, line_->layer_, true);
     }
     return true;
 }
