@@ -102,7 +102,7 @@ public:
 };
 
 
-class Bar : public IBar
+class ABar : public IBar
 {
 protected:
     wid_t id_;
@@ -127,11 +127,11 @@ protected:
 
     friend class BarAction;
 public:
-    Bar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
+    ABar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
                                                             std::unique_ptr<sfm::RectangleShape> &onHover,
                                                             std::unique_ptr<sfm::RectangleShape> &pressed,
                                                             std::unique_ptr<sfm::RectangleShape> &released);
-    virtual ~Bar() = default;
+    virtual ~ABar() = default;
 
     void draw(IRenderWindow* renderWindow) override;
     std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
@@ -189,13 +189,19 @@ public:
 };
 
 
-class OptionsBar : public IOptionsBar
+class AOptionsBar : public IOptionsBar
 {
+protected:
     wid_t id_ = kOptionsBarWindowId;
 
     std::unique_ptr<sfm::RectangleShape> main_shape_;
+    // std::unique_ptr<sfm::RectangleShape> normal_;
+    // std::unique_ptr<sfm::RectangleShape> released_;
+    // std::unique_ptr<sfm::RectangleShape> onHover_;
+    // std::unique_ptr<sfm::RectangleShape> pressed_;
     vec2u size_;
     vec2i pos_;
+    vec2u option_size_;
 
     bool is_active_ = false;
 
@@ -203,7 +209,8 @@ class OptionsBar : public IOptionsBar
 
     std::list<std::unique_ptr<IBarButton>> options_;
 public:
-    OptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape);
+    AOptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape);
+    virtual ~AOptionsBar() = default;
 
     void draw(IRenderWindow* renderWindow) override;
     std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
@@ -228,14 +235,16 @@ public:
     void removeWindow(wid_t id) override;
 
     void removeAllOptions() override;
+
+    virtual vec2i calculateNextPos(vec2i init_pos);
 };
 
 
 class BarAction : public AAction
 {
-    Bar *bar_;
+    ABar *bar_;
 public:
-    BarAction(Bar *bar, const IRenderWindow *renderWindow, const Event &event);
+    BarAction(ABar *bar, const IRenderWindow *renderWindow, const Event &event);
 
     bool execute(const Key &key) override;
     bool isUndoable(const Key &key) override;
@@ -247,6 +256,17 @@ class BarButtonAction : public AAction
     ABarButton *button_;
 public:
     BarButtonAction(ABarButton *button, const IRenderWindow *renderWindow, const Event &event);
+
+    bool execute(const Key &key) override;
+    bool isUndoable(const Key &key) override;
+};
+
+
+class AOptionsBarAction : public AAction
+{
+    AOptionsBar *bar_;
+public:
+    AOptionsBarAction(AOptionsBar *bar, const IRenderWindow *renderWindow, const Event &event);
 
     bool execute(const Key &key) override;
     bool isUndoable(const Key &key) override;

@@ -20,7 +20,7 @@ class Brush : public ABarButton
     sfm::vec2i last_pos_ = sfm::vec2i( 0, 0);
 
     ICanvas *canvas_;
-    IBar *options_bar_;
+    IOptionsBar *options_bar_;
     sfm::Color color_ = sfm::Color( 255, 0, 0);
 
     bool options_added_ = false;

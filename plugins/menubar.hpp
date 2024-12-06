@@ -1,5 +1,5 @@
-#ifndef PLUGIN_TOOLBAR
-#define PLUGIN_TOOLBAR
+#ifndef PLUGINS_MENU
+#define PLUGINS_MENU
 
 
 #include "../headers/api_impl/bar.hpp"
@@ -8,16 +8,15 @@
 extern "C"
 {
 
+
 bool loadPlugin();
 void unloadPlugin();
 
-}
 
-
-class ToolBar : public ABar
+class MenuBar : public ABar
 {
 public:
-    ToolBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
+    MenuBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
                                                             std::unique_ptr<sfm::RectangleShape> &onHover,
                                                             std::unique_ptr<sfm::RectangleShape> &pressed,
                                                             std::unique_ptr<sfm::RectangleShape> &released);
@@ -26,4 +25,6 @@ public:
 };
 
 
-#endif // PLUGIN_TOOLBAR
+}
+
+#endif // PLUGINS_MENU

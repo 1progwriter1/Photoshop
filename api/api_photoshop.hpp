@@ -43,7 +43,7 @@ const wid_t kInvalidWindowId = -1;
 sfm::IntRect getCanvasIntRect();
 sfm::IntRect getToolbarIntRect();
 sfm::IntRect getOptionsBarIntRect();
-sfm::IntRect getInstrumentOptionsIntRect();
+sfm::IntRect getMenuBarIntRect();
 
 /**
  * @brief Get the size of the screen

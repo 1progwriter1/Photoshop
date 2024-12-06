@@ -1,15 +1,5 @@
-#include "../api/api_photoshop.hpp"
-#include "../api/api_bar.hpp"
-#include "../headers/api_impl/bar.hpp"
+#include "menubar.hpp"
 #include <memory>
-
-
-extern "C"
-{
-
-
-bool loadPlugin();
-void unloadPlugin();
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
@@ -19,7 +9,7 @@ bool loadPlugin()
 {
     kRootWindowPtr = psapi::getRootWindow();
 
-    sfm::IntRect rect = psapi::getInstrumentOptionsIntRect();
+    sfm::IntRect rect = psapi::getMenuBarIntRect();
 
     std::unique_ptr<sfm::RectangleShape> main = std::make_unique<sfm::RectangleShape>();
     main->setPosition( sfm::vec2i( rect.pos + sfm::vec2i( 5, 5)));
@@ -52,7 +42,7 @@ bool loadPlugin()
     released->setOutlineColor( sfm::Color( 153, 204, 255));
     released->setOutlineThickness( 5);
 
-    std::unique_ptr<psapi::IBar> bar = std::make_unique<Bar>( kOptionsBarWindowId, main,
+    std::unique_ptr<psapi::IBar> bar = std::make_unique<ABar>( kMenuBarWindowId, main,
                                                                 normal,
                                                                 onHover,
                                                                 pressed,
@@ -72,4 +62,21 @@ void unloadPlugin()
 }
 
 
+MenuBar::MenuBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
+                                                            std::unique_ptr<sfm::RectangleShape> &onHover,
+                                                            std::unique_ptr<sfm::RectangleShape> &pressed,
+                                                            std::unique_ptr<sfm::RectangleShape> &released)
+    :   ABar(init_id, main_shape, normal, onHover, pressed, released) {}
+
+
+sfm::vec2i MenuBar::calculateNextPos(sfm::vec2i init_pos)
+{
+    size_t cnt_buttons = buttons_.size();
+    int offset = (size_.y - buttons_size_.y) / 2 + pos_.y;
+
+    sfm::vec2i pos = sfm::vec2i(offset, offset);
+    pos.x += cnt_buttons * (buttons_size_.x + offset);
+
+    return pos;
 }
+

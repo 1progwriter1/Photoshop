@@ -27,13 +27,13 @@ sfm::IntRect psapi::getCanvasIntRect()
 
 sfm::IntRect psapi::getOptionsBarIntRect()
 {
-    return sfm::IntRect( sfm::vec2i( 84, 0), sfm::vec2u(psapi::getScreenSize().x - 84 * 2, 84));
+    return sfm::IntRect( sfm::vec2i( psapi::getScreenSize().x - 84, 0), sfm::vec2u( 84, psapi::getScreenSize().y));
 }
 
 
-sfm::IntRect psapi::getInstrumentOptionsIntRect()
+sfm::IntRect psapi::getMenuBarIntRect()
 {
-    return sfm::IntRect( sfm::vec2i( psapi::getScreenSize().x - 84, 0), sfm::vec2u( 84, psapi::getScreenSize().y));
+    return sfm::IntRect( sfm::vec2i( 84, 0), sfm::vec2u(psapi::getScreenSize().x - 84 * 2, 84));
 }
 
 

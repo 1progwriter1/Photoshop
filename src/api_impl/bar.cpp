@@ -259,7 +259,7 @@ IBarButton::State AMenuButton::getState() const
 }
 
 
-Bar::Bar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::unique_ptr<sfm::RectangleShape> &normal,
+ABar::ABar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::unique_ptr<sfm::RectangleShape> &normal,
                                                     std::unique_ptr<sfm::RectangleShape> &onHover,
                                                     std::unique_ptr<sfm::RectangleShape> &pressed,
                                                     std::unique_ptr<sfm::RectangleShape> &released)
@@ -283,7 +283,7 @@ Bar::Bar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::
 }
 
 
-void Bar::draw(IRenderWindow* renderWindow)
+void ABar::draw(IRenderWindow* renderWindow)
 {
     assert( renderWindow );
 
@@ -298,13 +298,13 @@ void Bar::draw(IRenderWindow* renderWindow)
 }
 
 
-std::unique_ptr<IAction> Bar::createAction(const IRenderWindow* renderWindow, const Event& event)
+std::unique_ptr<IAction> ABar::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
     return std::make_unique<BarAction>(this, renderWindow, event);
 }
 
 
-void Bar::addWindow(std::unique_ptr<IWindow> window)
+void ABar::addWindow(std::unique_ptr<IWindow> window)
 {
     window->setSize(buttons_size_);
     vec2i pos = calculateNextPos(window->getPos());
@@ -313,7 +313,7 @@ void Bar::addWindow(std::unique_ptr<IWindow> window)
 }
 
 
-void Bar::removeWindow(wid_t id)
+void ABar::removeWindow(wid_t id)
 {
     auto iter = buttons_.begin();
     for ( auto &button : buttons_ )
@@ -328,13 +328,13 @@ void Bar::removeWindow(wid_t id)
 }
 
 
-wid_t Bar::getId() const
+wid_t ABar::getId() const
 {
     return id_;
 }
 
 
-bool Bar::unPressAllButtons()
+bool ABar::unPressAllButtons()
 {
     for ( auto &button : buttons_ )
     {
@@ -344,22 +344,23 @@ bool Bar::unPressAllButtons()
 }
 
 
-void Bar::setPos(const vec2i &pos)
+void ABar::setPos(const vec2i &pos)
 {
     pos_ = pos;
     main_shape_->setPosition( pos);
 }
 
 
-void Bar::setSize(const vec2u &size)
+void ABar::setSize(const vec2u &size)
 {
     size_ = size;
     main_shape_->setSize( size);
 }
 
 
-IWindow* Bar::getWindowById(wid_t id)
+IWindow* ABar::getWindowById(wid_t id)
 {
+
     if ( this->getId() == id ) return this;
 
     for ( const auto &button : buttons_ )
@@ -373,7 +374,7 @@ IWindow* Bar::getWindowById(wid_t id)
 }
 
 
-const IWindow* Bar::getWindowById(wid_t id) const
+const IWindow* ABar::getWindowById(wid_t id) const
 {
     if ( id == this->getId() ) return this;
 
@@ -388,55 +389,55 @@ const IWindow* Bar::getWindowById(wid_t id) const
 }
 
 
-vec2i Bar::getPos() const
+vec2i ABar::getPos() const
 {
     return pos_;
 }
 
 
-vec2u Bar::getSize() const
+vec2u ABar::getSize() const
 {
     return size_;
 }
 
 
-void Bar::setParent(const IWindow* parent)
+void ABar::setParent(const IWindow* parent)
 {
     parent_ = parent;
 }
 
 
-void Bar::forceActivate()
+void ABar::forceActivate()
 {
     is_active_ = true;
 }
 
 
-vec2i Bar::calculateNextPos(vec2i init_pos)
+vec2i ABar::calculateNextPos(vec2i init_pos)
 {
     return init_pos;
 }
 
 
-void Bar::forceDeactivate()
+void ABar::forceDeactivate()
 {
     is_active_ = false;
 }
 
 
-bool Bar::isActive() const
+bool ABar::isActive() const
 {
     return is_active_;
 }
 
 
-bool Bar::isWindowContainer() const
+bool ABar::isWindowContainer() const
 {
     return true;
 }
 
 
-void Bar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
+void ABar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
 {
     vec2i pos = button->getPos();
     switch ( button->getState() )
@@ -500,14 +501,15 @@ void OpacityOption::setOpacity(float opacity)
 }
 
 
-OptionsBar::OptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape)
-    :   id_( init_id), main_shape_(std::move(main_shape)),
-        size_( main_shape->getSize()),
-        pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y))
+AOptionsBar::AOptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape)
+    :   id_( init_id), main_shape_(std::move(main_shape))
+        // size_( main_shape->getSize()),
+        // pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y)),
+        // option_size_(main_shape->getSize())
 {}
 
 
-void OptionsBar::draw(IRenderWindow* renderWindow)
+void AOptionsBar::draw(IRenderWindow* renderWindow)
 {
     assert( renderWindow );
 
@@ -520,21 +522,19 @@ void OptionsBar::draw(IRenderWindow* renderWindow)
 }
 
 
-std::unique_ptr<IAction> OptionsBar::createAction(const IRenderWindow* renderWindow, const Event& event)
+std::unique_ptr<IAction> AOptionsBar::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
-    assert( 0 && "Not implemented" );
-
-    return nullptr;
+    return std::make_unique<AOptionsBarAction>(this, renderWindow, event);
 }
 
 
-wid_t OptionsBar::getId() const
+wid_t AOptionsBar::getId() const
 {
     return id_;
 }
 
 
-const IWindow* OptionsBar::getWindowById(wid_t id) const
+const IWindow* AOptionsBar::getWindowById(wid_t id) const
 {
     for ( const auto &option : options_ )
     {
@@ -547,8 +547,10 @@ const IWindow* OptionsBar::getWindowById(wid_t id) const
 }
 
 
-IWindow* OptionsBar::getWindowById(wid_t id)
+IWindow* AOptionsBar::getWindowById(wid_t id)
 {
+    if ( id == id_ )
+        return this;
     for ( auto &option : options_ )
     {
         if ( option->getId() == id )
@@ -560,25 +562,25 @@ IWindow* OptionsBar::getWindowById(wid_t id)
 }
 
 
-vec2i OptionsBar::getPos() const
+vec2i AOptionsBar::getPos() const
 {
     return pos_;
 }
 
 
-vec2u OptionsBar::getSize() const
+vec2u AOptionsBar::getSize() const
 {
     return size_;
 }
 
 
-void OptionsBar::setParent(const IWindow* parent)
+void AOptionsBar::setParent(const IWindow* parent)
 {
     parent_ = parent;
 }
 
 
-void OptionsBar::setPos(const vec2i &pos)
+void AOptionsBar::setPos(const vec2i &pos)
 {
     pos_ = pos;
 
@@ -586,7 +588,7 @@ void OptionsBar::setPos(const vec2i &pos)
 }
 
 
-void OptionsBar::setSize(const vec2u &size)
+void AOptionsBar::setSize(const vec2u &size)
 {
     size_ = size;
 
@@ -594,31 +596,37 @@ void OptionsBar::setSize(const vec2u &size)
 }
 
 
-void OptionsBar::forceActivate()
+void AOptionsBar::forceActivate()
 {
     is_active_ = true;
 }
 
 
-void OptionsBar::forceDeactivate()
+void AOptionsBar::forceDeactivate()
 {
     is_active_ = false;
 }
 
 
-bool OptionsBar::isActive() const
+bool AOptionsBar::isActive() const
 {
     return is_active_;
 }
 
 
-bool OptionsBar::isWindowContainer() const
+bool AOptionsBar::isWindowContainer() const
 {
     return true;
 }
 
 
-void OptionsBar::addWindow(std::unique_ptr<IWindow> window)
+vec2i AOptionsBar::calculateNextPos(vec2i init_pos)
+{
+    return init_pos;
+}
+
+
+void AOptionsBar::addWindow(std::unique_ptr<IWindow> window)
 {
     IBarButton *button = dynamic_cast<IBarButton *>( window.release());
     assert( button );
@@ -627,7 +635,7 @@ void OptionsBar::addWindow(std::unique_ptr<IWindow> window)
 }
 
 
-void OptionsBar::removeWindow(wid_t id)
+void AOptionsBar::removeWindow(wid_t id)
 {
     for ( auto it = options_.begin(); it != options_.end(); ++it )
     {
@@ -640,13 +648,13 @@ void OptionsBar::removeWindow(wid_t id)
 }
 
 
-void OptionsBar::removeAllOptions()
+void AOptionsBar::removeAllOptions()
 {
     options_.clear();
 }
 
 
-BarAction::BarAction(Bar *bar, const IRenderWindow *renderWindow, const Event &event)
+BarAction::BarAction(ABar *bar, const IRenderWindow *renderWindow, const Event &event)
     :   AAction(renderWindow, event), bar_(bar) {}
 
 
@@ -713,5 +721,21 @@ bool BarButtonAction::execute(const Key &key)
     {
         button_->state_ = psapi::IBarButton::State::Normal;
     }
+    return true;
+}
+
+
+AOptionsBarAction::AOptionsBarAction(AOptionsBar *bar, const IRenderWindow *render_window, const Event &event)
+    :   AAction(render_window, event), bar_(bar) {}
+
+
+bool AOptionsBarAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool AOptionsBarAction::execute(const Key &key)
+{
     return true;
 }

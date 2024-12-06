@@ -38,7 +38,7 @@ void unloadPlugin()
 Brush::Brush( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
     :   ABarButton( init_id, init_texture, init_sprite),
         canvas_( dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId))),
-        options_bar_( dynamic_cast<IBar *>( getRootWindow()->getWindowById( kOptionsBarWindowId)))
+        options_bar_( dynamic_cast<IOptionsBar *>(getRootWindow()->getWindowById( kOptionsBarWindowId)))
 {
     assert( canvas_ && "Failed to cast to canvas" );
     assert( options_bar_ && "Failed to cast to options bar" );

@@ -63,7 +63,7 @@ ToolBar::ToolBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape
                                                             std::unique_ptr<sfm::RectangleShape> &onHover,
                                                             std::unique_ptr<sfm::RectangleShape> &pressed,
                                                             std::unique_ptr<sfm::RectangleShape> &released)
-    :   Bar(init_id, main_shape, normal, onHover, pressed, released) {}
+    :   ABar(init_id, main_shape, normal, onHover, pressed, released) {}
 
 
 sfm::vec2i ToolBar::calculateNextPos(sfm::vec2i init_pos)
