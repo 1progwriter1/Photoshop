@@ -19,7 +19,7 @@ bool loadPlugin()
 
     std::unique_ptr<sfm::Texture> texture = std::make_unique<sfm::Texture>();
     std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
-    texture->loadFromFile("../images/ellipse48_48.png");
+    texture->loadFromFile("../assets/images/ellipse48_48.png");
     sprite->setTexture( texture.get());
 
     std::unique_ptr<ABarButton> ellipse = std::make_unique<Ellipse>( kEllipseButtonId, texture, sprite);

@@ -498,6 +498,24 @@ bool Font::loadFromFile( const std::string &filename)
 }
 
 
+std::unique_ptr<IFont> IFont::create()
+{
+    return std::make_unique<Font>();
+}
+
+
+const sf::Font &Font::getFont() const
+{
+    return font_;
+}
+
+
+std::unique_ptr<IText> IText::create()
+{
+    return std::make_unique<Text>();
+}
+
+
 void Text::setString(const std::string& string)
 {
     text_.setString( string);
@@ -506,7 +524,8 @@ void Text::setString(const std::string& string)
 
 void Text::setFont(const IFont* font)
 {
-    assert( 0 && "Not implemented" );
+    const Font *my_font = static_cast<const Font *>(font);
+    text_.setFont(my_font->getFont());
 }
 
 
@@ -544,11 +563,51 @@ void Text::setOutlineThickness(float thickness)
 }
 
 
+void Text::setPos(const vec2f &pos)
+{
+    text_.setPosition(pos.x, pos.y);
+}
+
+
+void Text::setSize(const vec2f &size)
+{
+    assert( 0 && "Cannot set text size with this function" );
+}
+
+sf::Text &Text::getText()
+{
+    return text_;
+}
+
+
+void Text::draw(IRenderWindow *renderWindow) const
+{
+    assert( renderWindow );
+
+    static_cast<RenderWindow *>( renderWindow)->getWindow().draw( text_);
+}
+
+
+IntRect Text::getGlobalBounds() const
+{
+    sf::FloatRect rect = text_.getGlobalBounds();
+    return IntRect(vec2i(rect.getPosition().x, rect.getPosition().y), vec2u(rect.getSize().x, rect.getSize().y));
+}
+
+
 RectangleShape::RectangleShape()
     :   color_( Color()), outline_color_( Color()), size_( vec2u()), pos_( vec2f()), scale_( vec2f()) {}
 
 
 RectangleShape::~RectangleShape() {}
+
+
+std::unique_ptr<IRectangleShape> IRectangleShape::create(unsigned int width, unsigned int height)
+{
+    std::unique_ptr<RectangleShape> shape = std::make_unique<RectangleShape>();
+    shape->setSize(vec2u(width, height));
+    return shape;
+}
 
 
 void RectangleShape::setTexture(const ITexture *texture)

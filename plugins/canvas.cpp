@@ -1,5 +1,5 @@
-#include "api_canvas.hpp"
-#include "api_photoshop.hpp"
+#include "api/api_canvas.hpp"
+#include "api/api_photoshop.hpp"
 #include "../headers/api_impl/canvas.hpp"
 #include <memory>
 

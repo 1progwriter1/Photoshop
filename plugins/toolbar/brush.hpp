@@ -18,6 +18,7 @@ class Brush : public ABarButton
 {
     std::deque<sfm::vec2i> points_;
     sfm::vec2i last_pos_ = sfm::vec2i( 0, 0);
+    sfm::IntRect canvas_rect_ = {};
 
     ICanvas *canvas_;
     IOptionsBar *options_bar_;

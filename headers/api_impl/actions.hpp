@@ -2,8 +2,8 @@
 #define PHOTOSHOP_ACTIONS_IMPLEMENTATION
 
 
-#include <api_actions.hpp>
-#include <api_photoshop.hpp>
+#include <api/api_actions.hpp>
+#include <api/api_photoshop.hpp>
 #include <deque>
 #include <memory>
 

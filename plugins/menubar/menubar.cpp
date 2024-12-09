@@ -1,4 +1,6 @@
 #include "menubar.hpp"
+#include <cassert>
+#include <iostream>
 #include <memory>
 
 
@@ -42,7 +44,7 @@ bool loadPlugin()
     released->setOutlineColor( sfm::Color( 153, 204, 255));
     released->setOutlineThickness( 5);
 
-    std::unique_ptr<psapi::IBar> bar = std::make_unique<ABar>( kMenuBarWindowId, main,
+    std::unique_ptr<psapi::IBar> bar = std::make_unique<MenuBar>( kMenuBarWindowId, main,
                                                                 normal,
                                                                 onHover,
                                                                 pressed,
@@ -66,17 +68,32 @@ MenuBar::MenuBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape
                                                             std::unique_ptr<sfm::RectangleShape> &onHover,
                                                             std::unique_ptr<sfm::RectangleShape> &pressed,
                                                             std::unique_ptr<sfm::RectangleShape> &released)
-    :   ABar(init_id, main_shape, normal, onHover, pressed, released) {}
+    :   ABar(init_id, main_shape, normal, onHover, pressed, released)
+{
+    offset_ = ABar::getPos();
+    int offset = (ABar::getSize().y - buttons_size_.y) / 2;
+    offset_ += sfm::vec2i(offset, offset);
+}
 
 
 sfm::vec2i MenuBar::calculateNextPos(sfm::vec2i init_pos)
 {
-    size_t cnt_buttons = buttons_.size();
-    int offset = (size_.y - buttons_size_.y) / 2 + pos_.y;
-
-    sfm::vec2i pos = sfm::vec2i(offset, offset);
-    pos.x += cnt_buttons * (buttons_size_.x + offset);
-
+    sfm::vec2i pos = offset_;
+    for ( auto &item : buttons_ )
+    {
+        sfm::vec2i end_pos = item->getPos() + sfm::vec2i(item->getSize());
+        pos.x = std::max(pos.x, end_pos.x);
+    }
+    pos.y = offset_.y;
+    pos.x += offset_.x - ABar::getPos().x;
     return pos;
 }
 
+
+void MenuBar::addWindow(std::unique_ptr<IWindow> window)
+{
+    sfm::vec2u size = window->getSize();
+    window->setSize(sfm::vec2u(0, getSize().y * 0.65));
+    window->setPos(calculateNextPos(window->getPos()));
+    buttons_.push_back( std::unique_ptr<IBarButton>( static_cast<IBarButton *>( window.release())));
+}

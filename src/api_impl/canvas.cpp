@@ -1,5 +1,5 @@
 #include <api_impl/canvas.hpp>
-#include <api_canvas.hpp>
+#include <api/api_canvas.hpp>
 #include <cassert>
 #include <iostream>
 

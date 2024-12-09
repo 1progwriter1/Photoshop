@@ -13,6 +13,7 @@ static const char *PLUGINS_PATH[] =
 	"../build/librectangle.dylib",
 	"../build/libellipse.dylib",
 	"../build/libline.dylib",
+	"../build/libmenu_items.dylib",
 	// "../build/libfilter.dylib",
 	// "../build/libbrightness_filter.dylib",
 	// "../build/libnegative_filter.dylib",

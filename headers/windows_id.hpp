@@ -2,7 +2,8 @@
 #define WINDOWS_ID_LIST
 
 
-#include <api_photoshop.hpp>
+#include <api/api_photoshop.hpp>
+#include <api/api_bar.hpp>
 
 
 using psapi::wid_t;
@@ -29,6 +30,17 @@ const wid_t kGreenColorButtonId = 22;
 // const wid_t kOptionsBarWindowId = 102;
 // const wid_t kRootWindowId = 0;
 // const wid_t kInvalidWindowId = -1;
+
+// const wid_t kMenuFileId   = 200;
+// const wid_t kMenuFilterId = 201;
+// const wid_t kMenuHelpId   = 202;
+// const wid_t kMenuLayerId  = 203;
+// const wid_t kMenuToolsId  = 204;
+//
+//
+// const wid_t kColorPaletteId = 300;
+// const wid_t kOpacityBarId   = 301;
+// const wid_t kThicknessBarId = 302;
 
 
 #endif // WINDOWS_ID_LIST

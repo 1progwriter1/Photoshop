@@ -2,9 +2,9 @@
 #define PHOTOSHOP_BAR_IMPLEMENTATION
 
 
-#include <api_bar.hpp>
+#include <api/api_bar.hpp>
 #include <list>
-#include <api_sfm.hpp>
+#include <api/api_sfm.hpp>
 #include <api_impl/actions.hpp>
 #include <api_impl/sfm.hpp>
 
@@ -56,8 +56,7 @@ public:
 class AMenuButton : public IMenuButton
 {
 protected:
-    std::unique_ptr<sfm::Texture> texture_;
-    std::unique_ptr<sfm::Sprite> sprite_;
+    std::unique_ptr<sfm::IRectangleShape> main_shape_;
     State state_ = IBarButton::State::Normal;
 
     wid_t id_;
@@ -67,8 +66,11 @@ protected:
     bool is_bar_active_ = false;
 
     const IBar *parent_ = nullptr;
+
+    friend class AMenuButtonAction;
 public:
-    AMenuButton( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite, std::unique_ptr<IBar> &nested_bar);
+    AMenuButton( wid_t init_id, std::unique_ptr<sfm::IRectangleShape> init_shape, std::unique_ptr<IBar> nested_bar);
+    virtual ~AMenuButton() = default;
 
     virtual void addMenuItem(std::unique_ptr<IWindow> option) override;
 
@@ -133,30 +135,30 @@ public:
                                                             std::unique_ptr<sfm::RectangleShape> &released);
     virtual ~ABar() = default;
 
-    void draw(IRenderWindow* renderWindow) override;
-    std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
+    virtual void draw(IRenderWindow* renderWindow) override;
+    virtual std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
 
-    wid_t getId() const override;
-    IWindow* getWindowById(wid_t id) override;
-    const IWindow* getWindowById(wid_t id) const override;
-    vec2i getPos() const override;
-    vec2u getSize() const override;
+    virtual wid_t getId() const override;
+    virtual IWindow* getWindowById(wid_t id) override;
+    virtual const IWindow* getWindowById(wid_t id) const override;
+    virtual vec2i getPos() const override;
+    virtual vec2u getSize() const override;
 
-    void setParent(const IWindow* parent) override;
-    void setSize(const vec2u &size) override;
-    void setPos(const vec2i &pos) override;
+    virtual void setParent(const IWindow* parent) override;
+    virtual void setSize(const vec2u &size) override;
+    virtual void setPos(const vec2i &pos) override;
 
-    void forceActivate() override;
-    void forceDeactivate() override;
+    virtual void forceActivate() override;
+    virtual void forceDeactivate() override;
 
-    bool isActive() const override;
-    bool isWindowContainer() const override;
+    virtual bool isActive() const override;
+    virtual bool isWindowContainer() const override;
 
-    void addWindow(std::unique_ptr<IWindow> window) override;
-    void removeWindow(wid_t id) override;
+    virtual void addWindow(std::unique_ptr<IWindow> window) override;
+    virtual void removeWindow(wid_t id) override;
 
-    bool unPressAllButtons() override;
-    void finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const override;
+    virtual bool unPressAllButtons() override;
+    virtual void finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const override;
 
     virtual vec2i calculateNextPos(vec2i init_pos);
 };
@@ -256,6 +258,17 @@ class BarButtonAction : public AAction
     ABarButton *button_;
 public:
     BarButtonAction(ABarButton *button, const IRenderWindow *renderWindow, const Event &event);
+
+    bool execute(const Key &key) override;
+    bool isUndoable(const Key &key) override;
+};
+
+
+class AMenuButtonAction : public AAction
+{
+    AMenuButton *button_;
+public:
+    AMenuButtonAction(AMenuButton *button, const IRenderWindow *renderWindow, const Event &event);
 
     bool execute(const Key &key) override;
     bool isUndoable(const Key &key) override;

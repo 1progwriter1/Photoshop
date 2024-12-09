@@ -25,7 +25,7 @@ target_link_libraries( ${TARGET} PRIVATE sfml-graphics sfml-window sfml-system)
 target_link_libraries( ${TARGET} PRIVATE api_photoshop)
 
 include_directories( headers)
-include_directories( api)
+include_directories( ${CMAKE_SOURCE_DIR})
 include_directories( /opt/homebrew/include/)
 include_directories( ../MyLibraries/headers/)
 
@@ -44,9 +44,8 @@ set(LIBRARIES
     "ellipse+${CMAKE_SOURCE_DIR}/plugins/toolbar/ellipse.cpp"
     "line+${CMAKE_SOURCE_DIR}/plugins/toolbar/line.cpp"
     "menubar+${CMAKE_SOURCE_DIR}/plugins/menubar/menubar.cpp"
+	"menu_items+${CMAKE_SOURCE_DIR}/plugins/menubar/menu_items.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/fill_menu.cpp"
 )
-
-set(MY_STRING "canvas.cpp toolbar.cpp optionsbar.cpp")
 
 
 foreach(LIB_DATA ${LIBRARIES})
@@ -59,15 +58,23 @@ foreach(LIB_DATA ${LIBRARIES})
     endif()
 
     list(GET PARTS 0 LIB_NAME)
-    list(GET PARTS 1 SRC_FILE)
+    list(GET PARTS 1 SRC_FILES)
 
-	# message(FATAL_ERROR "${LIB_NAME}    ${SRC_FILE}")
+    string(REPLACE "," ";" SRC_FILES ${SRC_FILES})
 
-    add_library(${LIB_NAME} SHARED ${SRC_FILE})
+    foreach(SRC_FILE ${SRC_FILES})
+        list(APPEND SRC_FILE_LIST ${SRC_FILE})
+    endforeach()
+
+    add_library(${LIB_NAME} SHARED ${SRC_FILE_LIST})
 	target_link_directories( ${LIB_NAME} PRIVATE /opt/homebrew/lib/)
 	target_link_directories( ${LIB_NAME} PRIVATE build/)
 	target_link_libraries( ${LIB_NAME} PRIVATE sfml-graphics sfml-window sfml-system)
 	target_link_libraries( ${LIB_NAME} PRIVATE api_photoshop)
+
+    foreach( SRC_FILE ${SRC_FILE_LIST})
+        list(REMOVE_ITEM SRC_FILE_LIST ${SRC_FILE})
+    endforeach()
 
 endforeach()
 

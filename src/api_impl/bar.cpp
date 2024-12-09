@@ -43,7 +43,8 @@ void ABarButton::setPos(const vec2i &pos)
 
 IWindow* ABarButton::getWindowById(wid_t id)
 {
-    assert( 0 && "Not implemented" );
+    if ( id_ == id )
+        return this;
 
     return nullptr;
 }
@@ -51,7 +52,8 @@ IWindow* ABarButton::getWindowById(wid_t id)
 
 const IWindow* ABarButton::getWindowById(wid_t id) const
 {
-    assert( 0 && "Not implemented" );
+    if ( id_ == id )
+        return this;
 
     return nullptr;
 }
@@ -99,8 +101,6 @@ bool ABarButton::isActive() const
 
 bool ABarButton::isWindowContainer() const
 {
-    assert( 0 && "Not implemented" );
-
     return false;
 }
 
@@ -117,8 +117,8 @@ IBarButton::State ABarButton::getState() const
 }
 
 
-AMenuButton::AMenuButton(wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite, std::unique_ptr<IBar> &nested_bar)
-    :   id_(init_id), texture_(std::move(init_texture)), sprite_(std::move(init_sprite)) {}
+AMenuButton::AMenuButton(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> init_shape, std::unique_ptr<IBar> nested_bar)
+    :   id_(init_id), main_shape_(std::move(init_shape)), bar_(std::move(nested_bar)) {}
 
 
 void AMenuButton::addMenuItem(std::unique_ptr<IWindow> option)
@@ -155,15 +155,26 @@ const IBar *AMenuButton::getMenu() const
 
 void AMenuButton::draw(IRenderWindow* renderWindow)
 {
-    renderWindow->draw( sprite_.get());
+    renderWindow->draw( main_shape_.get());
+
+    if ( state_ == psapi::IBarButton::State::Press )
+    {
+        is_bar_active_ = true;
+    } else
+    {
+        is_bar_active_ = false;
+    }
+
+    if ( is_bar_active_ )
+    {
+        // bar_->draw(renderWindow);
+    }
 }
 
 
 std::unique_ptr<IAction> AMenuButton::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
-    assert( 0 && "Not implemented" );
-
-    return nullptr;
+    return std::make_unique<AMenuButtonAction>(this, renderWindow, event);
 }
 
 
@@ -175,7 +186,8 @@ wid_t AMenuButton::getId() const
 
 IWindow* AMenuButton::getWindowById(wid_t id)
 {
-    assert( 0 && "Not implemented" );
+    if ( id_ == id )
+        return this;
 
     return nullptr;
 }
@@ -183,7 +195,8 @@ IWindow* AMenuButton::getWindowById(wid_t id)
 
 const IWindow* AMenuButton::getWindowById(wid_t id) const
 {
-    assert( 0 && "Not implemented" );
+    if ( id_ == id )
+        return this;
 
     return nullptr;
 }
@@ -191,14 +204,14 @@ const IWindow* AMenuButton::getWindowById(wid_t id) const
 
 vec2i AMenuButton::getPos() const
 {
-    vec2f pos = sprite_->getPosition();
+    vec2f pos = main_shape_->getPosition();
     return vec2i( static_cast<int>( pos.x), static_cast<int>( pos.y));
 }
 
 
 vec2u AMenuButton::getSize() const
 {
-    return sprite_->getSize();
+    return main_shape_->getSize();
 }
 
 
@@ -211,13 +224,13 @@ void AMenuButton::setParent(const IWindow* parent)
 
 void AMenuButton::setPos(const vec2i &pos)
 {
-    sprite_->setPosition( pos.x, pos.y);
+    main_shape_->setPosition( pos);
 }
 
 
 void AMenuButton::setSize(const vec2u &size)
 {
-    assert( 0 && "Not implemented" );
+    main_shape_->setSize(size);
 }
 
 
@@ -441,22 +454,27 @@ bool ABar::isWindowContainer() const
 void ABar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
 {
     vec2i pos = button->getPos();
+    vec2u size = button->getSize();
     switch ( button->getState() )
     {
         case IBarButton::State::Normal:
             normal_->setPosition( pos);
+            normal_->setSize(size);
             renderWindow->draw( normal_.get());
             break;
         case IBarButton::State::Hover:
             onHover_->setPosition( pos);
+            onHover_->setSize(size);
             renderWindow->draw( onHover_.get());
             break;
         case IBarButton::State::Press:
             pressed_->setPosition( pos);
+            pressed_->setSize(size);
             renderWindow->draw( pressed_.get());
             break;
         case IBarButton::State::Released:
             released_->setPosition( pos);
+            released_->setSize(size);
             renderWindow->draw( released_.get());
             break;
         default:
@@ -738,5 +756,45 @@ bool AOptionsBarAction::isUndoable(const Key &key)
 
 bool AOptionsBarAction::execute(const Key &key)
 {
+    return true;
+}
+
+
+AMenuButtonAction::AMenuButtonAction(AMenuButton *button, const IRenderWindow *render_window, const Event &event)
+    :   AAction(render_window, event), button_(button) {}
+
+
+bool AMenuButtonAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+bool AMenuButtonAction::execute(const Key &key)
+{
+    sfm::vec2i mouse_pos = sfm::Mouse::getPosition(render_window_);
+    sfm::vec2i button_pos = button_->getPos();
+
+    sfm::vec2u size = button_->getSize();
+    bool is_on_focus = button_pos.x <= mouse_pos.x && mouse_pos.x <= button_pos.x + size.x &&
+                        button_pos.y <= mouse_pos.y && mouse_pos.y <= button_pos.y + size.y;
+    if ( is_on_focus )
+    {
+        if ( event_.type == sfm::Event::MouseButtonPressed )
+        {
+            button_->state_ = (button_->state_ != IBarButton::State::Press) ? IBarButton::State::Press : IBarButton::State::Released;
+        } else if ( button_->state_ != IBarButton::State::Press )
+        {
+            button_->state_ = psapi::IBarButton::State::Hover;
+        }
+    } else if ( button_->state_ == psapi::IBarButton::State::Hover || button_->state_ == psapi::IBarButton::State::Released )
+    {
+        button_->state_ = psapi::IBarButton::State::Normal;
+    }
+
+    // if ( button_->state_ == psapi::IBarButton::State::Press )
+    // {
+    //     getActionController()->execute(button_->bar_->createAction(render_window_, event_));
+    // }
     return true;
 }

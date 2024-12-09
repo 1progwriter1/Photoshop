@@ -19,7 +19,7 @@ bool loadPlugin()
 
     std::unique_ptr<sfm::Texture> texture = std::make_unique<sfm::Texture>();
     std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
-    texture->loadFromFile("../images/brush48_48.png");
+    texture->loadFromFile("../assets/images/brush48_48.png");
     sprite->setTexture( texture.get());
 
     std::unique_ptr<ABarButton> brush = std::make_unique<Brush>( kBrushButtonId, texture, sprite);
@@ -42,6 +42,10 @@ Brush::Brush( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::u
 {
     assert( canvas_ && "Failed to cast to canvas" );
     assert( options_bar_ && "Failed to cast to options bar" );
+
+    canvas_rect_ = getCanvasIntRect();
+    canvas_rect_.pos += sfm::vec2i(0, 20);
+    canvas_rect_.size -= sfm::vec2u(20, 20);
 }
 
 
@@ -229,7 +233,7 @@ bool BrushAction::execute(const Key &key)
     }
 
     sfm::vec2i mouse_pos = sfm::Mouse::getPosition( render_window_);
-    sfm::vec2i relative_pos = mouse_pos - psapi::getCanvasIntRect().pos;
+    sfm::vec2i relative_pos = mouse_pos - brush_->canvas_rect_.pos;
 
     brush_->drawInterpolatedPoints( brush_->canvas_->getLayer( brush_->canvas_->getActiveLayerIndex()), relative_pos);
 

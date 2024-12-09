@@ -2,7 +2,7 @@
 #define SFM_IMPLEMENTATION
 
 
-#include <api_sfm.hpp>
+#include <api/api_sfm.hpp>
 #include <SFML/Graphics.hpp>
 
 
@@ -156,6 +156,8 @@ public:
     ~Font() = default;
 
     bool loadFromFile(const std::string& filename) override;
+
+    const sf::Font &getFont() const;
 };
 
 
@@ -173,6 +175,12 @@ public:
     void setFillColor(const Color* color)     override;
     void setOutlineColor(const Color* color)  override;
     void setOutlineThickness(float thickness) override;
+    virtual void setPos(const vec2f &pos)     override;
+    virtual void setSize(const vec2f &size)   override;
+    void draw(IRenderWindow *renderWindow) const override;
+    virtual IntRect getGlobalBounds() const override;
+
+    sf::Text &getText();
 };
 
 
