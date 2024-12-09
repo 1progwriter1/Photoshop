@@ -14,11 +14,31 @@ Layer::Layer(Canvas *canvas)
 }
 
 
+Color Layer::getPixelGlobal(sfm::vec2i pos) const
+{
+    if  ( !(pos.x >= 0 && canvas_->getSize().x > pos.x &&
+            pos.y >= 0 && canvas_->getSize().y > pos.y ) )
+        return Color();
+    return pixels_[pos.y * canvas_->getSize().x + pos.x];
+}
+
+
+void Layer::setPixelGlobal(vec2i pos, Color pixel)
+{
+    if  ( !(pos.x >= 0 && canvas_->getSize().x > pos.x &&
+            pos.y >= 0 && canvas_->getSize().y > pos.y ) )
+        return;
+    pixels_[pos.y * canvas_->getSize().x + pos.x] = pixel;
+}
+
 Color Layer::getPixel(sfm::vec2i pos) const
 {
-    if  ( !(pos.x >= rect_.pos.x && rect_.size.x + rect_.pos.x > pos.x &&
-            pos.y >= rect_.pos.y && rect_.size.y + rect_.pos.x > pos.y ) )
+    pos -= rect_.pos - canvas_->getActualRect().pos;
+    if  ( !(pos.x >= 0 && rect_.size.x > pos.x &&
+            pos.y >= 0 && rect_.size.y > pos.y ) )
         return Color();
+
+    pos += rect_.pos - canvas_->getPos();
     return pixels_[pos.y * canvas_->getSize().x + pos.x];
 }
 

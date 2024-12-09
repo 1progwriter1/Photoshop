@@ -1,6 +1,8 @@
 #include "fill_menu.hpp"
 #include <cassert>
-
+#include "api/api_photoshop.hpp"
+#include "filters.hpp"
+#include "windows_id.hpp"
 
 
 IRootWindow *kRootWindowPtr = nullptr;
@@ -18,6 +20,12 @@ bool loadPlugin()
     menu->addWindow(MenuButton::createMenuButton(kMenuLayerId, "Layer"));
     menu->addWindow(MenuButton::createMenuButton(kMenuToolsId, "Tools"));
     menu->addWindow(MenuButton::createMenuButton(kMenuHelpId, "Help"));
+
+    AMenuButton *filter_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuFilterId));
+    assert( filter_bar && "Failed to cast to menu button" );
+
+    filter_bar->addMenuItem(createFilter<BareliefFilter>(kBareliefFilterButtonId, "Barelief"));
+    filter_bar->addMenuItem(createFilter<ContrastFilter>(kContrastFilterButtonId, "Contrast"));
 
     return true;
 }

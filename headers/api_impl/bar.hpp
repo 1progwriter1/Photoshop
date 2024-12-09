@@ -60,7 +60,6 @@ protected:
     State state_ = IBarButton::State::Normal;
 
     wid_t id_;
-    std::vector<std::unique_ptr<IWindow>> options_;
 
     std::unique_ptr<IBar> bar_;
     bool is_bar_active_ = false;
@@ -72,7 +71,7 @@ public:
     AMenuButton( wid_t init_id, std::unique_ptr<sfm::IRectangleShape> init_shape, std::unique_ptr<IBar> nested_bar);
     virtual ~AMenuButton() = default;
 
-    virtual void addMenuItem(std::unique_ptr<IWindow> option) override;
+    virtual void addMenuItem(std::unique_ptr<IWindow> item) override;
 
     virtual void activateMenu() override;
     virtual void deactivateMenu() override;

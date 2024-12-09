@@ -32,6 +32,8 @@ public:
 
     Color getPixel(sfm::vec2i pos) const override;
     void setPixel(sfm::vec2i pos, sfm::Color pixel) override;
+    Color getPixelGlobal(sfm::vec2i pos) const;
+    void setPixelGlobal(vec2i pos, Color pixel);
 
     drawable_id_t addDrawable(std::unique_ptr<sfm::Drawable> drawable) override;
     void removeDrawable(drawable_id_t id) override;

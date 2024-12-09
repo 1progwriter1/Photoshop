@@ -121,11 +121,9 @@ AMenuButton::AMenuButton(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> in
     :   id_(init_id), main_shape_(std::move(init_shape)), bar_(std::move(nested_bar)) {}
 
 
-void AMenuButton::addMenuItem(std::unique_ptr<IWindow> option)
+void AMenuButton::addMenuItem(std::unique_ptr<IWindow> item)
 {
-    assert( option );
-
-    options_.push_back( std::move( option));
+    bar_->addWindow(std::move(item));
 }
 
 
@@ -300,6 +298,7 @@ void ABar::draw(IRenderWindow* renderWindow)
 {
     assert( renderWindow );
 
+    main_shape_->setSize(size_);
     renderWindow->draw( main_shape_.get());
 
     for ( const auto &button : buttons_ )
@@ -792,9 +791,9 @@ bool AMenuButtonAction::execute(const Key &key)
         button_->state_ = psapi::IBarButton::State::Normal;
     }
 
-    // if ( button_->state_ == psapi::IBarButton::State::Press )
-    // {
-    //     getActionController()->execute(button_->bar_->createAction(render_window_, event_));
-    // }
+    if ( button_->state_ == psapi::IBarButton::State::Press )
+    {
+        getActionController()->execute(button_->bar_->createAction(render_window_, event_));
+    }
     return true;
 }
