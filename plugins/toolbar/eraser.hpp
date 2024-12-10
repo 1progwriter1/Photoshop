@@ -2,8 +2,11 @@
 #define ERASER_PLUGIN
 
 
-#include "../headers/api_impl/bar.hpp"
-#include "../api/api_canvas.hpp"
+#include "api_impl/bar/button.hpp"
+#include "api/api_canvas.hpp"
+
+
+using namespace psapi;
 
 
 extern "C"

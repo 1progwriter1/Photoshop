@@ -2,8 +2,13 @@
 #define RECTANGLE_PLUGIN
 
 
-#include "../headers/api_impl/bar.hpp"
-#include "../api/api_canvas.hpp"
+#include "api_impl/bar/button.hpp"
+#include "api/api_canvas.hpp"
+#include "api/api_canvas.hpp"
+#include "api/api_sfm.hpp"
+
+
+using namespace psapi;
 
 
 extern "C"
@@ -15,8 +20,8 @@ extern "C"
 
 class Rectangle : public ABarButton
 {
-    sfm::vec2i left_upper_edge_ = {};
-    sfm::vec2i last_mouse_pos_ = {};
+    vec2i left_upper_edge_ = {};
+    vec2i last_mouse_pos_ = {};
     sfm::Color color_ = sfm::Color( 255, 0, 0);
     sfm::IntRect canvas_rect_ = {};
 

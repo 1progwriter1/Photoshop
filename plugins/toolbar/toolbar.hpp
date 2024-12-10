@@ -2,7 +2,7 @@
 #define PLUGIN_TOOLBAR
 
 
-#include "../headers/api_impl/bar.hpp"
+#include "api_impl/bar/bar.hpp"
 
 
 extern "C"

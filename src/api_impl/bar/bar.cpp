@@ -1,274 +1,6 @@
 #include "windows_id.hpp"
-#include <api_impl/bar.hpp>
+#include <api_impl/bar/bar.hpp>
 #include <cassert>
-#include <iostream>
-
-
-void ABarButton::draw(IRenderWindow* renderWindow)
-{
-    renderWindow->draw( sprite_.get());
-}
-
-
-ABarButton::ABarButton(  wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
-    :   id_( init_id)
-{
-    texture_ = std::move( init_texture);
-    sprite_ = std::move( init_sprite);
-}
-
-
-std::unique_ptr<IAction> ABarButton::createAction(const IRenderWindow* renderWindow, const Event& event)
-{
-    return std::make_unique<BarButtonAction>(this, renderWindow, event);
-}
-
-
-wid_t ABarButton::getId() const
-{
-    return id_;
-}
-
-
-void ABarButton::setSize(const vec2u &size)
-{
-    sprite_->setTextureRect(sfm::IntRect(sfm::vec2dToVec2u(sprite_->getPosition()), size));
-}
-
-
-void ABarButton::setPos(const vec2i &pos)
-{
-    sprite_->setPosition( pos.x, pos.y);
-}
-
-
-IWindow* ABarButton::getWindowById(wid_t id)
-{
-    if ( id_ == id )
-        return this;
-
-    return nullptr;
-}
-
-
-const IWindow* ABarButton::getWindowById(wid_t id) const
-{
-    if ( id_ == id )
-        return this;
-
-    return nullptr;
-}
-
-
-vec2i ABarButton::getPos() const
-{
-    vec2f pos = sprite_->getPosition();
-    return vec2i( static_cast<int>( pos.x), static_cast<int>( pos.y));
-}
-
-
-vec2u ABarButton::getSize() const
-{
-    return sprite_->getSize();
-}
-
-
-void ABarButton::setParent(const IWindow* parent)
-{
-    parent_ = dynamic_cast<const IBar *>( parent);
-    assert( parent_ );
-}
-
-
-void ABarButton::forceActivate()
-{
-    assert( 0 && "Not implemented" );
-}
-
-
-void ABarButton::forceDeactivate()
-{
-    assert( 0 && "Not implemented" );
-}
-
-
-bool ABarButton::isActive() const
-{
-    assert( 0 && "Not implemented" );
-
-    return false;
-}
-
-
-bool ABarButton::isWindowContainer() const
-{
-    return false;
-}
-
-
-void ABarButton::setState(State state)
-{
-    state_ = state;
-}
-
-
-IBarButton::State ABarButton::getState() const
-{
-    return state_;
-}
-
-
-AMenuButton::AMenuButton(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> init_shape, std::unique_ptr<IBar> nested_bar)
-    :   id_(init_id), main_shape_(std::move(init_shape)), bar_(std::move(nested_bar)) {}
-
-
-void AMenuButton::addMenuItem(std::unique_ptr<IWindow> item)
-{
-    bar_->addWindow(std::move(item));
-}
-
-
-void AMenuButton::activateMenu()
-{
-    is_bar_active_ = true;
-}
-
-
-void AMenuButton::deactivateMenu()
-{
-    is_bar_active_ = false;
-}
-
-
-IBar *AMenuButton::getMenu()
-{
-    return bar_.get();
-}
-
-
-const IBar *AMenuButton::getMenu() const
-{
-    return bar_.get();
-}
-
-
-void AMenuButton::draw(IRenderWindow* renderWindow)
-{
-    renderWindow->draw( main_shape_.get());
-
-    if ( state_ == psapi::IBarButton::State::Press )
-    {
-        is_bar_active_ = true;
-    } else
-    {
-        is_bar_active_ = false;
-    }
-
-    if ( is_bar_active_ )
-    {
-        // bar_->draw(renderWindow);
-    }
-}
-
-
-std::unique_ptr<IAction> AMenuButton::createAction(const IRenderWindow* renderWindow, const Event& event)
-{
-    return std::make_unique<AMenuButtonAction>(this, renderWindow, event);
-}
-
-
-wid_t AMenuButton::getId() const
-{
-    return id_;
-}
-
-
-IWindow* AMenuButton::getWindowById(wid_t id)
-{
-    if ( id_ == id )
-        return this;
-
-    return nullptr;
-}
-
-
-const IWindow* AMenuButton::getWindowById(wid_t id) const
-{
-    if ( id_ == id )
-        return this;
-
-    return nullptr;
-}
-
-
-vec2i AMenuButton::getPos() const
-{
-    vec2f pos = main_shape_->getPosition();
-    return vec2i( static_cast<int>( pos.x), static_cast<int>( pos.y));
-}
-
-
-vec2u AMenuButton::getSize() const
-{
-    return main_shape_->getSize();
-}
-
-
-void AMenuButton::setParent(const IWindow* parent)
-{
-    parent_ = dynamic_cast<const IBar *>( parent);
-    assert( parent_ );
-}
-
-
-void AMenuButton::setPos(const vec2i &pos)
-{
-    main_shape_->setPosition( pos);
-}
-
-
-void AMenuButton::setSize(const vec2u &size)
-{
-    main_shape_->setSize(size);
-}
-
-
-void AMenuButton::forceActivate()
-{
-    assert( 0 && "Not implemented" );
-}
-
-
-void AMenuButton::forceDeactivate()
-{
-    assert( 0 && "Not implemented" );
-}
-
-
-bool AMenuButton::isActive() const
-{
-    assert( 0 && "Not implemented" );
-
-    return false;
-}
-
-
-bool AMenuButton::isWindowContainer() const
-{
-    return false;
-}
-
-
-void AMenuButton::setState(State state)
-{
-    state_ = state;
-}
-
-
-IBarButton::State AMenuButton::getState() const
-{
-    return state_;
-}
 
 
 ABar::ABar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::unique_ptr<sfm::RectangleShape> &normal,
@@ -312,7 +44,7 @@ void ABar::draw(IRenderWindow* renderWindow)
 
 std::unique_ptr<IAction> ABar::createAction(const IRenderWindow* renderWindow, const Event& event)
 {
-    return std::make_unique<BarAction>(this, renderWindow, event);
+    return std::make_unique<ABarAction>(this, renderWindow, event);
 }
 
 
@@ -483,42 +215,6 @@ void ABar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* butto
 }
 
 
-sfm::Color ColorPalette::getColor() const
-{
-    return color_;
-}
-
-
-void ColorPalette::setColor(const sfm::Color &color)
-{
-    color_ = color;
-}
-
-
-float ThicknessOption::getThickness() const
-{
-    return thickness_;
-}
-
-
-void ThicknessOption::setThickness(float thickness)
-{
-    thickness_ = thickness;
-}
-
-
-float OpacityOption::getOpacity() const
-{
-    return opacity_;
-}
-
-
-void OpacityOption::setOpacity(float opacity)
-{
-    opacity_ = opacity;
-}
-
-
 AOptionsBar::AOptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape)
     :   id_( init_id), main_shape_(std::move(main_shape))
         // size_( main_shape->getSize()),
@@ -672,18 +368,18 @@ void AOptionsBar::removeAllOptions()
 }
 
 
-BarAction::BarAction(ABar *bar, const IRenderWindow *renderWindow, const Event &event)
+ABarAction::ABarAction(ABar *bar, const IRenderWindow *renderWindow, const Event &event)
     :   AAction(renderWindow, event), bar_(bar) {}
 
 
 
-bool BarAction::isUndoable(const Key &key)
+bool ABarAction::isUndoable(const Key &key)
 {
     return false;
 }
 
 
-bool BarAction::execute(const Key &key)
+bool ABarAction::execute(const Key &key)
 {
     for ( auto &button : bar_->buttons_ )
     {
@@ -708,41 +404,6 @@ bool BarAction::execute(const Key &key)
 }
 
 
-BarButtonAction::BarButtonAction(ABarButton *button, const IRenderWindow *renderWindow, const Event &event)
-    :   AAction(renderWindow, event), button_(button) {}
-
-
-bool BarButtonAction::isUndoable(const Key &key)
-{
-    return false;
-}
-
-
-bool BarButtonAction::execute(const Key &key)
-{
-    sfm::vec2i mouse_pos = sfm::Mouse::getPosition(render_window_);
-    sfm::vec2i button_pos = button_->getPos();
-
-    sfm::vec2u size = button_->getSize();
-    bool is_on_focus = button_pos.x <= mouse_pos.x && mouse_pos.x <= button_pos.x + size.x &&
-                        button_pos.y <= mouse_pos.y && mouse_pos.y <= button_pos.y + size.y;
-    if ( is_on_focus )
-    {
-        if ( event_.type == sfm::Event::MouseButtonPressed )
-        {
-            button_->state_ = (button_->state_ != IBarButton::State::Press) ? IBarButton::State::Press : IBarButton::State::Released;
-        } else if ( button_->state_ != IBarButton::State::Press )
-        {
-            button_->state_ = psapi::IBarButton::State::Hover;
-        }
-    } else if ( button_->state_ == psapi::IBarButton::State::Hover || button_->state_ == psapi::IBarButton::State::Released )
-    {
-        button_->state_ = psapi::IBarButton::State::Normal;
-    }
-    return true;
-}
-
-
 AOptionsBarAction::AOptionsBarAction(AOptionsBar *bar, const IRenderWindow *render_window, const Event &event)
     :   AAction(render_window, event), bar_(bar) {}
 
@@ -755,45 +416,5 @@ bool AOptionsBarAction::isUndoable(const Key &key)
 
 bool AOptionsBarAction::execute(const Key &key)
 {
-    return true;
-}
-
-
-AMenuButtonAction::AMenuButtonAction(AMenuButton *button, const IRenderWindow *render_window, const Event &event)
-    :   AAction(render_window, event), button_(button) {}
-
-
-bool AMenuButtonAction::isUndoable(const Key &key)
-{
-    return false;
-}
-
-
-bool AMenuButtonAction::execute(const Key &key)
-{
-    sfm::vec2i mouse_pos = sfm::Mouse::getPosition(render_window_);
-    sfm::vec2i button_pos = button_->getPos();
-
-    sfm::vec2u size = button_->getSize();
-    bool is_on_focus = button_pos.x <= mouse_pos.x && mouse_pos.x <= button_pos.x + size.x &&
-                        button_pos.y <= mouse_pos.y && mouse_pos.y <= button_pos.y + size.y;
-    if ( is_on_focus )
-    {
-        if ( event_.type == sfm::Event::MouseButtonPressed )
-        {
-            button_->state_ = (button_->state_ != IBarButton::State::Press) ? IBarButton::State::Press : IBarButton::State::Released;
-        } else if ( button_->state_ != IBarButton::State::Press )
-        {
-            button_->state_ = psapi::IBarButton::State::Hover;
-        }
-    } else if ( button_->state_ == psapi::IBarButton::State::Hover || button_->state_ == psapi::IBarButton::State::Released )
-    {
-        button_->state_ = psapi::IBarButton::State::Normal;
-    }
-
-    if ( button_->state_ == psapi::IBarButton::State::Press )
-    {
-        getActionController()->execute(button_->bar_->createAction(render_window_, event_));
-    }
     return true;
 }

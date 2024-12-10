@@ -2,9 +2,12 @@
 #define PLUGIN_BRUSH
 
 
-#include "../headers/api_impl/bar.hpp"
-#include "../api/api_canvas.hpp"
+#include "headers/api_impl/bar/button.hpp"
+#include "api/api_canvas.hpp"
 #include <deque>
+
+
+using namespace psapi;
 
 
 extern "C"

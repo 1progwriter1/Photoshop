@@ -2,9 +2,12 @@
 #define LINE_PLUGIN
 
 
-#include "../headers/api_impl/bar.hpp"
-#include "../api/api_canvas.hpp"
-#include "../headers/api_impl/canvas.hpp"
+#include "api_impl/bar/button.hpp"
+#include "api/api_canvas.hpp"
+#include "api/api_sfm.hpp"
+
+
+using namespace psapi;
 
 
 extern "C"

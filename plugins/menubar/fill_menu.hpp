@@ -8,6 +8,9 @@
 #include <cassert>
 
 
+using namespace psapi;
+
+
 extern "C"
 {
 

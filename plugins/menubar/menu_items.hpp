@@ -2,7 +2,8 @@
 #define PLUGIN_MENU_ITEMS
 
 
-#include "api_impl/bar.hpp"
+#include "api_impl/bar/bar.hpp"
+#include "api_impl/bar/button.hpp"
 
 
 #define FONT_FILE "../assets/fonts/HomeplanetbbBolditalic.ttf"

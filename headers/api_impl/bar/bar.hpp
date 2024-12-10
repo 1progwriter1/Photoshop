@@ -12,97 +12,6 @@
 using namespace psapi;
 
 
-
-class ABarButton : public IBarButton
-{
-protected:
-    std::unique_ptr<sfm::Texture> texture_;
-    std::unique_ptr<sfm::Sprite> sprite_;
-    State state_;
-
-    wid_t id_;
-
-    const IBar *parent_;
-
-    friend class BarButtonAction;
-public:
-    ABarButton( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
-    ~ABarButton() = default;
-
-    virtual void draw(IRenderWindow* renderWindow) override;
-    std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
-
-    virtual wid_t getId() const override;
-    virtual IWindow* getWindowById(wid_t id) override;
-    virtual const IWindow* getWindowById(wid_t id) const override;
-    virtual vec2i getPos() const override;
-    virtual vec2u getSize() const override;
-
-    virtual void setParent(const IWindow* parent) override;
-    virtual void setSize(const vec2u &size) override;
-    virtual void setPos(const vec2i &pos) override;
-
-    virtual void forceActivate() override;
-    virtual void forceDeactivate() override;
-
-    virtual bool isActive() const override;
-    virtual bool isWindowContainer() const override;
-
-    virtual void setState(State state) override;
-    virtual State getState() const override;
-};
-
-
-class AMenuButton : public IMenuButton
-{
-protected:
-    std::unique_ptr<sfm::IRectangleShape> main_shape_;
-    State state_ = IBarButton::State::Normal;
-
-    wid_t id_;
-
-    std::unique_ptr<IBar> bar_;
-    bool is_bar_active_ = false;
-
-    const IBar *parent_ = nullptr;
-
-    friend class AMenuButtonAction;
-public:
-    AMenuButton( wid_t init_id, std::unique_ptr<sfm::IRectangleShape> init_shape, std::unique_ptr<IBar> nested_bar);
-    virtual ~AMenuButton() = default;
-
-    virtual void addMenuItem(std::unique_ptr<IWindow> item) override;
-
-    virtual void activateMenu() override;
-    virtual void deactivateMenu() override;
-
-    virtual IBar *getMenu() override;
-    virtual const IBar *getMenu() const override;
-
-    virtual void draw(IRenderWindow* renderWindow) override;
-    std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
-
-    virtual wid_t getId() const override;
-    virtual IWindow* getWindowById(wid_t id) override;
-    virtual const IWindow* getWindowById(wid_t id) const override;
-    virtual vec2i getPos() const override;
-    virtual vec2u getSize() const override;
-
-    virtual void setParent(const IWindow* parent) override;
-    virtual void setSize(const vec2u &size) override;
-    virtual void setPos(const vec2i &pos) override;
-
-    virtual void forceActivate() override;
-    virtual void forceDeactivate() override;
-
-    virtual bool isActive() const override;
-    virtual bool isWindowContainer() const override;
-
-    virtual void setState(State state) override;
-    virtual State getState() const override;
-};
-
-
 class ABar : public IBar
 {
 protected:
@@ -126,7 +35,7 @@ protected:
 
     wid_t last_pressed_id_ = -1;
 
-    friend class BarAction;
+    friend class ABarAction;
 public:
     ABar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
                                                             std::unique_ptr<sfm::RectangleShape> &onHover,
@@ -160,33 +69,6 @@ public:
     virtual void finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const override;
 
     virtual vec2i calculateNextPos(vec2i init_pos);
-};
-
-
-class ColorPalette : public IColorPalette
-{
-    sfm::Color color_ = sfm::Color(0, 0, 0);
-public:
-    sfm::Color getColor() const override;
-    void setColor(const sfm::Color &color) override;
-};
-
-
-class ThicknessOption : public IThicknessOption
-{
-    float thickness_ = 0;
-public:
-    float getThickness() const override;
-    void setThickness(float thickness) override;
-};
-
-
-class OpacityOption : public IOpacityOption
-{
-    float opacity_ = 0;
-public:
-    float getOpacity() const override;
-    void setOpacity(float opacity) override;
 };
 
 
@@ -241,33 +123,11 @@ public:
 };
 
 
-class BarAction : public AAction
+class ABarAction : public AAction
 {
     ABar *bar_;
 public:
-    BarAction(ABar *bar, const IRenderWindow *renderWindow, const Event &event);
-
-    bool execute(const Key &key) override;
-    bool isUndoable(const Key &key) override;
-};
-
-
-class BarButtonAction : public AAction
-{
-    ABarButton *button_;
-public:
-    BarButtonAction(ABarButton *button, const IRenderWindow *renderWindow, const Event &event);
-
-    bool execute(const Key &key) override;
-    bool isUndoable(const Key &key) override;
-};
-
-
-class AMenuButtonAction : public AAction
-{
-    AMenuButton *button_;
-public:
-    AMenuButtonAction(AMenuButton *button, const IRenderWindow *renderWindow, const Event &event);
+    ABarAction(ABar *bar, const IRenderWindow *renderWindow, const Event &event);
 
     bool execute(const Key &key) override;
     bool isUndoable(const Key &key) override;

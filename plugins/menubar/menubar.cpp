@@ -1,6 +1,4 @@
 #include "menubar.hpp"
-#include <cassert>
-#include <iostream>
 #include <memory>
 
 

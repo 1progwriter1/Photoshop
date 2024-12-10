@@ -1,5 +1,4 @@
 #include "menu_items.hpp"
-#include "api_impl/bar.hpp"
 #include <cassert>
 #include <iostream>
 
