@@ -22,17 +22,18 @@ class Rectangle : public ABarButton
 {
     vec2i left_upper_edge_ = {};
     vec2i last_mouse_pos_ = {};
-    sfm::Color color_ = sfm::Color( 255, 0, 0);
+    sfm::Color color_ = sfm::Color::getStandardColor(psapi::sfm::Color::Type::Cyan);
     sfm::IntRect canvas_rect_ = {};
 
     bool draw_ = false;
 
+    IColorPalette *palette_ = nullptr;
     ICanvas *canvas_;
     ILayer *layer_ = nullptr;
     IOptionsBar *options_bar_;
 
     bool options_added_ = false;
-    std::vector<std::unique_ptr<ABarButton>> options_;
+    std::vector<std::unique_ptr<IWindow>> options_;
     std::vector<wid_t> id_;
 
     friend class RectangleAction;

@@ -336,7 +336,14 @@ bool BarButtonAction::execute(const Key &key)
     {
         if ( event_.type == Event::MouseButtonPressed )
         {
-            button_->state_ = (button_->state_ != IBarButton::State::Press) ? IBarButton::State::Press : IBarButton::State::Released;
+            if ( button_->state_ != IBarButton::State::Press )
+            {
+                button_->state_ = IBarButton::State::Press;
+            } else
+            {
+                button_->state_ = IBarButton::State::Released;
+                static_cast<psapi::IOptionsBar *>(psapi::getRootWindow()->getWindowById(psapi::kOptionsBarWindowId))->removeAllOptions();
+            }
         } else if ( button_->state_ != IBarButton::State::Press )
         {
             button_->state_ = psapi::IBarButton::State::Hover;

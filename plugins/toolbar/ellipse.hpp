@@ -24,6 +24,10 @@ class Ellipse : public ABarButton
     ILayer *layer_ = nullptr;
     ICanvas *canvas_ = nullptr;
     sfm::IntRect canvas_rect_ = {};
+    bool options_added_ = false;
+    IColorPalette *palette_ = nullptr;
+    sfm::Color color_ = sfm::Color::getStandardColor(psapi::sfm::Color::Type::Yellow);
+    std::vector<std::unique_ptr<IWindow>> options_;
 
     friend class EllipseAction;
 public:
@@ -35,6 +39,10 @@ public:
     bool isOnEllipse( sfm::vec2i pos, sfm::vec2u size2, sfm::vec2i center);
 
     void updateState(const IRenderWindow *renderWindow, const Event &event);
+
+    void addOptions();
+    void removeOptions();
+    void createOptions();
 };
 
 

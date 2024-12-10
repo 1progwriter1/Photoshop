@@ -61,14 +61,13 @@ void Ellipse::drawEllipse( const sfm::IRenderWindow *renderWindow, ILayer *layer
     int center_x = std::min( mouse_pos.x, left_upper_edge_.x) + size.x / 2;
     int center_y = std::min( mouse_pos.y, left_upper_edge_.y) + size.y / 2;
 
-    sfm::Color rect_color( 0, 0, 150);
     for ( int x = 0; x < canvas_rect_.size.x; x++ )
     {
         for ( int y = 0; y < canvas_rect_.size.y; y++ )
         {
             if ( isOnEllipse( sfm::vec2i( x, y), size2, sfm::vec2i( center_x, center_y)) )
             {
-                layer->setPixel( sfm::vec2i( x, y), rect_color);
+                layer->setPixel( sfm::vec2i( x, y), color_);
             } else if ( is_temp_layer )
             {
                 layer->setPixel( sfm::vec2i( x, y), sfm::Color(0, 0, 0, 0));
@@ -132,6 +131,34 @@ bool EllipseAction::undo(const Key &key)
 }
 
 
+void Ellipse::addOptions()
+{
+    for ( auto &option : options_ )
+    {
+        static_cast<IOptionsBar *>(psapi::getRootWindow()->getWindowById(kOptionsBarWindowId))->addWindow(std::move(option));
+    }
+    options_.clear();
+    options_added_ = true;
+}
+
+
+void Ellipse::removeOptions()
+{
+    static_cast<IOptionsBar *>(psapi::getRootWindow()->getWindowById(kOptionsBarWindowId))->removeAllOptions();
+    options_added_ = false;
+}
+
+
+
+void Ellipse::createOptions()
+{
+    std::unique_ptr<IColorPalette> palette = IColorPalette::create();
+    palette->setColor(color_);
+    palette_ = palette.get();
+    options_.push_back(std::move(palette));
+}
+
+
 bool EllipseAction::execute(const Key &key)
 {
     ellipse_->updateState(render_window_, event_);
@@ -140,6 +167,17 @@ bool EllipseAction::execute(const Key &key)
     {
         return true;
     }
+    if ( ellipse_->getState() != IBarButton::State::Press )
+    {
+        ellipse_->options_added_ = false;
+        return true;
+    }
+    if ( !ellipse_->options_added_ )
+    {
+        ellipse_->createOptions();
+        ellipse_->addOptions();
+    }
+    ellipse_->color_ = ellipse_->palette_->getColor();
     static bool is_front = false;
     if ( event_.type == sfm::Event::None )
     {

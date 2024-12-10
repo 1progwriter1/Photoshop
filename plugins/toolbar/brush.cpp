@@ -4,6 +4,7 @@
 
 
 #include "../headers/windows_id.hpp"
+#include "api_impl/bar/options.hpp"
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
@@ -140,25 +141,31 @@ void Brush::drawInterpolatedPoints( ILayer *layer, sfm::vec2i new_point)
 
 void Brush::addOptions()
 {
-    // for ( auto &option : options_ )
-    // {
-    //     options_bar_->addWindow( std::move( option));
-    // }
-    // options_.clear();
+    for ( auto &option : options_ )
+    {
+        static_cast<IOptionsBar *>(psapi::getRootWindow()->getWindowById(kOptionsBarWindowId))->addWindow(std::move(option));
+    }
+    options_.clear();
+    options_added_ = true;
 }
 
 
 void Brush::removeOptions()
 {
-    // static_cast<InstrumentsBar *>(psapi::getRootWindow()->getWindowById(kInstrumentsBarId))->removeAllInstruments();
+    IOptionsBar *bar = dynamic_cast<IOptionsBar *>(psapi::getRootWindow()->getWindowById(kOptionsBarWindowId));
+    assert( bar && "Failed to cast to options bar" );
+    bar->removeAllOptions();
+    options_added_ = false;
 }
 
 
 
 void Brush::createOptions()
 {
-    // std::unique_ptr<ColorPalette> color_palette = std::make_unique<ColorPalette>();
-    // options_.push_back( std::move( color_palette));
+    std::unique_ptr<IColorPalette> palette = IColorPalette::create();
+    palette->setColor(color_);
+    palette_ = palette.get();
+    options_.push_back(std::move(palette));
 }
 
 
@@ -212,20 +219,15 @@ bool BrushAction::execute(const Key &key)
 
     if ( brush_->getState() != IBarButton::State::Press )
     {
-        if ( brush_->options_added_   )
-        {
-            brush_->removeOptions();
-            brush_->options_added_ = false;
-        }
+        brush_->options_added_ = false;
         return true;
     }
     if ( !brush_->options_added_ )
     {
         brush_->createOptions();
         brush_->addOptions();
-        brush_->options_added_ = true;
     }
-
+    brush_->color_ = brush_->palette_->getColor();
     if ( !( sfm::Mouse::isButtonPressed( sfm::Mouse::Button::Left) || sfm::Mouse::isButtonPressed( sfm::Mouse::Button::Right) ) )
     {
         brush_->points_.clear();

@@ -90,7 +90,9 @@ protected:
 
     const IWindow *parent_ = nullptr;
 
-    std::list<std::unique_ptr<IBarButton>> options_;
+    std::list<std::unique_ptr<IWindow>> options_;
+
+    friend class AOptionsBarAction;
 public:
     AOptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape);
     virtual ~AOptionsBar() = default;
@@ -126,6 +128,7 @@ public:
 class ABarAction : public AAction
 {
     ABar *bar_;
+    bool options_removed_ = false;
 public:
     ABarAction(ABar *bar, const IRenderWindow *renderWindow, const Event &event);
 

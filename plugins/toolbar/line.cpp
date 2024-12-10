@@ -79,6 +79,34 @@ bool Line::isOnCanvas( sfm::vec2i mouse_pos)
 }
 
 
+void Line::addOptions()
+{
+    for ( auto &option : options_ )
+    {
+        static_cast<IOptionsBar *>(psapi::getRootWindow()->getWindowById(kOptionsBarWindowId))->addWindow(std::move(option));
+    }
+    options_.clear();
+    options_added_ = true;
+}
+
+
+void Line::removeOptions()
+{
+    static_cast<IOptionsBar *>(psapi::getRootWindow()->getWindowById(kOptionsBarWindowId))->removeAllOptions();
+    options_added_ = false;
+}
+
+
+
+void Line::createOptions()
+{
+    std::unique_ptr<IColorPalette> palette = IColorPalette::create();
+    palette->setColor(color_);
+    palette_ = palette.get();
+    options_.push_back(std::move(palette));
+}
+
+
 void Line::drawLine( const sfm::IRenderWindow *renderWindow, ILayer *layer, bool is_temp_layer)
 {
     if ( !is_temp_layer )
@@ -91,7 +119,6 @@ void Line::drawLine( const sfm::IRenderWindow *renderWindow, ILayer *layer, bool
 
     const sfm::IImage *image = shape_.getImage();
 
-    sfm::Color line_color = sfm::Color( 255, 0, 127);
     for ( size_t x = 0; x < canvas_rect_.size.x; x++ )
     {
         for ( size_t y = 0; y < canvas_rect_.size.y; y++ )
@@ -99,7 +126,7 @@ void Line::drawLine( const sfm::IRenderWindow *renderWindow, ILayer *layer, bool
             sfm::Color color = image->getPixel( x, y);
             if ( color.a != 0 )
             {
-                layer->setPixel( sfm::vec2i( x, y), line_color);
+                layer->setPixel( sfm::vec2i( x, y), color_);
             } else if ( is_temp_layer )
             {
                 layer->setPixel( sfm::vec2i( x, y), sfm::Color( 0, 0, 0, 0));
@@ -137,10 +164,17 @@ bool LineAction::execute(const Key &key)
 {
     line_->updateState(render_window_, event_);
 
-    if ( line_->state_ != psapi::IBarButton::State::Press )
+    if ( line_->getState() != IBarButton::State::Press )
     {
+        line_->options_added_ = false;
         return true;
     }
+    if ( !line_->options_added_ )
+    {
+        line_->createOptions();
+        line_->addOptions();
+    }
+    line_->color_ = line_->palette_->getColor();
     static bool is_front = false;
     if ( event_.type == sfm::Event::None )
     {

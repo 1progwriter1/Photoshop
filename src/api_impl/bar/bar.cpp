@@ -342,10 +342,16 @@ vec2i AOptionsBar::calculateNextPos(vec2i init_pos)
 
 void AOptionsBar::addWindow(std::unique_ptr<IWindow> window)
 {
-    IBarButton *button = dynamic_cast<IBarButton *>( window.release());
-    assert( button );
+    sfm::IntRect rect = getOptionsBarIntRect();
+    vec2u w_size = window->getSize();
+    float ratio = w_size.x == 0 ? 1 : (float) w_size.y / w_size.x;
 
-    options_.push_back( std::unique_ptr<IBarButton>( button));
+    w_size.x = rect.size.x - 10;
+    w_size.y = rect.size.x * ratio;
+
+    window->setSize( w_size);
+    window->setPos( rect.pos + vec2i(5, 5));
+    options_.push_back( std::move(window));
 }
 
 
@@ -416,5 +422,10 @@ bool AOptionsBarAction::isUndoable(const Key &key)
 
 bool AOptionsBarAction::execute(const Key &key)
 {
+    for ( auto &option : bar_->options_ )
+    {
+        if ( !psapi::getActionController()->execute(option->createAction(render_window_, event_)) )
+            return false;
+    }
     return true;
 }

@@ -23,6 +23,7 @@ class Brush : public ABarButton
     sfm::vec2i last_pos_ = sfm::vec2i( 0, 0);
     sfm::IntRect canvas_rect_ = {};
 
+    IColorPalette *palette_ = nullptr;
     ICanvas *canvas_;
     IOptionsBar *options_bar_;
     sfm::Color color_ = sfm::Color( 255, 0, 0);

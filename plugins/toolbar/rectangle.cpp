@@ -119,20 +119,29 @@ const sfm::Color &Rectangle::getColor() const
 
 void Rectangle::addOptions()
 {
-
+    for ( auto &option : options_ )
+    {
+        static_cast<IOptionsBar *>(psapi::getRootWindow()->getWindowById(kOptionsBarWindowId))->addWindow(std::move(option));
+    }
+    options_.clear();
+    options_added_ = true;
 }
 
 
 void Rectangle::removeOptions()
 {
-
+    static_cast<IOptionsBar *>(psapi::getRootWindow()->getWindowById(kOptionsBarWindowId))->removeAllOptions();
+    options_added_ = false;
 }
 
 
 
 void Rectangle::createOptions()
 {
-
+    std::unique_ptr<IColorPalette> palette = IColorPalette::create();
+    palette->setColor(color_);
+    palette_ = palette.get();
+    options_.push_back(std::move(palette));
 }
 
 
@@ -166,20 +175,15 @@ bool RectangleAction::execute(const Key &key)
 
     if ( rectangle_->getState() != IBarButton::State::Press )
     {
-        if ( rectangle_->options_added_ )
-        {
-            rectangle_->removeOptions();
-            rectangle_->options_added_ = false;
-        }
+        rectangle_->options_added_ = false;
         return true;
     }
     if ( !rectangle_->options_added_ )
     {
         rectangle_->createOptions();
         rectangle_->addOptions();
-        rectangle_->options_added_ = true;
     }
-
+    rectangle_->color_ = rectangle_->palette_->getColor();
     static bool is_front = false;
     if ( event_.type == sfm::Event::None )
     {
@@ -211,8 +215,5 @@ bool RectangleAction::execute(const Key &key)
         rectangle_->last_mouse_pos_ = new_mouse_pos;
         rectangle_->drawRectangle( render_window_, rectangle_->layer_, true);
     }
-
-    return true;
-
     return true;
 }

@@ -23,11 +23,16 @@ class Line : public ABarButton
     sfm::vec2i begin_pos_ = {};
     sfm::vec2i last_mouse_pos_ = {};
     sfm::IntRect canvas_rect_ = {};
+    sfm::Color color_ = sfm::Color::getStandardColor(psapi::sfm::Color::Type::Green);
+    std::vector<std::unique_ptr<IWindow>> options_;
 
     bool draw_ = false;
+    bool options_added_ = false;
 
     ICanvas *canvas_;
     ILayer *layer_ = nullptr;
+
+    IColorPalette *palette_ = nullptr;
 
     friend class LineAction;
 public:
@@ -42,6 +47,10 @@ private:
     bool isOnCanvas( sfm::vec2i mouse_pos);
 
     void updateState(const IRenderWindow *renderWindow, const Event &event);
+
+    void addOptions();
+    void removeOptions();
+    void createOptions();
 };
 
 
