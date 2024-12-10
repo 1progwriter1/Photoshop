@@ -481,3 +481,76 @@ bool NegativeFilterAction::isUndoable(const Key& key)
 {
     return false;
 }
+
+
+BrightnessFilter::BrightnessFilter(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
+                                   std::unique_ptr<sfm::IRectangleShape> init_shape)
+    :   TextButton(init_id, std::move(font), std::move(text), std::move(init_shape)) {}
+
+
+void BrightnessFilter::updateState(const IRenderWindow *renderWindow, const Event &event)
+{
+    getActionController()->execute(TextButton::createAction(renderWindow, event));
+}
+
+
+std::unique_ptr<IAction> BrightnessFilter::createAction(const IRenderWindow *renderWindow, const Event &event)
+{
+    return std::make_unique<BrightnessFilterAction>(this, renderWindow, event);
+}
+
+
+BrightnessFilterAction::BrightnessFilterAction(BrightnessFilter *button, const IRenderWindow *renderWindow, const Event &event)
+    :   AUndoableAction(renderWindow, event), button_(button)
+{
+    canvas_ = dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId));
+    assert( canvas_ && "Failed to cast to canvas" );
+}
+
+
+bool BrightnessFilterAction::execute(const Key& key)
+{
+    button_->updateState(render_window_, event_);
+    int delta = -10;
+    if ( button_->getState() != IBarButton::State::Press )
+    {
+        return true;
+    }
+
+    Layer *layer = static_cast<Layer *>(canvas_->getLayer( canvas_->getActiveLayerIndex()));
+    assert( layer );
+
+    sfm::vec2u canvas_size = canvas_->getSize();
+    for ( size_t x = 0; x < canvas_size.x; x++ )
+    {
+        for ( size_t y = 0; y < canvas_size.y; y++ )
+        {
+            sfm::Color color = layer->getPixelGlobal( sfm::vec2i( x, y));
+            color.a += delta;
+            layer->setPixelGlobal( sfm::vec2i( x, y), color);
+        }
+    }
+    button_->setState( IBarButton::State::Normal);
+
+    return true;
+}
+
+
+bool BrightnessFilterAction::undo(const Key& key)
+{
+    std::cout << "Undo brightness filter\n";
+    return true;
+}
+
+
+bool BrightnessFilterAction::redo(const Key& key)
+{
+    std::cout << "Redo brightness filter\n";
+    return true;
+}
+
+
+bool BrightnessFilterAction::isUndoable(const Key& key)
+{
+    return false;
+}

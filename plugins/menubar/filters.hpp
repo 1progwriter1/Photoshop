@@ -144,4 +144,31 @@ public:
 };
 
 
+class BrightnessFilter : public TextButton
+{
+    friend class BrightnessFilterAction;
+public:
+    BrightnessFilter(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
+                std::unique_ptr<sfm::IRectangleShape> init_shape);
+
+    std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
+    void updateState(const IRenderWindow *renderWindow, const Event &event);
+};
+
+
+class BrightnessFilterAction : public AUndoableAction
+{
+    ICanvas *canvas_;
+    BrightnessFilter *button_;
+public:
+    BrightnessFilterAction(BrightnessFilter *button, const IRenderWindow *renderWindow, const Event &event);
+
+    bool execute(const Key &key) override;
+    bool isUndoable(const Key &key) override;
+
+    bool undo(const Key &key) override;
+    bool redo(const Key &key) override;
+};
+
+
 #endif // FILTERS_FOR_MENU
