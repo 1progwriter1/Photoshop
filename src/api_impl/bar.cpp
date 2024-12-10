@@ -1,3 +1,4 @@
+#include "windows_id.hpp"
 #include <api_impl/bar.hpp>
 #include <cassert>
 #include <iostream>
@@ -305,7 +306,6 @@ void ABar::draw(IRenderWindow* renderWindow)
     {
         button->draw( renderWindow);
         finishButtonDraw( renderWindow, button.get());
-
     }
 }
 

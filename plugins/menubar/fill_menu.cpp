@@ -26,6 +26,9 @@ bool loadPlugin()
 
     filter_bar->addMenuItem(createFilter<BareliefFilter>(kBareliefFilterButtonId, "Barelief"));
     filter_bar->addMenuItem(createFilter<ContrastFilter>(kContrastFilterButtonId, "Contrast"));
+    filter_bar->addMenuItem(createFilter<BlurFilter>(kBlurFilterButtonId, "Blur"));
+    filter_bar->addMenuItem(createFilter<GaussBlurFilter>(kGaussBlurFilterButtonId, "Gauss blur"));
+    filter_bar->addMenuItem(createFilter<NegativeFilter>(kNegativeFilterButtonId, "Negative"));
 
     return true;
 }

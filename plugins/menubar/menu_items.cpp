@@ -19,13 +19,13 @@ std::unique_ptr<MenuButton> MenuButton::createMenuButton(wid_t id, const std::st
     std::unique_ptr<sfm::IRectangleShape> shape = sfm::RectangleShape::create(10, 10); // default size, it is not used later
     shape->setFillColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::White));
 
-    std::unique_ptr<IBar> bar = NestedMenu::createMenuBar();
+    std::unique_ptr<IBar> bar = NestedMenu::createMenuBar(id);
     bar->setSize(sfm::vec2u(100, 300));
     return std::make_unique<MenuButton>(id, std::move(font), std::move(button_text), std::move(shape), std::move(bar));
 }
 
 
-std::unique_ptr<NestedMenu> NestedMenu::createMenuBar()
+std::unique_ptr<NestedMenu> NestedMenu::createMenuBar(wid_t init_id)
 {
     std::unique_ptr<sfm::RectangleShape> main = std::make_unique<sfm::RectangleShape>();
     main->setFillColor(NESTED_BAR_COLOR);
@@ -46,7 +46,7 @@ std::unique_ptr<NestedMenu> NestedMenu::createMenuBar()
     std::unique_ptr<sfm::RectangleShape> released = std::make_unique<sfm::RectangleShape>();
     released->setFillColor(sfm::Color());
 
-    std::unique_ptr<NestedMenu> bar = std::make_unique<NestedMenu>( kToolBarWindowId, main,
+    std::unique_ptr<NestedMenu> bar = std::make_unique<NestedMenu>( init_id, main,
                                                                 normal,
                                                                 onHover,
                                                                 pressed,
@@ -122,7 +122,7 @@ void NestedMenu::addWindow(std::unique_ptr<IWindow> window)
         size_.x = window->getSize().x + 20;
     } else
     {
-        size_.x = std::max(size_.y, window->getSize().x + 20);
+        size_.x = std::max(size_.x, window->getSize().x + 20);
     }
     buttons_.push_back( std::unique_ptr<IBarButton>( static_cast<IBarButton *>( window.release())));
     size_.y = 10 + 40 * buttons_.size();

@@ -17,8 +17,8 @@ const wid_t kEllipseButtonId = 4;
 const wid_t kBrightnessFilterButtonId = 6;
 const wid_t kNegativeFilterButtonId = 7;
 const wid_t kBareliefFilterButtonId = 8;
-const wid_t kBluerFilterButtonId = 9;
-const wid_t kGaussBluerFilterButtonId = 10;
+const wid_t kBlurFilterButtonId = 9;
+const wid_t kGaussBlurFilterButtonId = 10;
 const wid_t kContrastFilterButtonId = 11;
 
 const wid_t kRedColorButtonId = 20;
@@ -28,6 +28,7 @@ const wid_t kGreenColorButtonId = 22;
 // const wid_t kCanvasWindowId = 100;
 // const wid_t kToolBarWindowId = 101;
 // const wid_t kOptionsBarWindowId = 102;
+// const wid_t kMenuBarWindowId  = 103;
 // const wid_t kRootWindowId = 0;
 // const wid_t kInvalidWindowId = -1;
 

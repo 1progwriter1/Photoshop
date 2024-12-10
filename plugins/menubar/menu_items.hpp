@@ -34,7 +34,7 @@ public:
                                                             std::unique_ptr<sfm::RectangleShape> &onHover,
                                                             std::unique_ptr<sfm::RectangleShape> &pressed,
                                                             std::unique_ptr<sfm::RectangleShape> &released);
-    static std::unique_ptr<NestedMenu> createMenuBar();
+    static std::unique_ptr<NestedMenu> createMenuBar(wid_t init_id);
 
     void addWindow(std::unique_ptr<IWindow> window) override;
 };

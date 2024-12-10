@@ -2,6 +2,7 @@
 #include <cassert>
 #include <iostream>
 #include "../headers/windows_id.hpp"
+#include "api_impl/canvas.hpp"
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
@@ -91,14 +92,14 @@ bool EraserAction::execute(const Key &key)
         return true;
 
     sfm::vec2u size = eraser_->canvas_->getSize();
-    ILayer *cur_layer = eraser_->canvas_->getLayer( eraser_->canvas_->getActiveLayerIndex());
+    Layer *cur_layer = static_cast<Layer *>(eraser_->canvas_->getLayer( eraser_->canvas_->getActiveLayerIndex()));
     assert( cur_layer );
 
     for ( unsigned int x = 0; x < size.x; x++ )
     {
         for ( unsigned int y = 0; y < size.y; y++ )
         {
-            cur_layer->setPixel( vec2i( x, y), sfm::Color( 255, 255, 255, 255));
+            cur_layer->setPixelGlobal( vec2i( x, y), sfm::Color( 255, 255, 255, 255));
         }
     }
     eraser_->setState(psapi::IBarButton::State::Normal);

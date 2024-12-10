@@ -1,3 +1,4 @@
+#include "api/api_bar.hpp"
 #include <api_impl/windows.hpp>
 #include <cassert>
 #include <iostream>
@@ -303,7 +304,9 @@ void RootWindow::draw(sfm::IRenderWindow *renderWindow)
 
     for ( auto &window : windows_ )
     {
+        // std::cerr << "draw " << window->getId() << '\n';
         window->draw( renderWindow);
+        // std::cerr << "finish " << window->getId() << '\n';
     }
 }
 
