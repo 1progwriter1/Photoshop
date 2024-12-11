@@ -21,6 +21,9 @@ const wid_t kBlurFilterButtonId = 9;
 const wid_t kGaussBlurFilterButtonId = 10;
 const wid_t kContrastFilterButtonId = 11;
 
+const wid_t kOpenFileMenuId = 12;
+const wid_t kSaveFileMenuId = 13;
+
 const wid_t kRedColorButtonId = 20;
 const wid_t kBlueColorButtonId = 21;
 const wid_t kGreenColorButtonId = 22;

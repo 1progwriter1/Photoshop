@@ -44,7 +44,7 @@ set(LIBRARIES
     "ellipse+${CMAKE_SOURCE_DIR}/plugins/toolbar/ellipse.cpp"
     "line+${CMAKE_SOURCE_DIR}/plugins/toolbar/line.cpp"
     "menubar+${CMAKE_SOURCE_DIR}/plugins/menubar/menubar.cpp"
-	"menu_items+${CMAKE_SOURCE_DIR}/plugins/menubar/menu_items.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/fill_menu.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters.cpp"
+	"menu_items+${CMAKE_SOURCE_DIR}/plugins/menubar/menu_items.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/fill_menu.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/file.cpp"
 )
 
 

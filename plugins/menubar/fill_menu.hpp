@@ -2,10 +2,7 @@
 #define PLUGIN_FILL_MENU
 
 
-#include "menubar.hpp"
-#include "api/api_canvas.hpp"
 #include "menu_items.hpp"
-#include <cassert>
 
 
 using namespace psapi;
@@ -21,8 +18,8 @@ void unloadPlugin();
 
 
 
-template<typename filter_type>
-std::unique_ptr<IWindow> createFilter(wid_t id, const std::string &name)
+template<typename type>
+std::unique_ptr<IWindow> createMenuButton(wid_t id, const std::string &name)
 {
     std::unique_ptr<sfm::IFont> font = sfm::IFont::create();
     font->loadFromFile(FONT_FILE);
@@ -35,9 +32,9 @@ std::unique_ptr<IWindow> createFilter(wid_t id, const std::string &name)
     std::unique_ptr<sfm::IRectangleShape> shape = sfm::RectangleShape::create(10, 10); // default size, it is not used later
     shape->setFillColor(NESTED_BAR_COLOR);
 
-    std::unique_ptr<filter_type> filter = std::make_unique<filter_type>(id, std::move(font),
-                                                                            std::move(button_text),
-                                                                            std::move(shape));
+    std::unique_ptr<type> filter = std::make_unique<type>(id, std::move(font),
+                                                                std::move(button_text),
+                                                                std::move(shape));
     return filter;
 }
 

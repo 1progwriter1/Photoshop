@@ -1,9 +1,7 @@
 #include "ellipse.hpp"
-
 #include <cassert>
 #include <iostream>
-#include "../headers/windows_id.hpp"
-#include "../headers/api_impl/canvas.hpp"
+#include "windows_id.hpp"
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;

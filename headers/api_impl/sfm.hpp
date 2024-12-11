@@ -84,6 +84,7 @@ public:
     void create(vec2u size, const Color *pixels) override;
 
     bool loadFromFile(const std::string &filename) override;
+    bool saveToFile(const std::string &filename);
 
     vec2u getSize() const override;
     void setPixel(unsigned int x, unsigned int y, const Color &color) override;

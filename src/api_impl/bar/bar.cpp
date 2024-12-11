@@ -1,6 +1,7 @@
 #include "windows_id.hpp"
 #include <api_impl/bar/bar.hpp>
 #include <cassert>
+#include <iostream>
 
 
 ABar::ABar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::unique_ptr<sfm::RectangleShape> &normal,

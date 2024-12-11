@@ -39,7 +39,7 @@ std::unique_ptr<NestedMenu> NestedMenu::createMenuBar(wid_t init_id)
 
     std::unique_ptr<sfm::RectangleShape> pressed = std::make_unique<sfm::RectangleShape>();
     pressed->setFillColor(sfm::Color());
-    pressed->setOutlineColor( sfm::Color::getStandardColor(psapi::sfm::Color::Type::Magenta));
+    pressed->setOutlineColor( sfm::Color( 51, 153, 255));
     pressed->setOutlineThickness( 5);
 
     std::unique_ptr<sfm::RectangleShape> released = std::make_unique<sfm::RectangleShape>();
@@ -52,6 +52,17 @@ std::unique_ptr<NestedMenu> NestedMenu::createMenuBar(wid_t init_id)
                                                                 released);
 
     return bar;
+}
+
+
+void NestedMenu::setPos(const sfm::vec2i &pos)
+{
+    vec2i diff = pos - getPos();
+    ABar::setPos(pos);
+    for ( auto &button : buttons_ )
+    {
+        button->setPos(button->getPos() + diff);
+    }
 }
 
 
@@ -68,7 +79,6 @@ void MenuButton::draw(IRenderWindow *renderWindow)
 
 void MenuButton::setSize(const sfm::vec2u &size)
 {
-
     AMenuButton::setSize(size);
 
     sfm::Text *text = dynamic_cast<sfm::Text *>(text_.get());
@@ -99,8 +109,7 @@ void MenuButton::setPos(const sfm::vec2i &pos)
 MenuButton::MenuButton(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
                 std::unique_ptr<sfm::IRectangleShape> init_shape, std::unique_ptr<IBar> nested_bar)
     :   AMenuButton(init_id, std::move(init_shape), std::move(nested_bar)), font_(std::move(font)), text_(std::move(text))
-{
-}
+{}
 
 
 NestedMenu::NestedMenu(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
@@ -311,4 +320,74 @@ sfm::IntRect fitTextToHeight(sf::Text& text, sfm::vec2i position, int height)
     text.setPosition(x, y);
 
     return sfm::IntRect({position.x, position.y}, sfm::vec2u(static_cast<int>(width), static_cast<int>(height)));
+}
+
+
+NestedMenuButton::NestedMenuButton(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
+                                   std::unique_ptr<sfm::IRectangleShape> init_shape, std::unique_ptr<IBar> nested_bar)
+    :   MenuButton(init_id, std::move(font), std::move(text), std::move(init_shape), std::move(nested_bar)) {}
+
+
+void NestedMenuButton::setPos(const sfm::vec2i &pos)
+{
+    MenuButton::setPos(pos);
+    assert( parent_ );
+    assert( dynamic_cast<const NestedMenu *>(parent_));
+    bar_->setPos(vec2i(parent_->getPos().x + parent_->getSize().x + 5, getPos().y));
+}
+
+
+std::unique_ptr<IAction> NestedMenuButton::createAction(const IRenderWindow *renderWindow, const Event &event)
+{
+    return std::make_unique<NestedMenuButtonAction>(this, renderWindow, event);
+}
+
+
+std::unique_ptr<NestedMenuButton> NestedMenuButton::createNestedMenuButton(wid_t id, const std::string &text, IBar *parent)
+{
+    assert( parent );
+
+    std::unique_ptr<sfm::IFont> font = sfm::IFont::create();
+    font->loadFromFile(FONT_FILE);
+
+    std::unique_ptr<sfm::IText> button_text = sfm::IText::create();
+    button_text->setFont(font.get());
+    sfm::Color color = sfm::Color::getStandardColor(psapi::sfm::Color::Type::Black);
+    button_text->setFillColor(&color);
+    button_text->setString(text);
+    sfm::IntRect text_rect = button_text->getGlobalBounds();
+
+    std::unique_ptr<sfm::IRectangleShape> shape = sfm::RectangleShape::create(10, 10); // default size, it is not used later
+    shape->setFillColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::White));
+
+    std::unique_ptr<NestedMenu> bar = NestedMenu::createMenuBar(id);
+    bar->setSize(vec2u(100, 300));
+    std::unique_ptr<NestedMenuButton> button = std::make_unique<NestedMenuButton>(id, std::move(font), std::move(button_text), std::move(shape), std::move(bar));
+
+    button->setParent(parent);
+    return button;
+}
+
+
+NestedMenuButtonAction::NestedMenuButtonAction(NestedMenuButton *button, const IRenderWindow *renderWindow, const Event &event)
+    : AAction(renderWindow, event), button_(button) {}
+
+
+bool NestedMenuButtonAction::execute(const Key &key)
+{
+    button_->updateState(render_window_, event_);
+    button_->setPos(button_->getPos());
+    return true;
+}
+
+
+bool NestedMenuButtonAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+void NestedMenuButton::updateState(const IRenderWindow *renderWindow, const Event &event)
+{
+    getActionController()->execute(AMenuButton::createAction(renderWindow, event));
 }

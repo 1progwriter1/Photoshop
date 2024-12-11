@@ -301,6 +301,12 @@ bool Image::loadFromFile(const std::string &filename)
 }
 
 
+bool Image::saveToFile(const std::string &filename)
+{
+    return image_.saveToFile( filename);
+}
+
+
 vec2u Image::getSize() const
 {
     return vec2u( image_.getSize().x, image_.getSize().y);
@@ -342,6 +348,12 @@ vec2i Image::getPos() const
 void Image::setPos(const vec2i &pos)
 {
     pos_ = pos;
+}
+
+
+std::unique_ptr<IImage> IImage::create()
+{
+    return std::make_unique<Image>();
 }
 
 
