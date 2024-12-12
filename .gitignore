@@ -7,3 +7,5 @@ build/
 *.trace
 html/
 latex/
+images/
+Doxyfile

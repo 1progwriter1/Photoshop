@@ -46,6 +46,9 @@ bool OpenFileAction::execute(const Key& key)
     {
         for ( unsigned int y = 0; y < size.y; y++ )
         {
+            sfm::Color color = image->getPixel(vec2u(x, y));
+            if ( color.r == 0 && color.g == 0 && color.b == 0 && color.a == 0 )
+                continue;
             layer->setPixel( sfm::vec2i( x, y), image->getPixel(vec2u(x, y)));
         }
     }

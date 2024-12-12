@@ -7,6 +7,7 @@
 
 #include "filters.hpp"
 #include "file.hpp"
+#include "tools.hpp"
 
 
 IRootWindow *kRootWindowPtr = nullptr;
@@ -27,6 +28,7 @@ bool loadPlugin()
     menu->addWindow(MenuButton::createMenuButton(kMenuLayerId, "Layer"));
     menu->addWindow(MenuButton::createMenuButton(kMenuToolsId, "Tools"));
     menu->addWindow(MenuButton::createMenuButton(kMenuHelpId, "Help"));
+
 
     AMenuButton *filter_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuFilterId));
     assert( filter_bar && "Failed to cast to menu button" );
@@ -51,6 +53,12 @@ bool loadPlugin()
     assert( save_bar && "Failed to cast to menu button" );
 
     addFiles(open_bar, save_bar);
+
+
+    AMenuButton *tools_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuToolsId));
+    assert( tools_bar && "Failed to cast to menu button" );
+
+    tools_bar->addMenuItem(createMenuButton<Seagfault>(kSeagfaultButtonId, "Seagfault"));
 
     return true;
 }
