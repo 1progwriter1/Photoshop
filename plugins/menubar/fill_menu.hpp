@@ -16,6 +16,12 @@ void unloadPlugin();
 
 }
 
+void fillMenu(ABar *menu);
+void fillFileMenu(AMenuButton* menu_bar);
+void fillFilterMenu(AMenuButton* menu_bar);
+void fillLayerMenu(AMenuButton* menu_bar);
+void fillToolsMenu(AMenuButton* menu_bar);
+void fillHelpMenu(AMenuButton* menu_bar);
 
 
 template<typename type>

@@ -24,6 +24,11 @@ const wid_t kContrastFilterButtonId = 11;
 const wid_t kOpenFileMenuId = 12;
 const wid_t kSaveFileMenuId = 13;
 
+const wid_t kZoomCanvasButtonId = 15;
+const wid_t kUnZoomCanvasButtonId = 16;
+const wid_t kUndoButtonId = 17;
+const wid_t kRedoButtonId = 18;
+
 const wid_t kSeagfaultButtonId = 14;
 
 const wid_t kRedColorButtonId = 20;

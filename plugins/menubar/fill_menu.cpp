@@ -8,6 +8,7 @@
 #include "filters.hpp"
 #include "file.hpp"
 #include "tools.hpp"
+#include "layer.hpp"
 
 
 IRootWindow *kRootWindowPtr = nullptr;
@@ -22,43 +23,28 @@ bool loadPlugin()
 
     ABar *menu = dynamic_cast<ABar *>(kRootWindowPtr->getWindowById(kMenuBarWindowId));
     assert( menu && "Failed to cast to menu" );
-
-    menu->addWindow(MenuButton::createMenuButton(kMenuFileId, "File"));
-    menu->addWindow(MenuButton::createMenuButton(kMenuFilterId, "Filter"));
-    menu->addWindow(MenuButton::createMenuButton(kMenuLayerId, "Layer"));
-    menu->addWindow(MenuButton::createMenuButton(kMenuToolsId, "Tools"));
-    menu->addWindow(MenuButton::createMenuButton(kMenuHelpId, "Help"));
-
+    fillMenu(menu);
 
     AMenuButton *filter_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuFilterId));
     assert( filter_bar && "Failed to cast to menu button" );
-
-    filter_bar->addMenuItem(createMenuButton<BareliefFilter>(kBareliefFilterButtonId, "Barelief"));
-    filter_bar->addMenuItem(createMenuButton<ContrastFilter>(kContrastFilterButtonId, "Contrast"));
-    filter_bar->addMenuItem(createMenuButton<BlurFilter>(kBlurFilterButtonId, "Blur"));
-    filter_bar->addMenuItem(createMenuButton<GaussBlurFilter>(kGaussBlurFilterButtonId, "Gauss blur"));
-    filter_bar->addMenuItem(createMenuButton<NegativeFilter>(kNegativeFilterButtonId, "Negative"));
-    filter_bar->addMenuItem(createMenuButton<BrightnessFilter>(kBrightnessFilterButtonId, "Brightness"));
+    fillFilterMenu(filter_bar);
 
     AMenuButton *file_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuFileId));
     assert( file_bar && "Failed to cast to menu button" );
+    fillFileMenu(file_bar);
 
-    file_bar->addMenuItem(NestedMenuButton::createNestedMenuButton(kOpenFileMenuId, "Open", file_bar->getMenu()));
-    file_bar->addMenuItem(NestedMenuButton::createNestedMenuButton(kSaveFileMenuId, "Save", file_bar->getMenu()));
-
-    AMenuButton *open_bar = dynamic_cast<AMenuButton *>(file_bar->getMenu()->getWindowById(kOpenFileMenuId));
-    assert( open_bar && "Failed to cast to menu button" );
-
-    AMenuButton *save_bar = dynamic_cast<AMenuButton *>(file_bar->getMenu()->getWindowById(kSaveFileMenuId));
-    assert( save_bar && "Failed to cast to menu button" );
-
-    addFiles(open_bar, save_bar);
+    AMenuButton *layer_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuLayerId));
+    assert( layer_bar && "Failed to cast to menu button" );
+    fillLayerMenu(layer_bar);
 
 
     AMenuButton *tools_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuToolsId));
     assert( tools_bar && "Failed to cast to menu button" );
+    fillToolsMenu(tools_bar);
 
-    tools_bar->addMenuItem(createMenuButton<Seagfault>(kSeagfaultButtonId, "Seagfault"));
+    AMenuButton *help_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuHelpId));
+    assert( help_bar && "Failed to cast to menu button" );
+    fillHelpMenu(help_bar);
 
     return true;
 }
@@ -67,6 +53,73 @@ bool loadPlugin()
 void unloadPlugin()
 {
 
+}
+
+
+void fillMenu(ABar *menu)
+{
+    assert( menu );
+
+    menu->addWindow(MenuButton::createMenuButton(kMenuFileId, "File"));
+    menu->addWindow(MenuButton::createMenuButton(kMenuFilterId, "Filter"));
+    menu->addWindow(MenuButton::createMenuButton(kMenuLayerId, "Layer"));
+    menu->addWindow(MenuButton::createMenuButton(kMenuToolsId, "Tools"));
+    menu->addWindow(MenuButton::createMenuButton(kMenuHelpId, "Help"));
+}
+
+
+void fillFileMenu(AMenuButton* menu_bar)
+{
+    assert( menu_bar );
+
+    menu_bar->addMenuItem(NestedMenuButton::createNestedMenuButton(kOpenFileMenuId, "Open", menu_bar->getMenu()));
+    menu_bar->addMenuItem(NestedMenuButton::createNestedMenuButton(kSaveFileMenuId, "Save", menu_bar->getMenu()));
+
+    AMenuButton *open_bar = dynamic_cast<AMenuButton *>(menu_bar->getMenu()->getWindowById(kOpenFileMenuId));
+    assert( open_bar && "Failed to cast to menu button" );
+
+    AMenuButton *save_bar = dynamic_cast<AMenuButton *>(menu_bar->getMenu()->getWindowById(kSaveFileMenuId));
+    assert( save_bar && "Failed to cast to menu button" );
+
+    addFiles(open_bar, save_bar);
+}
+
+
+void fillFilterMenu(AMenuButton* menu_bar)
+{
+    assert( menu_bar );
+
+    menu_bar->addMenuItem(createMenuButton<BareliefFilter>(kBareliefFilterButtonId, "Barelief"));
+    menu_bar->addMenuItem(createMenuButton<ContrastFilter>(kContrastFilterButtonId, "Contrast"));
+    menu_bar->addMenuItem(createMenuButton<BlurFilter>(kBlurFilterButtonId, "Blur"));
+    menu_bar->addMenuItem(createMenuButton<GaussBlurFilter>(kGaussBlurFilterButtonId, "Gauss blur"));
+    menu_bar->addMenuItem(createMenuButton<NegativeFilter>(kNegativeFilterButtonId, "Negative"));
+    menu_bar->addMenuItem(createMenuButton<BrightnessFilter>(kBrightnessFilterButtonId, "Brightness"));
+}
+
+
+void fillLayerMenu(AMenuButton* menu_bar)
+{
+    assert( menu_bar );
+
+    menu_bar->addMenuItem(createMenuButton<ZoomCanvas>(kZoomCanvasButtonId, "Zoom +"));
+    menu_bar->addMenuItem(createMenuButton<UnZoomCanvas>(kUnZoomCanvasButtonId, "Zoom -"));
+    menu_bar->addMenuItem(createMenuButton<Undo>(kUndoButtonId, "Undo"));
+    menu_bar->addMenuItem(createMenuButton<Redo>(kRedoButtonId, "Redo"));
+}
+
+
+void fillToolsMenu(AMenuButton* menu_bar)
+{
+    assert( menu_bar );
+
+    menu_bar->addMenuItem(createMenuButton<Seagfault>(kSeagfaultButtonId, "Seagfault"));
+}
+
+
+void fillHelpMenu(AMenuButton* menu_bar)
+{
+    assert( menu_bar );
 }
 
 
