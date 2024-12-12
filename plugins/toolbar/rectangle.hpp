@@ -6,6 +6,7 @@
 #include "api/api_canvas.hpp"
 #include "api/api_canvas.hpp"
 #include "api/api_sfm.hpp"
+#include "api_impl/memento.hpp"
 
 
 using namespace psapi;
@@ -37,6 +38,7 @@ class Rectangle : public ABarButton
     std::vector<wid_t> id_;
 
     friend class RectangleAction;
+    friend class UndoableRectangleAction;
 public:
     Rectangle( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
 
@@ -62,6 +64,22 @@ class RectangleAction : public AUndoableAction
     Rectangle *rectangle_;
 public:
     RectangleAction(Rectangle *rectangle, const IRenderWindow *renderWindow, const Event &event);
+
+    bool isUndoable(const Key &key) override;
+    bool execute(const Key &key) override;
+
+    bool undo(const Key &key) override;
+    bool redo(const Key &key) override;
+};
+
+
+class UndoableRectangleAction : public AUndoableAction
+{
+    Rectangle *rectangle_;
+    std::unique_ptr<ILayerSnapshot> snapshot_;
+    std::unique_ptr<AMementable<ILayerSnapshot>> memento_;
+public:
+    UndoableRectangleAction(Rectangle *rectangle, const IRenderWindow *renderWindow, const Event &event);
 
     bool isUndoable(const Key &key) override;
     bool execute(const Key &key) override;

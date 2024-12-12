@@ -3,11 +3,16 @@
 
 
 #include <api/api_memento.hpp>
+#include <api_impl/canvas.hpp>
 
 
 class ALayerSnapshot : public psapi::ILayerSnapshot
 {
+    std::vector<Color> pixels_;
 public:
+    ALayerSnapshot(const std::vector<Color> pixels);
+
+    Color operator[](size_t index);
 };
 
 

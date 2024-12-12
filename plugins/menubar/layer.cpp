@@ -138,6 +138,12 @@ RedoAction::RedoAction(Redo *button, const IRenderWindow *renderWindow, const Ev
 bool RedoAction::execute(const Key &key)
 {
     button_->updateState(render_window_, event_);
+    if ( button_->state_ != psapi::IBarButton::State::Press )
+    {
+        return true;
+    }
+    getActionController()->redo();
+    button_->setState(psapi::IBarButton::State::Normal);
     return true;
 }
 
@@ -172,6 +178,12 @@ UndoAction::UndoAction(Undo *button, const IRenderWindow *renderWindow, const Ev
 bool UndoAction::execute(const Key &key)
 {
     button_->updateState(render_window_, event_);
+    if ( button_->state_ != psapi::IBarButton::State::Press )
+    {
+        return true;
+    }
+    getActionController()->undo();
+    button_->setState(psapi::IBarButton::State::Normal);
     return true;
 }
 

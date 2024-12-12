@@ -34,11 +34,15 @@ void Layer::setPixelGlobal(vec2i pos, Color pixel)
 Color Layer::getPixel(sfm::vec2i pos) const
 {
     pos -= rect_.pos - canvas_->getActualRect().pos;
-    if  ( !(pos.x >= 0 && rect_.size.x > pos.x &&
-            pos.y >= 0 && rect_.size.y > pos.y ) )
+    int size_x = std::min<int>(rect_.size.x, static_cast<int>(canvas_->size_.x * canvas_->zoom_.x));
+    int size_y = std::min<int>(rect_.size.y, static_cast<int>(canvas_->size_.y * canvas_->zoom_.y));
+    if  ( !(pos.x >= 0 && size_x > pos.x &&
+            pos.y >= 0 && size_y > pos.y ) )
         return Color();
 
     pos += rect_.pos - canvas_->getPos();
+    pos.x /= canvas_->zoom_.x;
+    pos.y /= canvas_->zoom_.y;
     return pixels_[pos.y * canvas_->getSize().x + pos.x];
 }
 

@@ -1,5 +1,6 @@
 #include <api_impl/actions.hpp>
 #include <cassert>
+#include <iostream>
 
 
 AAction::AAction(const IRenderWindow *render_window, const Event &event)
@@ -45,10 +46,10 @@ bool ActionController::execute(std::unique_ptr<IAction> action)
     bool res = actionExecute(action.get());
     if ( isUndoableAction(action.get()) )
     {
-        psapi::IUndoableAction *undoable_action = dynamic_cast<psapi::IUndoableAction *>(action.get());
+        psapi::IUndoableAction *undoable_action = dynamic_cast<psapi::IUndoableAction *>(action.release());
         assert( undoable_action );
 
-        done_actions_.emplace_back( std::unique_ptr<psapi::IUndoableAction>( undoable_action));
+        done_actions_.emplace_back( std::unique_ptr<IUndoableAction>(undoable_action));
         if ( done_actions_.size() > 10 )
             done_actions_.pop_front();
     }
@@ -58,9 +59,12 @@ bool ActionController::execute(std::unique_ptr<IAction> action)
 
 bool ActionController::undo()
 {
+    if ( done_actions_.empty() )
+        return true;
+
     std::unique_ptr<psapi::IUndoableAction> action = std::move(done_actions_.back());
-    bool res = actionUndo(done_actions_.back().get());
     done_actions_.pop_back();
+    bool res = actionUndo(action.get());
 
     undone_actions_.emplace_back(std::move(action));
     if ( undone_actions_.size() > 10 )
@@ -72,9 +76,12 @@ bool ActionController::undo()
 
 bool ActionController::redo()
 {
+    if ( undone_actions_.empty() )
+        return true;
+
     std::unique_ptr<psapi::IUndoableAction> action = std::move(undone_actions_.back());
-    bool res = actionRedo(undone_actions_.back().get());
     undone_actions_.pop_back();
+    bool res = actionRedo(action.get());
 
     done_actions_.emplace_back(std::move(action));
     if ( done_actions_.size() > 10 )

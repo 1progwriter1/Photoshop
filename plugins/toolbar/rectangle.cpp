@@ -66,6 +66,10 @@ void Rectangle::updateState(const IRenderWindow *renderWindow, const Event &even
 
 std::unique_ptr<IAction> Rectangle::createAction(const IRenderWindow *renderWindow, const Event &event)
 {
+    if ( event.type == sfm::Event::MouseButtonReleased && draw_ )
+    {
+        return std::make_unique<UndoableRectangleAction>(this, renderWindow, event);
+    }
     return std::make_unique<RectangleAction>(this, renderWindow, event);
 }
 
@@ -201,10 +205,11 @@ bool RectangleAction::execute(const Key &key)
         rectangle_->last_mouse_pos_ = rectangle_->left_upper_edge_;
     } else if ( event_.type == sfm::Event::MouseButtonReleased && rectangle_->draw_ )
     {
-        rectangle_->canvas_->cleanTempLayer();
-        rectangle_->drawRectangle( render_window_, rectangle_->canvas_->getLayer( rectangle_->canvas_->getActiveLayerIndex()), false);
-        rectangle_->draw_ = false;
-        rectangle_->left_upper_edge_ = sfm::vec2i();
+        // rectangle_->canvas_->cleanTempLayer();
+        // rectangle_->drawRectangle( render_window_, rectangle_->canvas_->getLayer( rectangle_->canvas_->getActiveLayerIndex()), false);
+        // rectangle_->draw_ = false;
+        // rectangle_->left_upper_edge_ = sfm::vec2i();
+        std::cout << "Call undoable action\n";
         return true;
     }
 
@@ -215,5 +220,44 @@ bool RectangleAction::execute(const Key &key)
         rectangle_->last_mouse_pos_ = new_mouse_pos;
         rectangle_->drawRectangle( render_window_, rectangle_->layer_, true);
     }
+    return true;
+}
+
+
+UndoableRectangleAction::UndoableRectangleAction(Rectangle *rectangle, const IRenderWindow *renderWindow, const Event &event)
+    :   AUndoableAction(renderWindow, event), rectangle_(rectangle), memento_(std::make_unique<AMementable<ILayerSnapshot>>()) {}
+
+
+bool UndoableRectangleAction::isUndoable(const Key &key)
+{
+    return true;
+}
+
+
+bool UndoableRectangleAction::undo(const Key &key)
+{
+    std::unique_ptr<ILayerSnapshot> tmp = memento_->save();
+    memento_->restore(snapshot_.get());
+    snapshot_ = std::move(tmp);
+    return true;
+}
+
+
+bool UndoableRectangleAction::redo(const Key &key)
+{
+    memento_->restore(snapshot_.get());
+    return true;
+}
+
+
+bool UndoableRectangleAction::execute(const Key &key)
+{
+    rectangle_->updateState(render_window_, event_);
+    rectangle_->canvas_->cleanTempLayer();
+    snapshot_ = memento_->save();
+    rectangle_->drawRectangle( render_window_, rectangle_->canvas_->getLayer( rectangle_->canvas_->getActiveLayerIndex()), false);
+    rectangle_->draw_ = false;
+    rectangle_->left_upper_edge_ = sfm::vec2i();
+
     return true;
 }
