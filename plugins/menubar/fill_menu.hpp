@@ -3,6 +3,10 @@
 
 
 #include "menu_items.hpp"
+#include "filters.hpp"
+#include "file.hpp"
+#include "tools.hpp"
+#include "layer.hpp"
 
 
 using namespace psapi;
@@ -44,6 +48,8 @@ std::unique_ptr<IWindow> createMenuButton(wid_t id, const std::string &name)
     return filter;
 }
 
+
+std::pair<std::unique_ptr<IWindow>, std::unique_ptr<IWindow>> createZoomButtons();
 
 
 #endif

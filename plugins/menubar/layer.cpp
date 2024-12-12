@@ -1,4 +1,5 @@
 #include "layer.hpp"
+#include <cassert>
 
 
 ZoomCanvas::ZoomCanvas(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
@@ -18,13 +19,35 @@ void ZoomCanvas::updateState(const IRenderWindow *renderWindow, const Event &eve
 }
 
 
+vec2f ZoomCanvas::setZoom(vec2f zoom)
+{
+    zoom_ = zoom;
+    return zoom_;
+}
+
+
 ZoomCanvasAction::ZoomCanvasAction(ZoomCanvas *button, const IRenderWindow *renderWindow, const Event &event)
-    :   AAction(renderWindow, event), button_(button) {}
+    :   AAction(renderWindow, event), button_(button)
+{
+    canvas_ = dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId));
+    assert( canvas_ && "Failed to cast to canvas" );
+}
 
 
 bool ZoomCanvasAction::execute(const Key &key)
 {
     button_->updateState(render_window_, event_);
+    if ( button_->state_ != psapi::IBarButton::State::Press )
+    {
+        return true;
+    }
+    button_->zoom_.x = std::min(3.0, button_->zoom_.x + 0.1);
+    button_->zoom_.y = std::min(3.0, button_->zoom_.y + 0.1);
+
+    button_->another_->setZoom(button_->zoom_);
+    canvas_->setZoom(button_->zoom_);
+    button_->setState(psapi::IBarButton::State::Normal);
+
     return true;
 }
 
@@ -52,13 +75,35 @@ void UnZoomCanvas::updateState(const IRenderWindow *renderWindow, const Event &e
 }
 
 
+vec2f UnZoomCanvas::setZoom(vec2f zoom)
+{
+    zoom_ = zoom;
+    return zoom_;
+}
+
+
 UnZoomCanvasAction::UnZoomCanvasAction(UnZoomCanvas *button, const IRenderWindow *renderWindow, const Event &event)
-    :   AAction(renderWindow, event), button_(button) {}
+    :   AAction(renderWindow, event), button_(button)
+{
+    canvas_ = dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId));
+    assert( canvas_ && "Failed to cast to canvas" );
+}
 
 
 bool UnZoomCanvasAction::execute(const Key &key)
 {
     button_->updateState(render_window_, event_);
+    if ( button_->state_ != psapi::IBarButton::State::Press )
+    {
+        return true;
+    }
+    button_->zoom_.x = std::max(0.1, button_->zoom_.x - 0.1);
+    button_->zoom_.y = std::max(0.1, button_->zoom_.y - 0.1);
+
+    button_->another_->setZoom(button_->zoom_);
+    canvas_->setZoom(button_->zoom_);
+    button_->setState(psapi::IBarButton::State::Normal);
+
     return true;
 }
 

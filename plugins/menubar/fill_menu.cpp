@@ -5,11 +5,6 @@
 #include <filesystem>
 #include <iostream>
 
-#include "filters.hpp"
-#include "file.hpp"
-#include "tools.hpp"
-#include "layer.hpp"
-
 
 IRootWindow *kRootWindowPtr = nullptr;
 
@@ -102,8 +97,10 @@ void fillLayerMenu(AMenuButton* menu_bar)
 {
     assert( menu_bar );
 
-    menu_bar->addMenuItem(createMenuButton<ZoomCanvas>(kZoomCanvasButtonId, "Zoom +"));
-    menu_bar->addMenuItem(createMenuButton<UnZoomCanvas>(kUnZoomCanvasButtonId, "Zoom -"));
+    std::pair<std::unique_ptr<IWindow>, std::unique_ptr<IWindow>> zoom = createZoomButtons();
+
+    menu_bar->addMenuItem(std::move(zoom.first));
+    menu_bar->addMenuItem(std::move(zoom.second));
     menu_bar->addMenuItem(createMenuButton<Undo>(kUndoButtonId, "Undo"));
     menu_bar->addMenuItem(createMenuButton<Redo>(kRedoButtonId, "Redo"));
 }
@@ -147,4 +144,19 @@ void addFiles(AMenuButton *open_bar, AMenuButton *save_bar)
     {
         std::cerr << "Указанный путь не существует или не является директорией." << std::endl;
     }
+}
+
+
+std::pair<std::unique_ptr<IWindow>, std::unique_ptr<IWindow>> createZoomButtons()
+{
+    std::unique_ptr<IWindow> zoom_button = createMenuButton<ZoomCanvas>(kZoomCanvasButtonId, "Zoom +");
+    std::unique_ptr<IWindow> unzoom_button = createMenuButton<UnZoomCanvas>(kUnZoomCanvasButtonId, "Zoom -");
+
+    ZoomCanvas *zoom_canvas = dynamic_cast<ZoomCanvas *>(zoom_button.get());
+    UnZoomCanvas *unzoom_canvas = dynamic_cast<UnZoomCanvas *>(unzoom_button.get());
+
+    zoom_canvas->another_ = unzoom_canvas;
+    unzoom_canvas->another_ = zoom_canvas;
+
+    return std::make_pair(std::move(zoom_button), std::move(unzoom_button));
 }

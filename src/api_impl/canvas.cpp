@@ -46,11 +46,15 @@ Color Layer::getPixel(sfm::vec2i pos) const
 void Layer::setPixel(sfm::vec2i pos, sfm::Color pixel)
 {
     pos -= rect_.pos - canvas_->getActualRect().pos;
-    if  ( !(pos.x >= 0 && rect_.size.x > pos.x &&
-            pos.y >= 0 && rect_.size.y > pos.y ) )
+    int size_x = std::min<int>(rect_.size.x, static_cast<int>(canvas_->size_.x * canvas_->zoom_.x));
+    int size_y = std::min<int>(rect_.size.y, static_cast<int>(canvas_->size_.y * canvas_->zoom_.y));
+    if  ( !(pos.x >= 0 && size_x > pos.x &&
+            pos.y >= 0 && size_y > pos.y ) )
         return;
 
     pos += rect_.pos - canvas_->getPos();
+    pos.x /= canvas_->zoom_.x;
+    pos.y /= canvas_->zoom_.y;
     pixels_[pos.y * canvas_->getSize().x + pos.x] = pixel;
 }
 
@@ -252,7 +256,7 @@ void Canvas::setSize(const sfm::vec2u &size)
 
 void Canvas::setZoom(sfm::vec2f zoom)
 {
-    scale_ = zoom;
+    zoom_ = zoom;
 }
 
 
@@ -367,6 +371,7 @@ void Canvas::draw( IRenderWindow *renderWindow)
         texture_->update( cur_layer->pixels_.data());
         sprite_->setTexture( texture_.get());
         sprite_->setPosition(pos_.x, pos_.y);
+        sprite_->setScale(zoom_.x, zoom_.y);
         sprite_->draw( renderWindow);
     }
 
@@ -375,6 +380,7 @@ void Canvas::draw( IRenderWindow *renderWindow)
     texture_->update( cur_layer->pixels_.data());
     sprite_->setTexture( texture_.get());
     sprite_->draw( renderWindow);
+    sprite_->setScale(zoom_.x, zoom_.y);
     sprite_->setPosition(pos_.x, pos_.y);
 
     v_scroll_.draw( renderWindow);

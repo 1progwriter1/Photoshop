@@ -58,7 +58,7 @@ class Canvas : public ICanvas
     vec2u size_;
     vec2i pos_;
     sfm::IntRect actual_rect_;
-    vec2f scale_ = vec2f( 1, 1);
+    vec2f zoom_ = vec2f( 1, 1);
     vec2i mouse_pos_ = vec2i( 0, 0);
 
     std::unique_ptr<sfm::ITexture> texture_;
@@ -67,6 +67,7 @@ class Canvas : public ICanvas
     HorizontalScroll h_scroll_;
     VerticalScroll v_scroll_;
 
+    friend class Layer;
     friend class CanvasAction;
 public:
     Canvas( vec2i init_pos, vec2u init_size);
