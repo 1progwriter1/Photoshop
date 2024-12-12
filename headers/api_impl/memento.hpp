@@ -9,9 +9,10 @@
 class ALayerSnapshot : public psapi::ILayerSnapshot
 {
     std::vector<Color> pixels_;
+    vec2i offset_;
 public:
-    ALayerSnapshot(const std::vector<Color> pixels);
-
+    ALayerSnapshot(const std::vector<Color> pixels, vec2i offset);
+    vec2i getOffset();
     Color operator[](size_t index);
 };
 

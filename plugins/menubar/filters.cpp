@@ -13,6 +13,12 @@ const std::array<float, 9> GAUSS_MATRIX =
 const float GAUSS_SUM = 1;
 
 
+class ControlPanel
+{
+
+};
+
+
 BareliefFilter::BareliefFilter(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
                                std::unique_ptr<sfm::IRectangleShape> init_shape)
     :   TextButton(init_id, std::move(font), std::move(text), std::move(init_shape)) {}
