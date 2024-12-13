@@ -2,6 +2,8 @@
 #include <cassert>
 #include <iostream>
 #include "api_impl/canvas.hpp"
+#include "fill_menu.hpp"
+#include "windows_id.hpp"
 
 
 const std::array<float, 9> GAUSS_MATRIX =
@@ -11,12 +13,6 @@ const std::array<float, 9> GAUSS_MATRIX =
     0.025, 0.1, 0.025
 };
 const float GAUSS_SUM = 1;
-
-
-class ControlPanel
-{
-
-};
 
 
 BareliefFilter::BareliefFilter(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
@@ -106,7 +102,10 @@ bool BareliefFilterAction::execute(const Key &key)
 
 ContrastFilter::ContrastFilter(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
                                std::unique_ptr<sfm::IRectangleShape> init_shape)
-    :   TextButton(init_id, std::move(font), std::move(text), std::move(init_shape)) {}
+    :   TextButton(init_id, std::move(font), std::move(text), std::move(init_shape)), control_panel_(std::make_unique<ContrastControlPanel>())
+{
+    control_panel_->setFilter(this);
+}
 
 
 std::unique_ptr<IAction> ContrastFilter::createAction(const IRenderWindow* renderWindow, const Event& event)
@@ -115,9 +114,41 @@ std::unique_ptr<IAction> ContrastFilter::createAction(const IRenderWindow* rende
 }
 
 
+void ContrastFilter::draw(IRenderWindow* renderWindow)
+{
+    TextButton::draw(renderWindow);
+    if ( control_panel_->isActive())
+        control_panel_->draw(renderWindow);
+}
+
+
+void ContrastFilter::setOk(bool value)
+{
+    is_ok_ = value;
+}
+
+
+void ContrastFilter::setCancel(bool value)
+{
+    is_cancel_ = value;
+}
+
+
+void ContrastFilter::unsetAll()
+{
+    control_panel_->unsetAll();
+}
+
+
 void ContrastFilter::updateState(const IRenderWindow *renderWindow, const Event &event)
 {
     getActionController()->execute(TextButton::createAction(renderWindow, event));
+}
+
+
+void ContrastFilter::updatePanel(const IRenderWindow *renderWindow, const Event &event)
+{
+    getActionController()->execute(control_panel_->createAction(renderWindow, event));
 }
 
 
@@ -152,18 +183,47 @@ bool ContrastFilterAction::redo(const Key &key)
 bool ContrastFilterAction::execute(const Key &key)
 {
     button_->updateState(render_window_, event_);
-
     if ( button_->getState() != IBarButton::State::Press )
+    {
+        if ( button_->getState() != psapi::IBarButton::State::Hover )
+        {
+            button_->control_panel_->forceDeactivate();
+        }
+        return true;
+    }
+    button_->control_panel_->forceActivate();
+    button_->updatePanel(render_window_, event_);
+    if ( !button_->is_applied_ )
+    {
+        applyToTmpLayer();
+        button_->is_applied_ = true;
+    }
+    if ( button_->is_ok_)
+    {
+        applyToMainLayer();
+    }
+    else if ( button_->is_cancel_ )
+    {
+        removeTmpLayer();
+    } else
     {
         return true;
     }
+    button_->unsetAll();
+    button_->setState(psapi::IBarButton::State::Normal);
+    button_->is_applied_ = false;
+    button_->is_ok_ = false;
+    button_->is_cancel_ = false;
 
-    Layer *layer = static_cast<Layer *>(canvas_->getLayer( canvas_->getActiveLayerIndex()));
-    assert( layer );
+    return true;
+}
+
+
+void ContrastFilterAction::applyToTmpLayer()
+{
+    main_layer_ = static_cast<Layer *>(canvas_->getLayer( canvas_->getActiveLayerIndex()));
     assert( canvas_->insertEmptyLayer( 1) );
-    Layer *new_layer = static_cast<Layer *>(canvas_->getLayer( 1));
-    assert( new_layer );
-    assert( new_layer != layer );
+    tmp_layer_ = static_cast<Layer *>(canvas_->getLayer( 1));
 
     sfm::vec2u canvas_size = canvas_->getSize();
 
@@ -183,7 +243,7 @@ bool ContrastFilterAction::execute(const Key &key)
             {
                 for ( int j = from_y; j <= to_y; j++ )
                 {
-                    sfm::Color color = layer->getPixelGlobal( sfm::vec2i( i, j));
+                    sfm::Color color = main_layer_->getPixelGlobal( sfm::vec2i( i, j));
                     r += color.r * GAUSS_MATRIX[ (j - from_y) * 3 + (i - from_x)];
                     g += color.g * GAUSS_MATRIX[ (j - from_y) * 3 + (i - from_x)];
                     b += color.b * GAUSS_MATRIX[ (j - from_y) * 3 + (i - from_x)];
@@ -197,22 +257,31 @@ bool ContrastFilterAction::execute(const Key &key)
 
             sfm::Color color( static_cast<uint8_t>( r), static_cast<uint8_t>( g), static_cast<uint8_t>( b), static_cast<uint8_t>( a));
 
-            new_layer->setPixelGlobal( sfm::vec2i( x, y), color);
+            tmp_layer_->setPixelGlobal( sfm::vec2i( x, y), color);
         }
     }
     for ( int x = 0; x < canvas_size.x; x++ )
     {
         for ( int y = 0; y < canvas_size.y; y++ )
         {
-            sfm::Color normal = layer->getPixelGlobal( sfm::vec2i( x, y));
-            sfm::Color blurred = new_layer->getPixelGlobal( sfm::vec2i( x, y));
-            new_layer->setPixelGlobal( sfm::vec2i(x, y), createContrastColor( normal, blurred, 2));
+            sfm::Color normal = main_layer_->getPixelGlobal( sfm::vec2i( x, y));
+            sfm::Color blurred = tmp_layer_->getPixelGlobal( sfm::vec2i( x, y));
+            tmp_layer_->setPixelGlobal( sfm::vec2i(x, y), createContrastColor( normal, blurred, 1));
         }
     }
-    canvas_->removeLayer( 0);
-    button_->setState( IBarButton::State::Normal);
+}
 
-    return true;
+
+void ContrastFilterAction::applyToMainLayer()
+{
+    canvas_->removeLayer(canvas_->getActiveLayerIndex());
+    canvas_->setActiveLayerIndex(canvas_->getActiveLayerIndex());
+}
+
+
+void ContrastFilterAction::removeTmpLayer()
+{
+    canvas_->removeLayer(1);
 }
 
 
@@ -522,7 +591,6 @@ bool BrightnessFilterAction::execute(const Key& key)
     {
         return true;
     }
-
     Layer *layer = static_cast<Layer *>(canvas_->getLayer( canvas_->getActiveLayerIndex()));
     assert( layer );
 
@@ -557,6 +625,366 @@ bool BrightnessFilterAction::redo(const Key& key)
 
 
 bool BrightnessFilterAction::isUndoable(const Key& key)
+{
+    return false;
+}
+
+
+ControlPanel::ControlPanel()
+{
+    std::unique_ptr<IWindow> button_ok_tmp = createMenuButton<TextButton>(kOkButtonId, "Ok");
+    std::unique_ptr<IWindow> button_cancel_tmp = createMenuButton<TextButton>(kCancelButtonId, "Cancel");
+    button_ok_ = std::unique_ptr<TextButton>(static_cast<TextButton *>(button_ok_tmp.release()));
+    button_cancel_ = std::unique_ptr<TextButton>(static_cast<TextButton *>(button_cancel_tmp.release()));
+
+    button_ok_->setSize(buttons_rect_size_);
+    button_cancel_->setSize(buttons_rect_size_);
+    min_buttons_width_ = std::max(button_ok_->getSize().x, button_cancel_->getSize().x) * 2;
+    size_.x = min_buttons_width_;
+
+    button_ok_->setPos(vec2i(0, 50));
+    button_cancel_->setPos(vec2i(button_ok_->getSize().x, 50));
+
+    shape_->setFillColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::White));
+    shape_->setOutlineColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::Black));
+    shape_->setOutlineThickness(5);
+    shape_->setSize(size_);
+    shape_->setPosition(vec2i(0, 0));
+
+    normal_->setFillColor(sfm::Color());
+    normal_->setOutlineColor(sfm::Color());
+    normal_->setOutlineThickness(5);
+    onHover_->setFillColor(sfm::Color());
+    onHover_->setOutlineColor(sfm::Color(192, 192, 192));
+    onHover_->setOutlineThickness(5);
+    pressed_->setFillColor(sfm::Color());
+    pressed_->setOutlineColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::Black));
+    pressed_->setOutlineThickness(5);
+    released_->setFillColor(sfm::Color());
+    released_->setOutlineColor(sfm::Color());
+    released_->setOutlineThickness(5);
+}
+
+
+void ControlPanel::draw(IRenderWindow* renderWindow)
+{
+    if ( !active_ )
+        return;
+    shape_->draw(renderWindow);
+    button_ok_->draw(renderWindow);
+    button_cancel_->draw(renderWindow);
+    finishButtonDraw(renderWindow, button_ok_.get());
+    finishButtonDraw(renderWindow, button_cancel_.get());
+}
+
+
+void ControlPanel::finishButtonDraw(IRenderWindow* renderWindow, const TextButton* button)
+{
+    vec2i pos = button->getPos();
+    vec2u size = button->getSize();
+    switch ( button->getState() )
+    {
+        case IBarButton::State::Normal:
+            normal_->setPosition( pos);
+            normal_->setSize(size);
+            renderWindow->draw( normal_.get());
+            break;
+        case IBarButton::State::Hover:
+            onHover_->setPosition( pos);
+            onHover_->setSize(size);
+            renderWindow->draw( onHover_.get());
+            break;
+        case IBarButton::State::Press:
+            pressed_->setPosition( pos);
+            pressed_->setSize(size);
+            renderWindow->draw( pressed_.get());
+            break;
+        case IBarButton::State::Released:
+            released_->setPosition( pos);
+            released_->setSize(size);
+            renderWindow->draw( released_.get());
+            break;
+        default:
+            assert( 0 && "Unreachable" );
+
+    }
+}
+
+
+std::unique_ptr<IAction> ControlPanel::createAction(const IRenderWindow* renderWindow, const Event& event)
+{
+    return std::make_unique<ControlPanelAction>(this, renderWindow, event);
+}
+
+
+wid_t ControlPanel::getId() const
+{
+    return kControlPanelId;
+}
+
+
+IWindow* ControlPanel::getWindowById(wid_t id)
+{
+    if ( id == kControlPanelId )
+        return this;
+    if ( id == kOkButtonId )
+        return button_ok_.get();
+    if ( id == kCancelButtonId )
+        return button_cancel_.get();
+    return nullptr;
+}
+
+
+const IWindow* ControlPanel::getWindowById(wid_t id) const
+{
+    if ( id == kControlPanelId )
+        return this;
+    if ( id == kOkButtonId )
+        return button_ok_.get();
+    if ( id == kCancelButtonId )
+        return button_cancel_.get();
+    return nullptr;
+}
+
+
+vec2i ControlPanel::getPos() const
+{
+    return pos_;
+}
+
+
+vec2u ControlPanel::getSize() const
+{
+    return size_;
+}
+
+
+void ControlPanel::setSize(const vec2u& size)
+{
+    int buttons_width = std::max(min_buttons_width_, size.x);
+    int buttons_height = std::max(buttons_rect_size_.y, size.y);
+
+    vec2i button_ok_pos = button_ok_->getPos();
+    vec2i button_cancel_pos = button_cancel_->getPos();
+    vec2u button_ok_size = button_ok_->getSize();
+    vec2u button_cancel_size = button_cancel_->getSize();
+
+    int button_ok_offset = (buttons_width / 2 - button_ok_size.x) / 2;
+    int button_cancel_offset = (buttons_width / 2 - button_cancel_size.x) / 2;
+
+    button_ok_pos.x = button_ok_offset;
+    button_ok_pos.y = buttons_height - button_ok_size.y;
+    button_cancel_pos.x = button_cancel_offset + buttons_width / 2;
+    button_cancel_pos.y = buttons_height - button_cancel_size.y;
+
+    button_ok_->setPos(button_ok_pos);
+    button_cancel_->setPos(button_cancel_pos);
+
+    size_ = vec2u(buttons_width, buttons_height);
+    shape_->setSize(size_);
+
+    setPos(getCanvasIntRect().pos + vec2i(getCanvasIntRect().size) - vec2i(size_) - vec2i(5, 5));
+}
+
+
+void ControlPanel::setPos(const vec2i& pos)
+{
+    vec2i diff = pos - pos_;
+    pos_ = pos;
+    button_ok_->setPos(button_ok_->getPos() + diff);
+    button_cancel_->setPos(button_cancel_->getPos() + diff);
+    shape_->setPosition(vec2i(shape_->getPosition().x, shape_->getPosition().y) + diff);
+}
+
+
+void ControlPanel::setParent(const IWindow* parent)
+{
+    assert( 0 && "I don't know who should be parent for this window" );
+}
+
+
+void ControlPanel::forceActivate()
+{
+    active_ = true;
+}
+
+
+void ControlPanel::forceDeactivate()
+{
+    active_ = false;
+}
+
+
+bool ControlPanel::isActive() const
+{
+    return active_;
+}
+
+
+bool ControlPanel::isWindowContainer() const
+{
+    return false;
+}
+
+
+int ControlPanel::getButtonsRectHeight() const
+{
+    return buttons_rect_size_.y;
+}
+
+
+vec2u ControlPanel::fitButtonsIn(vec2u size)
+{
+    unsigned int buttons_width = std::max(min_buttons_width_, size.x);
+    unsigned int buttons_height = std::max<unsigned int>(50, size.y);
+
+    vec2i button_ok_pos = button_ok_->getPos();
+    vec2i button_cancel_pos = button_cancel_->getPos();
+    vec2u button_ok_size = button_ok_->getSize();
+    vec2u button_cancel_size = button_cancel_->getSize();
+
+    int button_ok_offset = buttons_width / 2 - button_ok_size.x / 2;
+    int button_cancel_offset = buttons_width / 2 - button_cancel_size.x / 2;
+
+    button_ok_pos.x = button_ok_offset;
+    button_ok_pos.y += buttons_height - size_.x;
+    button_cancel_pos.x = button_cancel_offset + buttons_width / 2;
+    button_cancel_pos.y += buttons_height - size_.x;
+
+    button_ok_->setPos(button_ok_pos);
+    button_cancel_->setPos(button_cancel_pos);
+
+    return vec2u(buttons_width, buttons_height);
+}
+
+
+ControlPanelAction::ControlPanelAction(ControlPanel *button, const IRenderWindow *renderWindow, const Event &event)
+    :   AAction(renderWindow, event), button_(button) {}
+
+
+bool ControlPanelAction::execute(const Key &key)
+{
+    getActionController()->execute(button_->button_ok_->createAction(render_window_, event_));
+    if ( button_->button_ok_->getState() == psapi::IBarButton::State::Press )
+    {
+        button_->button_cancel_->setState(psapi::IBarButton::State::Normal);
+    }
+    getActionController()->execute(button_->button_cancel_->createAction(render_window_, event_));
+    if ( button_->button_cancel_->getState() == psapi::IBarButton::State::Press )
+    {
+        button_->button_ok_->setState(psapi::IBarButton::State::Normal);
+    }
+    return true;
+}
+
+
+bool ControlPanelAction::isUndoable(const Key &key)
+{
+    return false;
+}
+
+
+ContrastControlPanel::ContrastControlPanel()
+    :   ControlPanel()
+{
+    setSize(vec2u(600, 200));
+    // main_shape_->setFillColor();
+}
+
+
+void ContrastControlPanel::setSize(const vec2u& size)
+{
+    ControlPanel::setSize(size);
+    return;
+}
+
+
+void ContrastControlPanel::setPos(const vec2i& pos)
+{
+    ControlPanel::setPos(pos);
+    return;
+}
+
+
+ABarButton::State ControlPanel::getOkState() const
+{
+    return button_ok_->getState();
+}
+
+
+ABarButton::State ControlPanel::getCancelState() const
+{
+    return button_cancel_->getState();
+}
+
+
+void ControlPanel::unsetAll()
+{
+    button_ok_->setState(psapi::IBarButton::State::Normal);
+    button_cancel_->setState(psapi::IBarButton::State::Normal);
+}
+
+
+void ContrastControlPanel::draw(IRenderWindow* renderWindow)
+{
+    ControlPanel::draw(renderWindow);
+    main_shape_->draw(renderWindow);
+    line_shape_->draw(renderWindow);
+    slider_shape_->draw(renderWindow);
+}
+
+
+void ContrastControlPanel::setFilter(ContrastFilter *parent)
+{
+    parent_ = parent;
+}
+
+
+void ContrastControlPanel::updateState(const IRenderWindow *renderWindow, const Event &event)
+{
+    getActionController()->execute(ControlPanel::createAction(renderWindow, event));
+}
+
+
+std::unique_ptr<IAction> ContrastControlPanel::createAction(const IRenderWindow* renderWindow, const Event& event)
+{
+    return std::make_unique<ContrastControlPanelAction>(this, renderWindow, event);
+}
+
+
+ABarButton::State ContrastControlPanel::getOkState() const
+{
+    return ControlPanel::getOkState();
+}
+
+
+ABarButton::State ContrastControlPanel::getCancelState() const
+{
+    return ControlPanel::getCancelState();
+}
+
+
+ContrastControlPanelAction::ContrastControlPanelAction(ContrastControlPanel *button, const IRenderWindow *renderWindow, const Event &event)
+    :   AAction(renderWindow, event), button_(button) {}
+
+
+bool ContrastControlPanelAction::execute(const Key &key)
+{
+    button_->updateState(render_window_, event_);
+    if ( button_->getOkState() == IBarButton::State::Press )
+    {
+        button_->parent_->setOk(true);
+        button_->parent_->setCancel(false);
+    } else if ( button_->getCancelState() == IBarButton::State::Press )
+    {
+        button_->parent_->setCancel(true);
+        button_->parent_->setOk(false);
+    }
+    return true;
+}
+
+
+bool ContrastControlPanelAction::isUndoable(const Key &key)
 {
     return false;
 }

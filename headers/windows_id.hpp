@@ -35,6 +35,10 @@ const wid_t kRedColorButtonId = 20;
 const wid_t kBlueColorButtonId = 21;
 const wid_t kGreenColorButtonId = 22;
 
+const wid_t kControlPanelId = 40;
+const wid_t kOkButtonId = 41;
+const wid_t kCancelButtonId = 42;
+
 // const wid_t kCanvasWindowId = 100;
 // const wid_t kToolBarWindowId = 101;
 // const wid_t kOptionsBarWindowId = 102;
