@@ -123,8 +123,10 @@ NestedMenu::NestedMenu(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main
 void NestedMenu::addWindow(std::unique_ptr<IWindow> window)
 {
     sfm::vec2i window_pos = pos_ + sfm::vec2i(10, 10 + 40 * buttons_.size());
+
     window->setPos(window_pos);
-    window->setSize(sfm::vec2u(0, 30));
+    window->setSize(sfm::vec2u(20, 30));
+
     if ( buttons_.empty() )
     {
         size_.x = window->getSize().x + 20;

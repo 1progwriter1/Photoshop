@@ -583,7 +583,7 @@ void Text::setPos(const vec2f &pos)
 
 void Text::setSize(const vec2f &size)
 {
-    assert( 0 && "Cannot set text size with this function" );
+    text_.setCharacterSize(size.x);
 }
 
 sf::Text &Text::getText()

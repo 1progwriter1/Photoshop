@@ -41,8 +41,8 @@ Color Layer::getPixel(sfm::vec2i pos) const
         return Color();
 
     pos += rect_.pos - canvas_->getPos();
-    pos.x /= canvas_->zoom_.x;
-    pos.y /= canvas_->zoom_.y;
+    pos.x = static_cast<float>(pos.x) / canvas_->zoom_.x + 0.5;
+    pos.y = static_cast<float>(pos.y) / canvas_->zoom_.y + 0.5;
     return pixels_[pos.y * canvas_->getSize().x + pos.x];
 }
 
@@ -57,8 +57,8 @@ void Layer::setPixel(sfm::vec2i pos, sfm::Color pixel)
         return;
 
     pos += rect_.pos - canvas_->getPos();
-    pos.x /= canvas_->zoom_.x;
-    pos.y /= canvas_->zoom_.y;
+    pos.x = static_cast<float>(pos.x) / canvas_->zoom_.x + 0.5;
+    pos.y = static_cast<float>(pos.y) / canvas_->zoom_.y + 0.5;
     pixels_[pos.y * canvas_->getSize().x + pos.x] = pixel;
 }
 
