@@ -73,6 +73,8 @@ class Image : public IImage
     sf::Image image_;
 
     vec2i pos_ = vec2i();
+
+    friend class Texture;
 public:
     Image() = default;
     ~Image() = default;

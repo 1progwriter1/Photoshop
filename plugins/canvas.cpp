@@ -7,14 +7,14 @@ extern "C"
 {
 
 
-bool loadPlugin();
-void unloadPlugin();
+bool onLoadPlugin();
+void onUnloadPlugin();
 
 
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
 
 
-bool loadPlugin()
+bool onLoadPlugin()
 {
 
     kRootWindowPtr = psapi::getRootWindow();
@@ -32,7 +32,7 @@ bool loadPlugin()
 
 
 
-void unloadPlugin()
+void onUnloadPlugin()
 {
 
 }

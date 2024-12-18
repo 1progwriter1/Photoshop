@@ -18,7 +18,7 @@ int main()
 	{
 		Controller ctrl(psapi::getRootWindow());
 
-		actionPlugins("loadPlugin", true);
+		actionPlugins("onLoadPlugin", true);
 
 		while ( ctrl.inProgress() )
 		{
@@ -26,7 +26,7 @@ int main()
 			ctrl.proceedView();
 		}
 
-		actionPlugins("unloadPlugin", false);
+		actionPlugins("onUnloadPlugin", false);
 
 	} catch ( my_std::exception &exc )
 	{

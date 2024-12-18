@@ -5,7 +5,7 @@
 psapi::IWindowContainer *kRootWindowPtr = nullptr;
 
 
-bool loadPlugin()
+bool onLoadPlugin()
 {
     kRootWindowPtr = psapi::getRootWindow();
 
@@ -26,7 +26,7 @@ bool loadPlugin()
 }
 
 
-void unloadPlugin()
+void onUnloadPlugin()
 {
 
 }

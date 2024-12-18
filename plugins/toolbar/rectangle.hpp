@@ -14,8 +14,8 @@ using namespace psapi;
 
 extern "C"
 {
-    bool loadPlugin();
-    void unloadPlugin();
+    bool onLoadPlugin();
+    void onUnloadPlugin();
 }
 
 
@@ -77,7 +77,7 @@ class UndoableRectangleAction : public AUndoableAction
 {
     Rectangle *rectangle_;
     std::unique_ptr<ILayerSnapshot> snapshot_;
-    std::unique_ptr<AMementable<ILayerSnapshot>> memento_;
+    std::unique_ptr<IMementable<ILayerSnapshot>> memento_;
 public:
     UndoableRectangleAction(Rectangle *rectangle, const IRenderWindow *renderWindow, const Event &event);
 

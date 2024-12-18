@@ -76,13 +76,13 @@ bool NegativeFilterButton::update(const IRenderWindow* renderWindow, const Event
 
 }
 
-bool loadPlugin()
+bool onLoadPlugin()
 {
     std::unique_ptr<IText> text = IText::create();
     std::unique_ptr<IFont> font = IFont::create();
     font->loadFromFile("../assets/fonts/Bold.ttf");
     text->setFont(font.get());
-    text->setString("Negative");
+    text->setString("Negative (Arman)");
 
     auto button = std::make_unique<NegativeFilterButton>(std::move(text), std::move(font));
 
@@ -96,7 +96,7 @@ bool loadPlugin()
     return true;
 }
 
-void unloadPlugin()
+void onUnloadPlugin()
 {
     return;
 }

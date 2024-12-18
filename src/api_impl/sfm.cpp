@@ -393,7 +393,7 @@ std::unique_ptr<IImage> Texture::copyToImage() const
 
 void Texture::update(const IImage *image)
 {
-    assert( 0 && "Not implemented" );
+    texture_.update(dynamic_cast<const Image *>( image)->image_);
 }
 
 

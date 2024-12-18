@@ -56,8 +56,8 @@ public:
     int getButtonsRectHeight() const;
     void finishButtonDraw(IRenderWindow* renderWindow, const TextButton* button);
 
-    ABarButton::State getOkState() const;
-    ABarButton::State getCancelState() const;
+    virtual ABarButton::State getOkState() const;
+    virtual ABarButton::State getCancelState() const;
     void unsetAll();
 };
 
@@ -70,18 +70,6 @@ public:
 
     bool execute(const Key &key) override;
     bool isUndoable(const Key &key) override;
-};
-
-
-class BareliefFilter : public TextButton
-{
-    friend class BareliefFilterAction;
-public:
-    BareliefFilter(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
-                std::unique_ptr<sfm::IRectangleShape> init_shape);
-
-    std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
-    void updateState(const IRenderWindow *renderWindow, const Event &event);
 };
 
 

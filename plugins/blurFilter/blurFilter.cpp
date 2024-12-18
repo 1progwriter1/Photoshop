@@ -76,13 +76,13 @@ bool BlurFilterButton::update(const IRenderWindow* renderWindow, const Event& ev
 
 } // namespace anonymous
 
-bool loadPlugin()
+bool onLoadPlugin()
 {
     std::unique_ptr<IText> text = IText::create();
     std::unique_ptr<IFont> font = IFont::create();
     font->loadFromFile("../assets/fonts/Italic.ttf");
     text->setFont(font.get());
-    text->setString("Box blur");
+    text->setString("Box blur (Arman)");
 
     auto button = std::make_unique<BlurFilterButton>(std::move(text), std::move(font));
 
@@ -96,7 +96,7 @@ bool loadPlugin()
     return true;
 }
 
-void unloadPlugin()
+void onUnloadPlugin()
 {
     return;
 }

@@ -17,14 +17,14 @@ void actionPlugins( const char *func, bool is_load)
 		bool (*pluginFunction)() = (bool (*)()) dlsym(handle, func);
 		if ( char *error = dlerror() )
 		{
-			fprintf( stderr, "Failed to find function [%s]: %s\n", func, dlerror());
+			fprintf( stderr, "Failed to find function [%s] for plugin [%s]: %s\n", func, plugin_path, dlerror());
 			dlclose(handle);
 			throw MY_EXCEPTION( "plugin load error", nullptr);
 		}
 
 		if ( is_load && !pluginFunction() )
 		{
-			throw MY_EXCEPTION( "loadPlugin returned false", nullptr);
+			throw MY_EXCEPTION( "onLoadPlugin returned false", nullptr);
 		}
 	}
 }

@@ -234,7 +234,6 @@ bool Canvas::insertEmptyLayer(size_t index)
             new_layer->pixels_[y * size_.x + x] = sfm::Color();
         }
     }
-
     auto iter = layers_.begin();
     std::advance( iter, index);
     layers_.insert( iter, std::move( new_layer));

@@ -1,4 +1,7 @@
 #include "control_panel.hpp"
+#include "fill_menu.hpp"
+#include "windows_id.hpp"
+#include <cassert>
 
 
 ControlPanel::ControlPanel()
@@ -272,3 +275,4 @@ bool ControlPanelAction::isUndoable(const Key &key)
 {
     return false;
 }
+

@@ -4,6 +4,13 @@
 #include "windows_id.hpp"
 #include <filesystem>
 #include <iostream>
+#include "filters/unsharp_mask.hpp"
+#include "filters/gauss_blur.hpp"
+#include "filters/blur.hpp"
+#include "filters/barelief.hpp"
+#include "filters/brightness.hpp"
+#include "filters/negative.hpp"
+
 
 
 IRootWindow *kRootWindowPtr = nullptr;
@@ -12,7 +19,7 @@ IRootWindow *kRootWindowPtr = nullptr;
 void addFiles(AMenuButton *open_bar, AMenuButton *close_bar);
 
 
-bool loadPlugin()
+bool onLoadPlugin()
 {
     kRootWindowPtr = psapi::getRootWindow();
 
@@ -45,7 +52,7 @@ bool loadPlugin()
 }
 
 
-void unloadPlugin()
+void onUnloadPlugin()
 {
 
 }
@@ -85,7 +92,7 @@ void fillFilterMenu(AMenuButton* menu_bar)
     assert( menu_bar );
 
     menu_bar->addMenuItem(createMenuButton<BareliefFilter>(kBareliefFilterButtonId, "Barelief"));
-    menu_bar->addMenuItem(createMenuButton<ContrastFilter>(kContrastFilterButtonId, "Contrast"));
+    menu_bar->addMenuItem(createMenuButton<UnsharpMaskFilter>(kContrastFilterButtonId, "UnsharpMask"));
     menu_bar->addMenuItem(createMenuButton<BlurFilter>(kBlurFilterButtonId, "Blur"));
     menu_bar->addMenuItem(createMenuButton<GaussBlurFilter>(kGaussBlurFilterButtonId, "Gauss blur"));
     menu_bar->addMenuItem(createMenuButton<NegativeFilter>(kNegativeFilterButtonId, "Negative"));

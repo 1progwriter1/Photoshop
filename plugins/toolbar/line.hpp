@@ -12,8 +12,8 @@ using namespace psapi;
 
 extern "C"
 {
-    bool loadPlugin();
-    void unloadPlugin();
+    bool onLoadPlugin();
+    void onUnloadPlugin();
 }
 
 

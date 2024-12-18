@@ -44,7 +44,7 @@ set(LIBRARIES
     "ellipse+${CMAKE_SOURCE_DIR}/plugins/toolbar/ellipse.cpp"
     "line+${CMAKE_SOURCE_DIR}/plugins/toolbar/line.cpp"
     "menubar+${CMAKE_SOURCE_DIR}/plugins/menubar/menubar.cpp"
-	"menu_items+${CMAKE_SOURCE_DIR}/plugins/menubar/menu_items.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/fill_menu.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/file.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/tools.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/layer.cpp"
+	"menu_items+${CMAKE_SOURCE_DIR}/plugins/menubar/menu_items.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/fill_menu.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/file.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/tools.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/layer.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/blur.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/gauss_blur.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/unsharp_mask.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/barelief.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/control_panel.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/negative.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/brightness.cpp"
 )
 
 
