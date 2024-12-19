@@ -17,8 +17,8 @@ bool onLoadPlugin()
     IBar *toolbar = dynamic_cast<IBar *>( kRootWindowPtr->getWindowById( psapi::kToolBarWindowId));
     assert( toolbar && "Failed to cast to IBar" );
 
-    std::unique_ptr<sfm::Texture> texture = std::make_unique<sfm::Texture>();
-    std::unique_ptr<sfm::Sprite> sprite = std::make_unique<sfm::Sprite>();
+    std::unique_ptr<sfm::ITexture> texture = std::make_unique<sfm::Texture>();
+    std::unique_ptr<sfm::ISprite> sprite = std::make_unique<sfm::Sprite>();
     texture->loadFromFile("../assets/images/rectangle48_48.png");
     sprite->setTexture( texture.get());
 
@@ -35,7 +35,7 @@ void onUnloadPlugin()
 }
 
 
-Rectangle::Rectangle( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite)
+Rectangle::Rectangle( wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::unique_ptr<sfm::ISprite> &init_sprite)
     :   ABarButton( init_id, init_texture, init_sprite),
         canvas_( dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId))),
         options_bar_( dynamic_cast<IOptionsBar *>( getRootWindow()->getWindowById( kOptionsBarWindowId)))

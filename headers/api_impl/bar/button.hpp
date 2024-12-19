@@ -9,11 +9,11 @@ using psapi::IMenuButton;
 using psapi::IWindow;
 using psapi::IRenderWindow;
 using psapi::Event;
+using psapi::sfm::ITexture;
+using psapi::sfm::ISprite;
 
 using psapi::wid_t;
 
-using psapi::sfm::Texture;
-using psapi::sfm::Sprite;
 using psapi::sfm::IRectangleShape;
 
 using psapi::IAction;
@@ -26,8 +26,8 @@ using psapi::sfm::vec2f;
 class ABarButton : public IBarButton
 {
 protected:
-    std::unique_ptr<Texture> texture_;
-    std::unique_ptr<Sprite> sprite_;
+    std::unique_ptr<ITexture> texture_;
+    std::unique_ptr<ISprite> sprite_;
     State state_;
 
     wid_t id_;
@@ -36,7 +36,7 @@ protected:
 
     friend class BarButtonAction;
 public:
-    ABarButton( wid_t init_id, std::unique_ptr<Texture> &init_texture, std::unique_ptr<Sprite> &init_sprite);
+    ABarButton( wid_t init_id, std::unique_ptr<ITexture> &init_texture, std::unique_ptr<ISprite> &init_sprite);
     ~ABarButton() = default;
 
     virtual void draw(IRenderWindow* renderWindow) override;

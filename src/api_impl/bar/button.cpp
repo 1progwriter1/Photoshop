@@ -12,7 +12,7 @@ void ABarButton::draw(IRenderWindow* renderWindow)
 }
 
 
-ABarButton::ABarButton(  wid_t init_id, std::unique_ptr<Texture> &init_texture, std::unique_ptr<Sprite> &init_sprite)
+ABarButton::ABarButton(  wid_t init_id, std::unique_ptr<ITexture> &init_texture, std::unique_ptr<ISprite> &init_sprite)
     :   id_( init_id)
 {
     texture_ = std::move( init_texture);

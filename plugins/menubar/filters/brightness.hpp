@@ -13,7 +13,7 @@ class BrightnessFilterControlPanel;
 
 class BrightnessFilter : public TextButton
 {
-    std::unique_ptr<BrightnessFilterControlPanel> panel_;
+    std::unique_ptr<BrightnessFilterControlPanel> panel_ = nullptr;
     friend class BrightnessFilterAction;
 
     bool is_applied_ = false;
@@ -70,12 +70,13 @@ class BrightnessFilterControlPanel : public ControlPanel
     std::vector<std::pair<int, int>> interpolated_;
     sfm::IntRect draw_rect_;
 
-    std::unique_ptr<sfm::IImage> image_ = std::make_unique<sfm::Image>();
-    std::unique_ptr<sfm::ITexture> texture_ = std::make_unique<sfm::Texture>();
-    std::unique_ptr<sfm::ISprite> sprite_ = std::make_unique<sfm::Sprite>();
+    std::unique_ptr<sfm::IImage> image_ = sfm::IImage::create();
+    std::unique_ptr<sfm::ITexture> texture_ = ITexture::create();
+    std::unique_ptr<sfm::ISprite> sprite_ = ISprite::create();
 
     BrightnessFilter *parent_;
-    bool is_added_ = false;
+    bool is_added_ = true;
+    bool was_released_ = false;
 
     friend class ControlPanelAction;
 public:
@@ -89,9 +90,10 @@ public:
     void setPos(const vec2i& pos) override;
     void setFilter(BrightnessFilter *parent);
 
-    const std::vector<std::pair<int, int>> &getBrightnessPoints() const &;
+    const std::vector<std::pair<int, int>> &getBrightnessPoints() &;
 private:
     void drawPoint(sfm::vec2i pos, sfm::Color color, int radius);
+    void clearImage();
 };
 
 
@@ -106,6 +108,9 @@ public:
 private:
     void interpolate();
     sfm::vec2i interpolatePoint( sfm::vec2i p0, sfm::vec2i p1, sfm::vec2i p2, sfm::vec2i p3, float t);
+    void executeButtons();
+    void interpolatePoints();
+    bool proceedRightMouseButton(vec2i mouse_pos);
 };
 
 

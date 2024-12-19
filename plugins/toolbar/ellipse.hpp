@@ -31,7 +31,7 @@ class Ellipse : public ABarButton
 
     friend class EllipseAction;
 public:
-    Ellipse( wid_t init_id, std::unique_ptr<sfm::Texture> &init_texture, std::unique_ptr<sfm::Sprite> &init_sprite);
+    Ellipse( wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::unique_ptr<sfm::ISprite> &init_sprite);
 
     std::unique_ptr<IAction> createAction(const IRenderWindow *renderWindow, const Event &event) override;
     bool isOnCanvas( sfm::vec2i mouse_pos);
