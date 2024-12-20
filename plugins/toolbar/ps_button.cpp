@@ -54,7 +54,6 @@ PsButtonAction::PsButtonAction(PsButton *button, const IRenderWindow *render_win
 
 bool PsButtonAction::execute(const Key &key)
 {
-    button_->updateState(render_window_, event_);
     return true;
 }
 

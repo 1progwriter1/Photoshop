@@ -91,15 +91,14 @@ void ABar::setSize(const vec2u &size)
 
 IWindow* ABar::getWindowById(wid_t id)
 {
-
     if ( this->getId() == id ) return this;
 
     for ( const auto &button : buttons_ )
     {
-        if ( button->getId() == id )
-        {
-            return button.get();
-        }
+        IWindow *but = nullptr;
+        but = button->getWindowById( id);
+        if ( but )
+            return but;
     }
     return nullptr;
 }
@@ -107,14 +106,14 @@ IWindow* ABar::getWindowById(wid_t id)
 
 const IWindow* ABar::getWindowById(wid_t id) const
 {
-    if ( id == this->getId() ) return this;
+    if ( this->getId() == id ) return this;
 
     for ( const auto &button : buttons_ )
     {
-        if ( button->getId() == id )
-        {
-            return button.get();
-        }
+        IWindow *but = nullptr;
+        but = button->getWindowById( id);
+        if ( but )
+            return but;
     }
     return nullptr;
 }
@@ -276,12 +275,14 @@ wid_t AOptionsBar::getId() const
 
 const IWindow* AOptionsBar::getWindowById(wid_t id) const
 {
+    if ( this->getId() == id ) return this;
+
     for ( const auto &option : options_ )
     {
-        if ( option->getId() == id )
-        {
-            return option.get();
-        }
+        IWindow *opt = nullptr;
+        opt = option->getWindowById( id);
+        if ( opt )
+            return opt;
     }
     return nullptr;
 }
@@ -289,14 +290,14 @@ const IWindow* AOptionsBar::getWindowById(wid_t id) const
 
 IWindow* AOptionsBar::getWindowById(wid_t id)
 {
-    if ( id == id_ )
-        return this;
-    for ( auto &option : options_ )
+    if ( this->getId() == id ) return this;
+
+    for ( const auto &option : options_ )
     {
-        if ( option->getId() == id )
-        {
-            return option.get();
-        }
+        IWindow *opt = nullptr;
+        opt = option->getWindowById( id);
+        if ( opt )
+            return opt;
     }
     return nullptr;
 }

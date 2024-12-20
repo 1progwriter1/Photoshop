@@ -122,12 +122,14 @@ void AWindowContainer::draw( sfm::IRenderWindow *renderWindow)
 
 IWindow *AWindowContainer::getWindowById( wid_t id)
 {
+    if ( this->getId() == id )
+        return this;
     for ( auto &window : windows_ )
     {
-        if ( window->getId() == id )
-        {
-            return window->getWindowById( id);
-        }
+        IWindow *win = nullptr;
+        win = window->getWindowById( id);
+        if ( win )
+            return win;
     }
 
     return nullptr;
@@ -136,14 +138,15 @@ IWindow *AWindowContainer::getWindowById( wid_t id)
 
 const IWindow *AWindowContainer::getWindowById( wid_t id) const
 {
+    if ( this->getId() == id )
+        return this;
     for ( auto &window : windows_ )
     {
-        if ( window->getId() == id )
-        {
-            return window->getWindowById( id);
-        }
+        IWindow *win = nullptr;
+        win = window->getWindowById( id);
+        if ( win )
+            return win;
     }
-
     return nullptr;
 }
 
@@ -276,14 +279,14 @@ bool RootWindow::isActive() const
 
 IWindow *RootWindow::getWindowById( wid_t id)
 {
-    if ( id == kRootWindowId )  return this;
-
+    if ( this->getId() == id )
+        return this;
     for ( auto &window : windows_ )
     {
-        if ( window->getId() == id )
-        {
-            return window->getWindowById( id);
-        }
+        IWindow *win = nullptr;
+        win = window->getWindowById( id);
+        if ( win )
+            return win;
     }
     return nullptr;
 }
@@ -291,14 +294,14 @@ IWindow *RootWindow::getWindowById( wid_t id)
 
 const IWindow *RootWindow::getWindowById( wid_t id) const
 {
-    if ( id == kRootWindowId )  return this;
-
+    if ( this->getId() == id )
+        return this;
     for ( auto &window : windows_ )
     {
-        if ( window->getId() == id )
-        {
-            return window->getWindowById( id);
-        }
+        IWindow *win = nullptr;
+        win = window->getWindowById( id);
+        if ( win )
+            return win;
     }
     return nullptr;
 }

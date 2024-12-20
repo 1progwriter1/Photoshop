@@ -58,7 +58,7 @@ MenuBar::MenuBar(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape
 {
     offset_ = sfm::vec2i();
     buttons_size_ = sfm::vec2u(0, 32);
-    int offset = (ABar::getSize().y - buttons_size_.y) / 2;
+    int offset = (ABar::getSize().y - buttons_size_.y) / 2 + 1;
     offset_ += sfm::vec2i(5, offset);
 }
 
