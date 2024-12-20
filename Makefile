@@ -1,8 +1,6 @@
-DYLIB_DIR := build
+SRC_DIR:=src
 
-all: build/lib_blur_filter.dylib
-	g++ -shared -o $@ $^
+SOURCES=$(wildcard $(SRC_DIR)/api_impl/*.cpp)
 
-	build/lib_blur_filter.dylib : plugins/blurFilter/blurFilter.cpp \
-	plugins/pluginLib/windows/windows.cpp plugins/pluginLib/bars/ps_bar.cpp \
-	plugins/pluginLib/canvas/canvas.cpp plugins/pluginLib/filters/filters.cpp libapi_photoshop.dylib
+all:
+	g++ -shared -o libgauss_blur.dylib $(SRC_DIR)/filters/gauss_blur.cpp $(SOURCES) $(SRC_DIR)/control_panel.cpp $(SRC_DIR)/menu_items.cpp -I$(SRC_DIR)

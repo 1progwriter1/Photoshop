@@ -389,3 +389,8 @@ bool RootWindowAction::execute(const Key &key)
     }
     return true;
 }
+
+std::unique_ptr<psapi::sfm::IRenderWindow> psapi::sfm::IRenderWindow::create(unsigned int width, unsigned int height, const std::string &name)
+{
+    return std::make_unique<RenderWindow>(width, height, name);
+}

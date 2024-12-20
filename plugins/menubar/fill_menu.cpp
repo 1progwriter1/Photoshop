@@ -94,7 +94,6 @@ void fillFilterMenu(AMenuButton* menu_bar)
     menu_bar->addMenuItem(createMenuButton<BareliefFilter>(kBareliefFilterButtonId, "Barelief"));
     menu_bar->addMenuItem(createMenuButton<UnsharpMaskFilter>(kContrastFilterButtonId, "UnsharpMask"));
     menu_bar->addMenuItem(createMenuButton<BlurFilter>(kBlurFilterButtonId, "Blur"));
-    menu_bar->addMenuItem(createMenuButton<GaussBlurFilter>(kGaussBlurFilterButtonId, "Gauss blur"));
     menu_bar->addMenuItem(createMenuButton<NegativeFilter>(kNegativeFilterButtonId, "Negative"));
     menu_bar->addMenuItem(createMenuButton<BrightnessFilter>(kBrightnessFilterButtonId, "Brightness"));
 }

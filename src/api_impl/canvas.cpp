@@ -1,3 +1,4 @@
+#include "api_impl/memento.hpp"
 #include <api_impl/canvas.hpp>
 #include <api/api_canvas.hpp>
 #include <cassert>
@@ -430,7 +431,9 @@ std::unique_ptr<IAction> Canvas::createAction(const IRenderWindow* renderWindow,
 
 std::unique_ptr<ICanvasSnapshot> Canvas::save()
 {
-    assert( 0 && "Not implemented" );
+    // std::unique_ptr<AMementable<ICanvasSnapshot>> memento = std::make_unique<AMementable<ICanvasSnapshot>>();
+    // return memento->save();
+    assert( 0 );
 
     return nullptr;
 }

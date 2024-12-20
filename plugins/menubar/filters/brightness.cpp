@@ -213,11 +213,13 @@ BrightnessFilterControlPanel::BrightnessFilterControlPanel()
     points_.insert({-30, 0});
     points_.insert({-20, 0});
     points_.insert({-10, 0});
+    points_.insert({0, 0});
 
     points_.insert({draw_rect_.size.x + 30, 0});
     points_.insert({draw_rect_.size.x + 20, 0});
     points_.insert({draw_rect_.size.x + 10, 0});
     points_.insert({draw_rect_.size.x + 5, 0});
+    points_.insert({draw_rect_.size.x, 0});
     is_added_ = true;
 }
 

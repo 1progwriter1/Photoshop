@@ -898,7 +898,6 @@ void EllipseShape::move(const vec2f &offset)
     assert( 0 && "Not implemented");
 }
 
-
 // * Mouse implementation
 
 

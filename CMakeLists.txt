@@ -1,8 +1,7 @@
 cmake_minimum_required( VERSION 3.30)
 
-set( CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 
 set( TARGET run)
 set( DYLIB api_photoshop)
@@ -29,10 +28,6 @@ include_directories( ${CMAKE_SOURCE_DIR})
 include_directories( /opt/homebrew/include/)
 include_directories( ../MyLibraries/headers/)
 
-# set(PLUGINS "canvas" "toolbar" "optionsbar" "brush" "eraser" "rectangle" "ellipse" "line"
-# 			"brightness_filter" "negative_filter" "barelief_filter" "bluer_filter" "gauss_bluer_filter"
-# 			"contrast_filter" "filter" "menubar")
-
 
 set(LIBRARIES
     "canvas+${CMAKE_SOURCE_DIR}/plugins/canvas.cpp"
@@ -45,7 +40,8 @@ set(LIBRARIES
     "ellipse+${CMAKE_SOURCE_DIR}/plugins/toolbar/ellipse.cpp"
     "line+${CMAKE_SOURCE_DIR}/plugins/toolbar/line.cpp"
     "menubar+${CMAKE_SOURCE_DIR}/plugins/menubar/menubar.cpp"
-	"menu_items+${CMAKE_SOURCE_DIR}/plugins/menubar/menu_items.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/fill_menu.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/file.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/tools.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/layer.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/blur.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/gauss_blur.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/unsharp_mask.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/barelief.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/control_panel.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/negative.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/brightness.cpp"
+	"menu_items+${CMAKE_SOURCE_DIR}/plugins/menubar/menu_items.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/fill_menu.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/file.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/tools.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/layer.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/blur.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/unsharp_mask.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/barelief.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/control_panel.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/negative.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/filters/brightness.cpp"
+    "gauss_blur+${CMAKE_SOURCE_DIR}/plugins/menubar/filters/gauss_blur.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/menu_items.cpp,${CMAKE_SOURCE_DIR}/plugins/menubar/control_panel.cpp"
 )
 
 

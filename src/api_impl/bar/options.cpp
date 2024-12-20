@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-const std::array<Color, 8> PALETTE_COLORS =
+const std::array<Color, 10> PALETTE_COLORS =
 {
     Color::getStandardColor(psapi::sfm::Color::Type::Red),
     Color::getStandardColor(psapi::sfm::Color::Type::Green),
@@ -15,6 +15,8 @@ const std::array<Color, 8> PALETTE_COLORS =
     // Color::getStandardColor(psapi::sfm::Color::Type::White),
     Color(153, 153, 255),
     Color(153, 0, 76),
+    Color(102, 0, 204),
+    Color(76, 153, 0),
     // Color::getStandardColor(psapi::sfm::Color::Type::Black)
 };
 
@@ -38,6 +40,12 @@ ColorPalette::ColorPalette(vec2i init_pos, vec2u init_size)
         button->setFillColor(color);
         colors_.push_back(std::move(button));
     }
+}
+
+
+std::unique_ptr<IThicknessOption> IThicknessOption::create()
+{
+    return nullptr;
 }
 
 
@@ -112,7 +120,7 @@ void ColorPalette::setSize(const vec2u& size)
     vec2u button_size = vec2u(size_.x / 2, size_.y / 5);
     indicator_->setSize(vec2u(size_.x, button_size.y));
     vec2i row_pos = vec2i(indicator_->getPosition().x, indicator_->getPosition().y);
-    for ( int i = 0; i < 4; i++ )
+    for ( int i = 0; i < 5; i++ )
     {
         row_pos += vec2i(0, button_size.y);
         vec2i button_pos = row_pos;

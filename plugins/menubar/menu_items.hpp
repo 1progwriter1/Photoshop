@@ -32,6 +32,8 @@ public:
 
 class NestedMenu : public ABarShapes
 {
+    unsigned int min_size = 125;
+    unsigned int min_offset = 25;
 public:
     NestedMenu(wid_t init_id, std::unique_ptr<sfm::RectangleShape> main_shape, BarRectangleShapes &shapes);
 

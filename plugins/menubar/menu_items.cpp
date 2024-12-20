@@ -162,10 +162,10 @@ void NestedMenu::addWindow(std::unique_ptr<IWindow> window)
 
     if ( buttons_.empty() )
     {
-        size_.x = window->getSize().x;
+        size_.x = std::max(min_size, window->getSize().x + min_offset);
     } else
     {
-        size_.x = std::max(size_.x, window->getSize().x);
+        size_.x = std::max(std::max(size_.x, window->getSize().x + min_offset), min_size);
     }
     buttons_.push_back( std::unique_ptr<IBarButton>( static_cast<IBarButton *>( window.release())));
     size_.y = 32 * buttons_.size();

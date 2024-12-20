@@ -18,7 +18,6 @@ vec2i ALayerSnapshot::getOffset()
     return offset_;
 }
 
-
 template<>
 std::unique_ptr<ILayerSnapshot> AMementable<ILayerSnapshot>::save()
 {
@@ -71,3 +70,5 @@ void AMementable<ACanvasSnapshot>::restore(ACanvasSnapshot* snapshot)
 {
     assert( 0 && "Not implemented" );
 }
+
+
