@@ -3,6 +3,12 @@
 #include <iostream>
 
 
+int getCharacterSize()
+{
+    return 20;
+}
+
+
 std::unique_ptr<MenuButton> MenuButton::createMenuButton(wid_t id, const std::string &text)
 {
     std::unique_ptr<sfm::IFont> font = sfm::IFont::create();
@@ -10,13 +16,13 @@ std::unique_ptr<MenuButton> MenuButton::createMenuButton(wid_t id, const std::st
 
     std::unique_ptr<sfm::IText> button_text = sfm::IText::create();
     button_text->setFont(font.get());
-    sfm::Color color = sfm::Color::getStandardColor(psapi::sfm::Color::Type::Black);
+    sfm::Color color = sfm::Color::getStandardColor(psapi::sfm::Color::Type::White);
     button_text->setFillColor(&color);
     button_text->setString(text);
     sfm::IntRect text_rect = button_text->getGlobalBounds();
 
     std::unique_ptr<sfm::IRectangleShape> shape = sfm::RectangleShape::create(10, 10); // default size, it is not used later
-    shape->setFillColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::White));
+    shape->setFillColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::Transparent));
 
     std::unique_ptr<IBar> bar = NestedMenu::createMenuBar(id);
     bar->setSize(sfm::vec2u(100, 300));
@@ -45,11 +51,13 @@ std::unique_ptr<NestedMenu> NestedMenu::createMenuBar(wid_t init_id)
     std::unique_ptr<sfm::RectangleShape> released = std::make_unique<sfm::RectangleShape>();
     released->setFillColor(sfm::Color());
 
-    std::unique_ptr<NestedMenu> bar = std::make_unique<NestedMenu>( init_id, main,
-                                                                normal,
-                                                                onHover,
-                                                                pressed,
-                                                                released);
+    BarRectangleShapes shapes;
+    shapes.normal = std::move( normal);
+    shapes.on_hover = std::move( onHover);
+    shapes.pressed = std::move( pressed);
+    shapes.released = std::move( released);
+
+    std::unique_ptr<NestedMenu> bar = std::make_unique<NestedMenu>( init_id, std::move(main), shapes);
 
     return bar;
 }
@@ -79,14 +87,17 @@ void MenuButton::draw(IRenderWindow *renderWindow)
 
 void MenuButton::setSize(const sfm::vec2u &size)
 {
-    AMenuButton::setSize(size);
+    text_->setCharacterSize(getCharacterSize());
+    vec2u text_size = text_->getGlobalBounds().size;
+    text_size.y = size.y;
+    text_size.x += 20;
 
-    sfm::Text *text = dynamic_cast<sfm::Text *>(text_.get());
-    assert( text );
+//     sfm::Text *text = dynamic_cast<sfm::Text *>(text_.get());
+//     assert( text );
+//
+//     sfm::IntRect button_rect = fitTextToHeight(text->getText(), AMenuButton::getPos(), size.y);
 
-    sfm::IntRect button_rect = fitTextToHeight(text->getText(), AMenuButton::getPos(), size.y);
-
-    AMenuButton::setSize(button_rect.size);
+    AMenuButton::setSize(text_size);
 }
 
 
@@ -94,15 +105,16 @@ void MenuButton::setPos(const sfm::vec2i &pos)
 {
     AMenuButton::setPos(pos);
 
-    sfm::Text *text = dynamic_cast<sfm::Text *>(text_.get());
-    assert( text );
+//     sfm::Text *text = dynamic_cast<sfm::Text *>(text_.get());
+//     assert( text );
+//
+//     sfm::IntRect button_rect = fitTextToHeight(text->getText(), AMenuButton::getPos(), AMenuButton::getSize().y);
+//
+//     AMenuButton::setSize(button_rect.size);
 
-    sfm::IntRect button_rect = fitTextToHeight(text->getText(), AMenuButton::getPos(), AMenuButton::getSize().y);
-
-    AMenuButton::setSize(button_rect.size);
-
-    sfm::vec2i bar_pos = sfm::vec2i(button_rect.pos.x, button_rect.pos.y + button_rect.size.y);
-    bar_->setPos(bar_pos + sfm::vec2i(0, 10));
+    vec2u text_size = text_->getGlobalBounds().size;
+    text_->setPos(vec2f(pos.x + (AMenuButton::getSize().x - text_size.x) / 2.f, pos.y + 2));
+    bar_->setPos(pos + sfm::vec2i(0, 42));
 }
 
 
@@ -112,11 +124,8 @@ MenuButton::MenuButton(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::uni
 {}
 
 
-NestedMenu::NestedMenu(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
-                                                            std::unique_ptr<sfm::RectangleShape> &onHover,
-                                                            std::unique_ptr<sfm::RectangleShape> &pressed,
-                                                            std::unique_ptr<sfm::RectangleShape> &released)
-    :   ABar(init_id, main_shape, normal, onHover, pressed, released)
+NestedMenu::NestedMenu(wid_t init_id, std::unique_ptr<sfm::RectangleShape> main_shape,  BarRectangleShapes &shapes)
+    :   ABarShapes(init_id, std::move(main_shape), shapes)
 {}
 
 

@@ -6,8 +6,11 @@
 #include "api_impl/bar/button.hpp"
 
 
-#define FONT_FILE "../assets/fonts/HomeplanetbbBolditalic.ttf"
+#define FONT_FILE "../assets/fonts/Normal.ttf"
 #define NESTED_BAR_COLOR sfm::Color( 224, 224, 224)
+
+
+int getCharacterSize();
 
 
 class MenuButton : public AMenuButton
@@ -27,13 +30,11 @@ public:
 };
 
 
-class NestedMenu : public ABar
+class NestedMenu : public ABarShapes
 {
 public:
-    NestedMenu(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
-                                                            std::unique_ptr<sfm::RectangleShape> &onHover,
-                                                            std::unique_ptr<sfm::RectangleShape> &pressed,
-                                                            std::unique_ptr<sfm::RectangleShape> &released);
+    NestedMenu(wid_t init_id, std::unique_ptr<sfm::RectangleShape> main_shape, BarRectangleShapes &shapes);
+
     static std::unique_ptr<NestedMenu> createMenuBar(wid_t init_id);
     void setPos(const sfm::vec2i &pos) override;
     void addWindow(std::unique_ptr<IWindow> window) override;

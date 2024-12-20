@@ -7,6 +7,8 @@
 ABar::ABar( wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape)
     :   id_( init_id), size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y))
 {
+    pos_ = vec2i( main_shape->getPosition().x, main_shape->getPosition().y);
+    size_ = main_shape->getSize();
     main_shape_ = std::move( main_shape);
 }
 

@@ -34,7 +34,7 @@ sfm::IntRect psapi::getOptionsBarIntRect()
 
 sfm::IntRect psapi::getMenuBarIntRect()
 {
-    return sfm::IntRect( sfm::vec2i( 34, 0), sfm::vec2u(psapi::getScreenSize().x - 34 - 84, 35));
+    return sfm::IntRect( sfm::vec2i( 34, 0), sfm::vec2u(psapi::getScreenSize().x - 34 - 84, 34));
 }
 
 
