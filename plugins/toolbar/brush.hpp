@@ -34,7 +34,7 @@ class Brush : public ABarButton
 
     friend class BrushAction;
 public:
-    Brush(wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::unique_ptr<sfm::ISprite> &init_sprite);
+    Brush(wid_t init_id, std::unique_ptr<sfm::ITexture> init_texture, std::unique_ptr<sfm::ISprite> init_sprite);
     ~Brush();
 
     std::unique_ptr<IAction> createAction(const IRenderWindow *renderWindow, const Event &event) override;

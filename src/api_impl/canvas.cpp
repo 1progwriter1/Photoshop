@@ -392,7 +392,7 @@ void Canvas::draw( IRenderWindow *renderWindow)
 
 
 Canvas::Canvas( vec2i init_pos, vec2u init_size)
-    :   is_active_( true), parent_( nullptr), size_( init_size - vec2u(20, 20)), pos_( init_pos + sfm::vec2i(0, 20)), temp_layer_( nullptr),
+    :   is_active_( true), parent_( nullptr), size_( init_size - vec2u(SCROLL_SIZE, SCROLL_SIZE)), pos_( init_pos + sfm::vec2i(0, SCROLL_SIZE)), temp_layer_( nullptr),
         v_scroll_( psapi::getCanvasIntRect().pos, psapi::getCanvasIntRect().size, pos_, size_),
         h_scroll_( psapi::getCanvasIntRect().pos, psapi::getCanvasIntRect().size, pos_, size_)
 {
@@ -400,8 +400,8 @@ Canvas::Canvas( vec2i init_pos, vec2u init_size)
     texture_->create( size_.x, size_.y);
 
     actual_rect_ = psapi::getCanvasIntRect();
-    actual_rect_.pos += vec2i(0, 20);
-    actual_rect_.size -= vec2u(20, 20);
+    actual_rect_.pos += vec2i(0, SCROLL_SIZE);
+    actual_rect_.size -= vec2u(SCROLL_SIZE, SCROLL_SIZE);
 
     sprite_ = sfm::ISprite::create();
     sprite_->setPosition(static_cast<float>(pos_.x), static_cast<float>(pos_.y));

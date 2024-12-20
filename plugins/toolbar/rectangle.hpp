@@ -40,7 +40,7 @@ class Rectangle : public ABarButton
     friend class RectangleAction;
     friend class UndoableRectangleAction;
 public:
-    Rectangle( wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::unique_ptr<sfm::ISprite> &init_sprite);
+    Rectangle( wid_t init_id, std::unique_ptr<sfm::ITexture> init_texture, std::unique_ptr<sfm::ISprite> init_sprite);
 
     void draw( sfm::IRenderWindow *renderWindow) override;
     std::unique_ptr<IAction> createAction(const IRenderWindow *renderWindow, const Event &event) override;

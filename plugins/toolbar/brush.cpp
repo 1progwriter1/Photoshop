@@ -20,10 +20,10 @@ bool onLoadPlugin()
 
     std::unique_ptr<sfm::ITexture> texture = sfm::ITexture::create();
     std::unique_ptr<sfm::ISprite> sprite = sfm::ISprite::create();
-    texture->loadFromFile("../assets/images/brush48_48.png");
+    texture->loadFromFile("../assets/images/brush32_32.png");
     sprite->setTexture( texture.get());
 
-    std::unique_ptr<ABarButton> brush = std::make_unique<Brush>( kBrushButtonId, texture, sprite);
+    std::unique_ptr<ABarButton> brush = std::make_unique<Brush>( kBrushButtonId, std::move(texture), std::move(sprite));
     brush->setParent( toolbar);
     toolbar->addWindow( std::move( brush));
 
@@ -36,8 +36,8 @@ void onUnloadPlugin()
 }
 
 
-Brush::Brush( wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::unique_ptr<sfm::ISprite> &init_sprite)
-    :   ABarButton( init_id, init_texture, init_sprite),
+Brush::Brush( wid_t init_id, std::unique_ptr<sfm::ITexture> init_texture, std::unique_ptr<sfm::ISprite> init_sprite)
+    :   ABarButton(init_id, std::move(init_texture), std::move(init_sprite)),
         canvas_( dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId))),
         options_bar_( dynamic_cast<IOptionsBar *>(getRootWindow()->getWindowById( kOptionsBarWindowId)))
 {
@@ -45,8 +45,8 @@ Brush::Brush( wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::
     assert( options_bar_ && "Failed to cast to options bar" );
 
     canvas_rect_ = getCanvasIntRect();
-    canvas_rect_.pos += sfm::vec2i(0, 20);
-    canvas_rect_.size -= sfm::vec2u(20, 20);
+    canvas_rect_.pos += sfm::vec2i(0, 10);
+    canvas_rect_.size -= sfm::vec2u(10, 10);
 }
 
 

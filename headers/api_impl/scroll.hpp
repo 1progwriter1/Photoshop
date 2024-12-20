@@ -16,6 +16,9 @@ using psapi::sfm::Color;
 using psapi::sfm::Event;
 
 
+const int SCROLL_SIZE = 10;
+
+
 class Scrollable : psapi::sfm::Drawable
 {
 protected:

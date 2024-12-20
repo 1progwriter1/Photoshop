@@ -36,7 +36,7 @@ protected:
 
     friend class BarButtonAction;
 public:
-    ABarButton( wid_t init_id, std::unique_ptr<ITexture> &init_texture, std::unique_ptr<ISprite> &init_sprite);
+    ABarButton( wid_t init_id, std::unique_ptr<ITexture> init_texture, std::unique_ptr<ISprite> init_sprite);
     ~ABarButton() = default;
 
     virtual void draw(IRenderWindow* renderWindow) override;

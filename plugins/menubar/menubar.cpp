@@ -11,42 +11,32 @@ bool onLoadPlugin()
 
     sfm::IntRect rect = psapi::getMenuBarIntRect();
 
-    std::unique_ptr<sfm::RectangleShape> main = std::make_unique<sfm::RectangleShape>();
-    main->setPosition( sfm::vec2i( rect.pos + sfm::vec2i( 5, 5)));
-    main->setSize( sfm::vec2u( rect.size - sfm::vec2u( 10, 10)));
-    main->setFillColor( sfm::Color( 204, 255, 255));
-    main->setOutlineColor( sfm::Color( 51, 153, 255));
-    main->setOutlineThickness( 5);
+    std::unique_ptr<sfm::IRectangleShape> main = sfm::IRectangleShape::create(0, 0);
+    main->setPosition( sfm::vec2i( rect.pos + sfm::vec2i(1, 1)));
+    main->setSize( sfm::vec2u( rect.size - sfm::vec2u( 2, 2)));
+    main->setFillColor( sfm::Color( 128, 128, 128));
+    main->setOutlineColor( sfm::Color( 64, 64, 64));
+    main->setOutlineThickness( 1);
 
-    std::unique_ptr<sfm::RectangleShape> normal = std::make_unique<sfm::RectangleShape>();
-    normal->setSize( vec2u( 48, 48));
+    std::unique_ptr<sfm::IRectangleShape> normal = sfm::IRectangleShape::create(0, 0);
     normal->setFillColor( sfm::Color());
-    normal->setOutlineColor( sfm::Color());
-    normal->setOutlineThickness( 5);
 
-    std::unique_ptr<sfm::RectangleShape> onHover = std::make_unique<sfm::RectangleShape>();
-    onHover->setSize( vec2u( 48, 48));
+    std::unique_ptr<sfm::IRectangleShape> onHover = sfm::IRectangleShape::create(0, 0);
     onHover->setFillColor( sfm::Color());
-    onHover->setOutlineColor( sfm::Color( 192, 192, 192));
-    onHover->setOutlineThickness( 5);
 
-    std::unique_ptr<sfm::RectangleShape> pressed = std::make_unique<sfm::RectangleShape>();
-    pressed->setSize( vec2u( 48, 48));
+    std::unique_ptr<sfm::IRectangleShape> pressed = sfm::IRectangleShape::create(0, 0);
     pressed->setFillColor( sfm::Color());
-    pressed->setOutlineColor( sfm::Color( 51, 153, 255));
-    pressed->setOutlineThickness( 5);
 
-    std::unique_ptr<sfm::RectangleShape> released = std::make_unique<sfm::RectangleShape>();
-    released->setSize( vec2u( 48, 48));
+    std::unique_ptr<sfm::IRectangleShape> released = sfm::IRectangleShape::create(0, 0);
     released->setFillColor( sfm::Color());
-    released->setOutlineColor( sfm::Color( 153, 204, 255));
-    released->setOutlineThickness( 5);
 
-    std::unique_ptr<psapi::IBar> bar = std::make_unique<MenuBar>( kMenuBarWindowId, main,
-                                                                normal,
-                                                                onHover,
-                                                                pressed,
-                                                                released);
+    BarRectangleShapes shapes;
+    shapes.normal = std::move( normal);
+    shapes.on_hover = std::move( onHover);
+    shapes.pressed = std::move( pressed);
+    shapes.released = std::move( released);
+
+    std::unique_ptr<psapi::IBar> bar = std::make_unique<MenuBar>( kMenuBarWindowId, std::move(main), shapes);
 
     bar->setParent( kRootWindowPtr);
 
@@ -62,13 +52,11 @@ void onUnloadPlugin()
 }
 
 
-MenuBar::MenuBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
-                                                            std::unique_ptr<sfm::RectangleShape> &onHover,
-                                                            std::unique_ptr<sfm::RectangleShape> &pressed,
-                                                            std::unique_ptr<sfm::RectangleShape> &released)
-    :   ABar(init_id, main_shape, normal, onHover, pressed, released)
+MenuBar::MenuBar(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape,  BarRectangleShapes &shapes)
+    :   ABarShapes(init_id, std::move(main_shape), shapes)
 {
     offset_ = ABar::getPos();
+    buttons_size_ = sfm::vec2u(0, 32);
     int offset = (ABar::getSize().y - buttons_size_.y) / 2;
     offset_ += sfm::vec2i(offset, offset);
 }
@@ -91,7 +79,7 @@ sfm::vec2i MenuBar::calculateNextPos(sfm::vec2i init_pos)
 void MenuBar::addWindow(std::unique_ptr<IWindow> window)
 {
     sfm::vec2u size = window->getSize();
-    window->setSize(sfm::vec2u(0, getSize().y * 0.65));
+    window->setSize(sfm::vec2u(0, 32));
     window->setPos(calculateNextPos(window->getPos()));
     buttons_.push_back( std::unique_ptr<IBarButton>( static_cast<IBarButton *>( window.release())));
 }

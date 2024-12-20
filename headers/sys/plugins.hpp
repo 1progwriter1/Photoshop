@@ -8,14 +8,15 @@ static const char *PLUGINS_PATH[] =
 	"../build/libtoolbar.dylib",
 	"../build/liboptionsbar.dylib",
 	"../build/libmenubar.dylib",
+	"../build/libps_button.dylib",
 	"../build/libbrush.dylib",
 	"../build/liberaser.dylib",
 	"../build/librectangle.dylib",
 	"../build/libellipse.dylib",
 	"../build/libline.dylib",
-	"../build/libmenu_items.dylib",
+	// "../build/libmenu_items.dylib",
 	// "../build/lib_blur_filter.dylib",
-	"../build/lib_negative_filter.dylib",
+	// "../build/lib_negative_filter.dylib",
 };
 
 

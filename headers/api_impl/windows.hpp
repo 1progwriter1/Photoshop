@@ -115,6 +115,8 @@ public:
     layer_id_t decreaseLayerId() override;
     layer_id_t increaseLayerId() override;
     layer_id_t getUpperLayerId() const override;
+
+    sf::RenderWindow &getWindow();
 };
 
 

@@ -6,8 +6,8 @@
 
 
 // TODO: текст рисуется относительно lowerBound, а не относительно getLocalBounds.
-// TODO: исправить UNSharpMask
-// TODO: spline
+// * исправить UNSharpMask
+// * spline
 // TODO: Изменить интерфейс, так, чтобы он стал похож на Final Cut Pro or Adobe Photoshop
 // TODO: изменяемый в runtime интерфейс
 
@@ -19,6 +19,13 @@ int main()
 		Controller ctrl(psapi::getRootWindow());
 
 		actionPlugins("onLoadPlugin", true);
+
+		sf::Image icon;
+
+		if ( !icon.loadFromFile( "../assets/images/icon.png") )
+			throw MY_EXCEPTION( "Failed to load icon", nullptr);
+
+		ctrl.getSFMLWindow().setIcon( icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
 		while ( ctrl.inProgress() )
 		{

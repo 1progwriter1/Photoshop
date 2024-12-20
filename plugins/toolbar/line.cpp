@@ -14,12 +14,12 @@ bool onLoadPlugin()
     psapi::IBar *toolbar = dynamic_cast<psapi::IBar *>( kRootWindowPtr->getWindowById( psapi::kToolBarWindowId));
     assert( toolbar && "Failed to cast to IBar" );
 
-    std::unique_ptr<sfm::ITexture> texture = std::make_unique<sfm::Texture>();
-    std::unique_ptr<sfm::ISprite> sprite = std::make_unique<sfm::Sprite>();
-    texture->loadFromFile("../assets/images/line48_48.png");
+    std::unique_ptr<sfm::ITexture> texture = ITexture::create();
+    std::unique_ptr<sfm::ISprite> sprite = ISprite::create();
+    texture->loadFromFile("../assets/images/line32_32.png");
     sprite->setTexture( texture.get());
 
-    std::unique_ptr<ABarButton> line = std::make_unique<Line>( kLineButtonId, texture, sprite);
+    std::unique_ptr<ABarButton> line = std::make_unique<Line>( kLineButtonId, std::move(texture), std::move(sprite));
     line->setParent( toolbar);
     toolbar->addWindow( std::move( line));
 
@@ -32,8 +32,8 @@ void onUnloadPlugin()
 }
 
 
-Line::Line( wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::unique_ptr<sfm::ISprite> &init_sprite)
-    :   ABarButton( init_id, init_texture, init_sprite), canvas_( dynamic_cast<ICanvas *>( kRootWindowPtr->getWindowById( psapi::kCanvasWindowId)))
+Line::Line( wid_t init_id, std::unique_ptr<sfm::ITexture> init_texture, std::unique_ptr<sfm::ISprite> init_sprite)
+    :   ABarButton( init_id, std::move(init_texture), std::move(init_sprite)), canvas_( dynamic_cast<ICanvas *>( kRootWindowPtr->getWindowById( psapi::kCanvasWindowId)))
 {
     assert( canvas_ && "Failed to cast to canvas" );
     layer_ = canvas_->getTempLayer();
@@ -48,7 +48,6 @@ Line::Line( wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::un
 void Line::draw( sfm::IRenderWindow *renderWindow)
 {
     ABarButton::draw( renderWindow);
-    parent_->finishButtonDraw( renderWindow, this);
 }
 
 

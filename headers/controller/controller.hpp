@@ -18,6 +18,8 @@ public:
     bool inProgress();
     void getRequests();
     void proceedView();
+
+    sf::RenderWindow &getSFMLWindow();
 };
 
 

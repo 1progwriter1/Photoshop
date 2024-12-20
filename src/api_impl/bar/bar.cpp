@@ -4,27 +4,10 @@
 #include <iostream>
 
 
-ABar::ABar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape, std::unique_ptr<sfm::RectangleShape> &normal,
-                                                    std::unique_ptr<sfm::RectangleShape> &onHover,
-                                                    std::unique_ptr<sfm::RectangleShape> &pressed,
-                                                    std::unique_ptr<sfm::RectangleShape> &released)
-    :   id_( init_id), size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y)),
-    buttons_size_(normal->getSize())
+ABar::ABar( wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape)
+    :   id_( init_id), size_( main_shape->getSize()), pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y))
 {
-    assert( buttons_size_.x == released->getSize().x );
-    assert( buttons_size_.y == released->getSize().y );
-
-    assert( buttons_size_.x == pressed->getSize().x );
-    assert( buttons_size_.y == pressed->getSize().y );
-
-    assert( buttons_size_.x == onHover->getSize().x );
-    assert( buttons_size_.y == onHover->getSize().y );
-
     main_shape_ = std::move( main_shape);
-    normal_ = std::move( normal);
-    onHover_ = std::move( onHover);
-    pressed_ = std::move( pressed);
-    released_ = std::move( released);
 }
 
 
@@ -37,8 +20,8 @@ void ABar::draw(IRenderWindow* renderWindow)
 
     for ( const auto &button : buttons_ )
     {
-        button->draw( renderWindow);
         finishButtonDraw( renderWindow, button.get());
+        button->draw( renderWindow);
     }
 }
 
@@ -52,7 +35,7 @@ std::unique_ptr<IAction> ABar::createAction(const IRenderWindow* renderWindow, c
 void ABar::addWindow(std::unique_ptr<IWindow> window)
 {
     window->setPos( vec2i());
-    window->setSize(buttons_size_);
+    window->setSize( buttons_size_);
     vec2i pos = calculateNextPos(window->getPos());
     window->setPos(pos);
     buttons_.push_back( std::unique_ptr<IBarButton>( dynamic_cast<IBarButton *>( window.release())));
@@ -183,7 +166,48 @@ bool ABar::isWindowContainer() const
 }
 
 
-void ABar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
+ABarTextures::ABarTextures(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape, BarTextures &textures)
+    :   ABar(init_id, std::move(main_shape)),
+        texture_normal_(std::move(textures.texture_normal)), sprite_normal_(std::move(textures.sprite_normal)),
+        texture_on_hover_(std::move(textures.texture_on_hover)), sprite_on_hover_(std::move(textures.sprite_on_hover)),
+        texture_pressed_(std::move(textures.texture_pressed)), sprite_pressed_(std::move(textures.sprite_pressed)),
+        texture_released_(std::move(textures.texture_released)), sprite_released_(std::move(textures.sprite_released)) {}
+
+
+void ABarTextures::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
+{
+    vec2i pos = button->getPos();
+    switch ( button->getState() )
+    {
+        case IBarButton::State::Normal:
+            sprite_normal_->setPosition( pos.x, pos.y);
+            renderWindow->draw( sprite_normal_.get());
+            break;
+        case IBarButton::State::Hover:
+            sprite_on_hover_->setPosition( pos.x, pos.y);
+            renderWindow->draw( sprite_on_hover_.get());
+            break;
+        case IBarButton::State::Press:
+            sprite_pressed_->setPosition( pos.x, pos.y);
+            renderWindow->draw( sprite_pressed_.get());
+            break;
+        case IBarButton::State::Released:
+            sprite_released_->setPosition( pos.x, pos.y);
+            renderWindow->draw( sprite_released_.get());
+            break;
+        default:
+            assert( 0 && "Unreachable" );
+
+    }
+}
+
+
+ABarShapes::ABarShapes(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape, BarRectangleShapes &shapes)
+    :   ABar(init_id, std::move(main_shape)),
+        normal_(std::move(shapes.normal)), on_hover_(std::move(shapes.on_hover)), pressed_(std::move(shapes.pressed)), released_(std::move(shapes.released)) {}
+
+
+void ABarShapes::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const
 {
     vec2i pos = button->getPos();
     vec2u size = button->getSize();
@@ -195,9 +219,9 @@ void ABar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* butto
             renderWindow->draw( normal_.get());
             break;
         case IBarButton::State::Hover:
-            onHover_->setPosition( pos);
-            onHover_->setSize(size);
-            renderWindow->draw( onHover_.get());
+            on_hover_->setPosition( pos);
+            on_hover_->setSize(size);
+            renderWindow->draw( on_hover_.get());
             break;
         case IBarButton::State::Press:
             pressed_->setPosition( pos);
@@ -211,12 +235,11 @@ void ABar::finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* butto
             break;
         default:
             assert( 0 && "Unreachable" );
-
     }
 }
 
 
-AOptionsBar::AOptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape)
+AOptionsBar::AOptionsBar(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> &main_shape)
     :   id_( init_id), main_shape_(std::move(main_shape))
         // size_( main_shape->getSize()),
         // pos_( vec2i( main_shape->getPosition().x, main_shape->getPosition().y)),

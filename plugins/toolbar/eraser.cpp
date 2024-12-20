@@ -16,12 +16,12 @@ bool onLoadPlugin()
     psapi::IBar *toolbar = dynamic_cast<psapi::IBar *>( kRootWindowPtr->getWindowById( psapi::kToolBarWindowId));
     assert( toolbar && "Failed to cast to IBar" );
 
-    std::unique_ptr<sfm::ITexture> texture = std::make_unique<sfm::Texture>();
-    std::unique_ptr<sfm::ISprite> sprite = std::make_unique<sfm::Sprite>();
-    texture->loadFromFile("../assets/images/eraser48_48.png");
+    std::unique_ptr<sfm::ITexture> texture = ITexture::create();
+    std::unique_ptr<sfm::ISprite> sprite = ISprite::create();
+    texture->loadFromFile("../assets/images/eraser32_32.png");
     sprite->setTexture( texture.get());
 
-    std::unique_ptr<ABarButton> eraser = std::make_unique<Eraser>( kEraserButtonId, texture, sprite);
+    std::unique_ptr<ABarButton> eraser = std::make_unique<Eraser>( kEraserButtonId, std::move(texture), std::move(sprite));
     eraser->setParent( toolbar);
     toolbar->addWindow( std::move( eraser));
 
@@ -34,8 +34,8 @@ void onUnloadPlugin()
 }
 
 
-Eraser::Eraser( wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::unique_ptr<sfm::ISprite> &init_sprite)
-    :   ABarButton( init_id, init_texture, init_sprite),
+Eraser::Eraser( wid_t init_id, std::unique_ptr<sfm::ITexture> init_texture, std::unique_ptr<sfm::ISprite> init_sprite)
+    :   ABarButton( init_id, std::move(init_texture), std::move(init_sprite)),
         canvas_( dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId)))
 {
     assert( canvas_ && "Failed to cast to canvas" );

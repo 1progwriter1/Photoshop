@@ -39,6 +39,7 @@ set(LIBRARIES
     "toolbar+${CMAKE_SOURCE_DIR}/plugins/toolbar/toolbar.cpp"
     "optionsbar+${CMAKE_SOURCE_DIR}/plugins/optionsbar/optionsbar.cpp"
     "brush+${CMAKE_SOURCE_DIR}/plugins/toolbar/brush.cpp"
+    "ps_button+${CMAKE_SOURCE_DIR}/plugins/toolbar/ps_button.cpp"
     "eraser+${CMAKE_SOURCE_DIR}/plugins/toolbar/eraser.cpp"
     "rectangle+${CMAKE_SOURCE_DIR}/plugins/toolbar/rectangle.cpp"
     "ellipse+${CMAKE_SOURCE_DIR}/plugins/toolbar/ellipse.cpp"

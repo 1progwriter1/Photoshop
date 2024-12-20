@@ -27,20 +27,13 @@ protected:
 
     std::list<std::unique_ptr<IBarButton>> buttons_;
 
-    std::unique_ptr<sfm::RectangleShape> main_shape_;
-    std::unique_ptr<sfm::RectangleShape> normal_;
-    std::unique_ptr<sfm::RectangleShape> onHover_;
-    std::unique_ptr<sfm::RectangleShape> pressed_;
-    std::unique_ptr<sfm::RectangleShape> released_;
+    std::unique_ptr<sfm::IRectangleShape> main_shape_;
 
     wid_t last_pressed_id_ = -1;
 
     friend class ABarAction;
 public:
-    ABar( wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
-                                                            std::unique_ptr<sfm::RectangleShape> &onHover,
-                                                            std::unique_ptr<sfm::RectangleShape> &pressed,
-                                                            std::unique_ptr<sfm::RectangleShape> &released);
+    ABar( wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape);
     virtual ~ABar() = default;
 
     virtual void draw(IRenderWindow* renderWindow) override;
@@ -66,9 +59,60 @@ public:
     virtual void removeWindow(wid_t id) override;
 
     virtual bool unPressAllButtons() override;
-    virtual void finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const override;
 
     virtual vec2i calculateNextPos(vec2i init_pos);
+};
+
+
+struct BarTextures
+{
+    std::unique_ptr<sfm::ITexture> texture_normal;
+    std::unique_ptr<sfm::ISprite> sprite_normal;
+    std::unique_ptr<sfm::ITexture> texture_on_hover;
+    std::unique_ptr<sfm::ISprite> sprite_on_hover;
+    std::unique_ptr<sfm::ITexture> texture_pressed;
+    std::unique_ptr<sfm::ISprite> sprite_pressed;
+    std::unique_ptr<sfm::ITexture> texture_released;
+    std::unique_ptr<sfm::ISprite> sprite_released;
+};
+
+
+class ABarTextures : public ABar
+{
+    std::unique_ptr<sfm::ITexture> texture_normal_;
+    std::unique_ptr<sfm::ISprite> sprite_normal_;
+    std::unique_ptr<sfm::ITexture> texture_on_hover_;
+    std::unique_ptr<sfm::ISprite> sprite_on_hover_;
+    std::unique_ptr<sfm::ITexture> texture_pressed_;
+    std::unique_ptr<sfm::ISprite> sprite_pressed_;
+    std::unique_ptr<sfm::ITexture> texture_released_;
+    std::unique_ptr<sfm::ISprite> sprite_released_;
+public:
+    ABarTextures(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape, BarTextures &textures);
+
+    virtual void finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const override;
+};
+
+
+struct BarRectangleShapes
+{
+    std::unique_ptr<sfm::IRectangleShape> normal;
+    std::unique_ptr<sfm::IRectangleShape> on_hover;
+    std::unique_ptr<sfm::IRectangleShape> pressed;
+    std::unique_ptr<sfm::IRectangleShape> released;
+};
+
+
+class ABarShapes : public ABar
+{
+    std::unique_ptr<sfm::IRectangleShape> normal_;
+    std::unique_ptr<sfm::IRectangleShape> on_hover_;
+    std::unique_ptr<sfm::IRectangleShape> pressed_;
+    std::unique_ptr<sfm::IRectangleShape> released_;
+public:
+    ABarShapes(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape, BarRectangleShapes &shapes);
+
+    virtual void finishButtonDraw(IRenderWindow* renderWindow, const IBarButton* button) const override;
 };
 
 
@@ -77,7 +121,7 @@ class AOptionsBar : public IOptionsBar
 protected:
     wid_t id_ = kOptionsBarWindowId;
 
-    std::unique_ptr<sfm::RectangleShape> main_shape_;
+    std::unique_ptr<sfm::IRectangleShape> main_shape_;
     // std::unique_ptr<sfm::RectangleShape> normal_;
     // std::unique_ptr<sfm::RectangleShape> released_;
     // std::unique_ptr<sfm::RectangleShape> onHover_;
@@ -94,7 +138,7 @@ protected:
 
     friend class AOptionsBarAction;
 public:
-    AOptionsBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape);
+    AOptionsBar(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> &main_shape);
     virtual ~AOptionsBar() = default;
 
     void draw(IRenderWindow* renderWindow) override;

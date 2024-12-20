@@ -10,42 +10,35 @@ bool onLoadPlugin()
 {
     kRootWindowPtr = psapi::getRootWindow();
 
-    std::unique_ptr<sfm::RectangleShape> main = std::make_unique<sfm::RectangleShape>();
-    main->setPosition( psapi::getToolbarIntRect().pos + vec2i(5, 5));
-    main->setSize( psapi::getToolbarIntRect().size - vec2u(10, 10));
-    main->setFillColor( sfm::Color( 204, 255, 255));
-    main->setOutlineColor( sfm::Color( 51, 153, 255));
-    main->setOutlineThickness( 5);
+    std::unique_ptr<sfm::IRectangleShape> main = sfm::IRectangleShape::create(0, 0);
+    main->setPosition( psapi::getToolbarIntRect().pos + vec2i(1, 1));
+    main->setSize( psapi::getToolbarIntRect().size - vec2u(2, 2));
+    main->setFillColor( sfm::Color( 128, 128, 128));
+    main->setOutlineColor( sfm::Color( 64, 64, 64));
+    main->setOutlineThickness( 1);
 
-    std::unique_ptr<sfm::RectangleShape> normal = std::make_unique<sfm::RectangleShape>();
-    normal->setSize( vec2u( 48, 48));
-    normal->setFillColor( sfm::Color());
-    normal->setOutlineColor( sfm::Color());
-    normal->setOutlineThickness( 5);
+    BarTextures textures;
+    textures.texture_normal = sfm::ITexture::create();
+    textures.texture_on_hover = sfm::ITexture::create();
+    textures.texture_pressed = sfm::ITexture::create();
+    textures.texture_released = sfm::ITexture::create();
 
-    std::unique_ptr<sfm::RectangleShape> onHover = std::make_unique<sfm::RectangleShape>();
-    onHover->setSize( vec2u( 48, 48));
-    onHover->setFillColor( sfm::Color());
-    onHover->setOutlineColor( sfm::Color( 192, 192, 192));
-    onHover->setOutlineThickness( 5);
+    textures.texture_normal->loadFromFile("../assets/images/normal.png");
+    textures.texture_on_hover->loadFromFile("../assets/images/on_hover.png");
+    textures.texture_pressed->loadFromFile("../assets/images/pressed.png");
+    textures.texture_released->loadFromFile("../assets/images/normal.png");
 
-    std::unique_ptr<sfm::RectangleShape> pressed = std::make_unique<sfm::RectangleShape>();
-    pressed->setSize( vec2u( 48, 48));
-    pressed->setFillColor( sfm::Color());
-    pressed->setOutlineColor( sfm::Color( 51, 153, 255));
-    pressed->setOutlineThickness( 5);
+    textures.sprite_normal = sfm::ISprite::create();
+    textures.sprite_on_hover = sfm::ISprite::create();
+    textures.sprite_pressed = sfm::ISprite::create();
+    textures.sprite_released = sfm::ISprite::create();
 
-    std::unique_ptr<sfm::RectangleShape> released = std::make_unique<sfm::RectangleShape>();
-    released->setSize( vec2u( 48, 48));
-    released->setFillColor( sfm::Color());
-    released->setOutlineColor( sfm::Color( 153, 204, 255));
-    released->setOutlineThickness( 5);
+    textures.sprite_normal->setTexture(textures.texture_normal.get());
+    textures.sprite_on_hover->setTexture(textures.texture_on_hover.get());
+    textures.sprite_pressed->setTexture(textures.texture_pressed.get());
+    textures.sprite_released->setTexture(textures.texture_released.get());
 
-    std::unique_ptr<psapi::IBar> bar = std::make_unique<ToolBar>( kToolBarWindowId, main,
-                                                                normal,
-                                                                onHover,
-                                                                pressed,
-                                                                released);
+    std::unique_ptr<psapi::IBar> bar = std::make_unique<ToolBar>( kToolBarWindowId, std::move(main), textures);
 
     kRootWindowPtr->addWindow( std::move( bar));
 
@@ -59,17 +52,17 @@ void onUnloadPlugin()
 }
 
 
-ToolBar::ToolBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
-                                                            std::unique_ptr<sfm::RectangleShape> &onHover,
-                                                            std::unique_ptr<sfm::RectangleShape> &pressed,
-                                                            std::unique_ptr<sfm::RectangleShape> &released)
-    :   ABar(init_id, main_shape, normal, onHover, pressed, released) {}
+ToolBar::ToolBar(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape, BarTextures &textures)
+    :   ABarTextures(init_id, std::move(main_shape), textures)
+{
+    buttons_size_ = sfm::vec2u(32, 32);
+}
 
 
 sfm::vec2i ToolBar::calculateNextPos(sfm::vec2i init_pos)
 {
     size_t cnt_buttons = buttons_.size();
-    int offset = (size_.x - buttons_size_.x) / 2 + pos_.x;
+    int offset = (getSize().x - buttons_size_.x) / 2 + getPos().x;
 
     sfm::vec2i pos = sfm::vec2i(offset, offset);
     pos.y += cnt_buttons * (buttons_size_.y + offset);

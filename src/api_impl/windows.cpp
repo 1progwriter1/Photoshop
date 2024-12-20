@@ -16,13 +16,13 @@ sfm::vec2u psapi::getScreenSize()
 
 sfm::IntRect psapi::getToolbarIntRect()
 {
-    return sfm::IntRect( sfm::vec2i( 0, 0), sfm::vec2u( 84, psapi::getScreenSize().y));
+    return sfm::IntRect( sfm::vec2i( 0, 0), sfm::vec2u( 34, psapi::getScreenSize().y));
 }
 
 
 sfm::IntRect psapi::getCanvasIntRect()
 {
-    return sfm::IntRect( sfm::vec2i( 84, 84), sfm::vec2u( psapi::getScreenSize().x - 84 * 2, psapi::getScreenSize().y - 84));
+    return sfm::IntRect( sfm::vec2i( 34, 34), sfm::vec2u( psapi::getScreenSize().x - 34 - 84, psapi::getScreenSize().y - 34));
 }
 
 
@@ -34,7 +34,7 @@ sfm::IntRect psapi::getOptionsBarIntRect()
 
 sfm::IntRect psapi::getMenuBarIntRect()
 {
-    return sfm::IntRect( sfm::vec2i( 84, 0), sfm::vec2u(psapi::getScreenSize().x - 84 * 2, 84));
+    return sfm::IntRect( sfm::vec2i( 34, 0), sfm::vec2u(psapi::getScreenSize().x - 34 - 84, 35));
 }
 
 
@@ -247,6 +247,12 @@ void RootWindow::setSize(const vec2u &size)
 vec2i RootWindow::getPos() const
 {
     return pos_;
+}
+
+
+sf::RenderWindow &RootWindow::getWindow()
+{
+    return window_.getWindow();
 }
 
 

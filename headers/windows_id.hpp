@@ -20,9 +20,10 @@ const wid_t kBareliefFilterButtonId = 8;
 const wid_t kBlurFilterButtonId = 9;
 const wid_t kGaussBlurFilterButtonId = 10;
 const wid_t kContrastFilterButtonId = 11;
+const wid_t kPsButtonId = 12;
 
-const wid_t kOpenFileMenuId = 12;
-const wid_t kSaveFileMenuId = 13;
+const wid_t kOpenFileMenuId = 50;
+const wid_t kSaveFileMenuId = 51;
 
 const wid_t kZoomCanvasButtonId = 15;
 const wid_t kUnZoomCanvasButtonId = 16;

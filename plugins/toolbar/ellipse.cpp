@@ -15,12 +15,12 @@ bool onLoadPlugin()
     psapi::IBar *toolbar = dynamic_cast<psapi::IBar *>( kRootWindowPtr->getWindowById( psapi::kToolBarWindowId));
     assert( toolbar && "Failed to cast to IBar" );
 
-    std::unique_ptr<sfm::ITexture> texture = std::make_unique<sfm::Texture>();
-    std::unique_ptr<sfm::ISprite> sprite = std::make_unique<sfm::Sprite>();
-    texture->loadFromFile("../assets/images/ellipse48_48.png");
+    std::unique_ptr<sfm::ITexture> texture = ITexture::create();
+    std::unique_ptr<sfm::ISprite> sprite = ISprite::create();
+    texture->loadFromFile("../assets/images/ellipse32_32.png");
     sprite->setTexture( texture.get());
 
-    std::unique_ptr<ABarButton> ellipse = std::make_unique<Ellipse>( kEllipseButtonId, texture, sprite);
+    std::unique_ptr<ABarButton> ellipse = std::make_unique<Ellipse>( kEllipseButtonId, std::move(texture), std::move(sprite));
     toolbar->addWindow( std::move(ellipse));
 
     return true;
@@ -32,8 +32,8 @@ void onUnloadPlugin()
 }
 
 
-Ellipse::Ellipse( wid_t init_id, std::unique_ptr<sfm::ITexture> &init_texture, std::unique_ptr<sfm::ISprite> &init_sprite)
-    :   ABarButton( init_id, init_texture, init_sprite)
+Ellipse::Ellipse( wid_t init_id, std::unique_ptr<sfm::ITexture> init_texture, std::unique_ptr<sfm::ISprite> init_sprite)
+    :   ABarButton( init_id, std::move(init_texture), std::move(init_sprite))
 {
     canvas_ = dynamic_cast<ICanvas *>( getRootWindow()->getWindowById( kCanvasWindowId));
     assert( canvas_ && "Failed to cast to canvas" );

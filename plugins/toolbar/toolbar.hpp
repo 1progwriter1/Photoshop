@@ -14,13 +14,10 @@ void onUnloadPlugin();
 }
 
 
-class ToolBar : public ABar
+class ToolBar : public ABarTextures
 {
 public:
-    ToolBar(wid_t init_id, std::unique_ptr<sfm::RectangleShape> &main_shape,  std::unique_ptr<sfm::RectangleShape> &normal,
-                                                            std::unique_ptr<sfm::RectangleShape> &onHover,
-                                                            std::unique_ptr<sfm::RectangleShape> &pressed,
-                                                            std::unique_ptr<sfm::RectangleShape> &released);
+    ToolBar(wid_t init_id, std::unique_ptr<sfm::IRectangleShape> main_shape,  BarTextures &textures);
 
     sfm::vec2i calculateNextPos(sfm::vec2i init_pos) override;
 };

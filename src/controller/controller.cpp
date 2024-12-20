@@ -41,3 +41,9 @@ void Controller::proceedView()
     root_window_->draw(root_window_->getRenderWindow());
     root_window_->getRenderWindow()->display();
 }
+
+
+sf::RenderWindow &Controller::getSFMLWindow()
+{
+    return root_window_->getWindow();
+}
