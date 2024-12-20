@@ -105,6 +105,7 @@ struct BarRectangleShapes
 
 class ABarShapes : public ABar
 {
+protected:
     std::unique_ptr<sfm::IRectangleShape> normal_;
     std::unique_ptr<sfm::IRectangleShape> on_hover_;
     std::unique_ptr<sfm::IRectangleShape> pressed_;

@@ -7,7 +7,9 @@
 OpenFile::OpenFile(wid_t init_id, std::unique_ptr<sfm::IFont> font, std::unique_ptr<sfm::IText> text,
                 std::unique_ptr<sfm::IRectangleShape> init_shape, std::string &file)
     :   TextButton(init_id, std::move(font), std::move(text), std::move(init_shape)), file_(std::move(file))
-{}
+{
+    TextButton::shape_->setFillColor(sfm::Color());
+}
 
 
 std::unique_ptr<IAction> OpenFile::createAction(const IRenderWindow *renderWindow, const Event &event)

@@ -27,26 +27,26 @@ bool onLoadPlugin()
     assert( menu && "Failed to cast to menu" );
     fillMenu(menu);
 
-//     AMenuButton *filter_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuFilterId));
-//     assert( filter_bar && "Failed to cast to menu button" );
-//     fillFilterMenu(filter_bar);
-//
-//     AMenuButton *file_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuFileId));
-//     assert( file_bar && "Failed to cast to menu button" );
-//     fillFileMenu(file_bar);
-//
-//     AMenuButton *layer_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuLayerId));
-//     assert( layer_bar && "Failed to cast to menu button" );
-//     fillLayerMenu(layer_bar);
-//
-//
-//     AMenuButton *tools_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuToolsId));
-//     assert( tools_bar && "Failed to cast to menu button" );
-//     fillToolsMenu(tools_bar);
-//
-//     AMenuButton *help_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuHelpId));
-//     assert( help_bar && "Failed to cast to menu button" );
-//     fillHelpMenu(help_bar);
+    AMenuButton *filter_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuFilterId));
+    assert( filter_bar && "Failed to cast to menu button" );
+    fillFilterMenu(filter_bar);
+
+    AMenuButton *file_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuFileId));
+    assert( file_bar && "Failed to cast to menu button" );
+    fillFileMenu(file_bar);
+
+    AMenuButton *layer_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuLayerId));
+    assert( layer_bar && "Failed to cast to menu button" );
+    fillLayerMenu(layer_bar);
+
+
+    AMenuButton *tools_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuToolsId));
+    assert( tools_bar && "Failed to cast to menu button" );
+    fillToolsMenu(tools_bar);
+
+    AMenuButton *help_bar = dynamic_cast<AMenuButton *>(menu->getWindowById(kMenuHelpId));
+    assert( help_bar && "Failed to cast to menu button" );
+    fillHelpMenu(help_bar);
 
     return true;
 }

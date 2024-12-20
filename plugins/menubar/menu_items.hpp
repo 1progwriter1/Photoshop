@@ -7,7 +7,7 @@
 
 
 #define FONT_FILE "../assets/fonts/Normal.ttf"
-#define NESTED_BAR_COLOR sfm::Color( 224, 224, 224)
+#define NESTED_BAR_COLOR sfm::Color( 128, 128, 128)
 
 
 int getCharacterSize();
@@ -38,6 +38,8 @@ public:
     static std::unique_ptr<NestedMenu> createMenuBar(wid_t init_id);
     void setPos(const sfm::vec2i &pos) override;
     void addWindow(std::unique_ptr<IWindow> window) override;
+
+    void finishButtonDraw(IRenderWindow *renderWindow, const IBarButton *button) const override;
 };
 
 

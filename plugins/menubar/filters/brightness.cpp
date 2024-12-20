@@ -131,6 +131,7 @@ bool BrightnessFilterAction::execute(const Key& key)
     button_->is_applied_ = false;
     button_->is_ok_ = false;
     button_->is_cancel_ = false;
+    button_->is_saved_ = false;
 
     return true;
 }
@@ -139,7 +140,11 @@ bool BrightnessFilterAction::execute(const Key& key)
 void BrightnessFilterAction::applyToTmpLayer()
 {
     main_layer_ = static_cast<ILayer *>(canvas_->getLayer( canvas_->getActiveLayerIndex()));
-    button_->snapshot_ = button_->memento_->save();
+    if ( !button_->is_saved_ )
+    {
+        button_->snapshot_ = button_->memento_->save();
+        button_->is_saved_ = true;
+    }
 
     const std::vector<std::pair<int, int>> &points = button_->panel_->getBrightnessPoints();
     sfm::IntRect rect = getCanvasIntRect();

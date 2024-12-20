@@ -19,6 +19,7 @@ class BrightnessFilter : public TextButton
     bool is_applied_ = false;
     bool is_ok_ = false;
     bool is_cancel_ = false;
+    bool is_saved_ = false;
 
     std::unique_ptr<IMementable<ILayerSnapshot>> memento_;
     std::unique_ptr<ILayerSnapshot> snapshot_;
