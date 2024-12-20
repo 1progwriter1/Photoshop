@@ -368,7 +368,7 @@ void NestedMenuButton::setPos(const sfm::vec2i &pos)
     MenuButton::setPos(pos);
     assert( parent_ );
     assert( dynamic_cast<const NestedMenu *>(parent_));
-    bar_->setPos(vec2i(parent_->getPos().x + parent_->getSize().x, getPos().y));
+    bar_->setPos(vec2i(parent_->getPos().x + parent_->getSize().x + 1, getPos().y));
 }
 
 

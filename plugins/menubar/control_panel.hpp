@@ -20,7 +20,7 @@ class ControlPanel : public IWindow
 
     vec2i pos_ = vec2i(0, 0);
     vec2u size_ = vec2u(100, 100);
-    vec2u buttons_rect_size_ = vec2u(0, 50);
+    vec2u buttons_rect_size_ = vec2u(0, 32);
     unsigned int min_buttons_width_ = 0;
 
     bool active_ = false;

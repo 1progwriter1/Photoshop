@@ -166,40 +166,7 @@ void UnsharpMaskFilterAction::applyToTmpLayer()
     tmp_layer_ = static_cast<ILayer *>(canvas_->getLayer( 1));
 
     sfm::vec2u canvas_size = getCanvasIntRect().size;
-//     for ( size_t x = 0; x < canvas_size.x - 2; x++ )
-//     {
-//         for ( size_t y = 0; y < canvas_size.y - 2; y++ )
-//         {
-//             int from_x = std::max( 0, static_cast<int>( x - 2));
-//             int to_x = std::min( static_cast<int>( canvas_size.x - 1), static_cast<int>( x + 2));
-//
-//             int from_y = std::max( 0, static_cast<int>( y - 2));
-//             int to_y = std::min( static_cast<int>( canvas_size.y - 1), static_cast<int>( y + 2));
-//
-//             float r = 0, g = 0, b = 0, a = 0;
-//
-//             for ( int i = from_x; i <= to_x; i++ )
-//             {
-//                 for ( int j = from_y; j <= to_y; j++ )
-//                 {
-//                     sfm::Color color = main_layer_->getPixel( sfm::vec2i( i, j));
-//                     r += color.r * GAUSS_MATRIX5_5[ (j - from_y) * 5 + (i - from_x)];
-//                     g += color.g * GAUSS_MATRIX5_5[ (j - from_y) * 5 + (i - from_x)];
-//                     b += color.b * GAUSS_MATRIX5_5[ (j - from_y) * 5 + (i - from_x)];
-//                     a += color.a * GAUSS_MATRIX5_5[ (j - from_y) * 5 + (i - from_x)];
-//                 }
-//             }
-//             r /= GAUSS_SUM;
-//             g /= GAUSS_SUM;
-//             b /= GAUSS_SUM;
-//             a /= GAUSS_SUM;
-//
-//             sfm::Color color( static_cast<uint8_t>( r), static_cast<uint8_t>( g), static_cast<uint8_t>( b), static_cast<uint8_t>( a));
-//
-//             tmp_layer_->setPixel( sfm::vec2i( x, y), color);
-//         }
-//     }
-for ( size_t x = 0; x < canvas_size.x - 2; x++ )
+    for ( size_t x = 0; x < canvas_size.x - 2; x++ )
     {
         for ( size_t y = 0; y < canvas_size.y - 2; y++ )
         {
@@ -254,7 +221,7 @@ void UnsharpMaskFilterAction::removeTmpLayer()
 UnsharpMaskControlPanel::UnsharpMaskControlPanel()
     :   ControlPanel()
 {
-    setSize(vec2u(600, 200));
+    setSize(vec2u(100, 32));
     // main_shape_->setFillColor();
 }
 

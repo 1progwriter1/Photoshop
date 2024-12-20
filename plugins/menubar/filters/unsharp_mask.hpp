@@ -73,8 +73,7 @@ class UnsharpMaskControlPanel : public ControlPanel
 
     friend class ControlPanelAction;
 public:
-    UnsharpMaskControlPanel
-();
+    UnsharpMaskControlPanel();
 
     std::unique_ptr<IAction> createAction(const IRenderWindow* renderWindow, const Event& event) override;
     void draw(IRenderWindow* renderWindow) override;

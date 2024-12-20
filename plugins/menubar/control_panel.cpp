@@ -16,27 +16,19 @@ ControlPanel::ControlPanel()
     min_buttons_width_ = std::max(button_ok_->getSize().x, button_cancel_->getSize().x) * 2;
     size_.x = min_buttons_width_;
 
-    button_ok_->setPos(vec2i(0, 50));
-    button_cancel_->setPos(vec2i(button_ok_->getSize().x, 50));
+    button_ok_->setPos(vec2i(0, 32));
+    button_cancel_->setPos(vec2i(button_ok_->getSize().x, 32));
 
-    shape_->setFillColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::White));
-    shape_->setOutlineColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::Black));
-    shape_->setOutlineThickness(5);
+    shape_->setFillColor(sfm::Color(128, 128, 128));
+    shape_->setOutlineColor(sfm::Color(64, 64, 64));
+    shape_->setOutlineThickness(1);
     shape_->setSize(size_);
     shape_->setPosition(vec2i(0, 0));
 
-    normal_->setFillColor(sfm::Color());
-    normal_->setOutlineColor(sfm::Color());
-    normal_->setOutlineThickness(5);
-    onHover_->setFillColor(sfm::Color());
-    onHover_->setOutlineColor(sfm::Color(192, 192, 192));
-    onHover_->setOutlineThickness(5);
-    pressed_->setFillColor(sfm::Color());
-    pressed_->setOutlineColor(sfm::Color::getStandardColor(psapi::sfm::Color::Type::Black));
-    pressed_->setOutlineThickness(5);
-    released_->setFillColor(sfm::Color());
-    released_->setOutlineColor(sfm::Color());
-    released_->setOutlineThickness(5);
+    normal_->setFillColor(sfm::Color(128, 128, 128));
+    onHover_->setFillColor(sfm::Color(64, 64, 64));
+    pressed_->setFillColor(sfm::Color(51, 255, 153));
+    released_->setFillColor(sfm::Color(128, 128, 128));
 }
 
 
@@ -45,10 +37,10 @@ void ControlPanel::draw(IRenderWindow* renderWindow)
     if ( !active_ )
         return;
     shape_->draw(renderWindow);
-    button_ok_->draw(renderWindow);
-    button_cancel_->draw(renderWindow);
     finishButtonDraw(renderWindow, button_ok_.get());
     finishButtonDraw(renderWindow, button_cancel_.get());
+    button_ok_->draw(renderWindow);
+    button_cancel_->draw(renderWindow);
 }
 
 
@@ -56,6 +48,9 @@ void ControlPanel::finishButtonDraw(IRenderWindow* renderWindow, const TextButto
 {
     vec2i pos = button->getPos();
     vec2u size = button->getSize();
+    size.x = getSize().x / 2;
+    pos.x = (pos.x < (getPos().x + getSize().x / 2)) ? 0 : size.x;
+    pos.x += getPos().x;
     switch ( button->getState() )
     {
         case IBarButton::State::Normal:

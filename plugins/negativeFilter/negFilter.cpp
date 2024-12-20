@@ -80,7 +80,7 @@ bool onLoadPlugin()
 {
     std::unique_ptr<IText> text = IText::create();
     std::unique_ptr<IFont> font = IFont::create();
-    font->loadFromFile("../assets/fonts/Bold.ttf");
+    font->loadFromFile("../assets/fonts/Normal.ttf");
     text->setFont(font.get());
     text->setString("Negative (Arman)");
 

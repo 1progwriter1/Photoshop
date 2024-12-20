@@ -197,8 +197,8 @@ bool BrightnessFilterAction::isUndoable(const Key& key)
 
 BrightnessFilterControlPanel::BrightnessFilterControlPanel()
 {
-    setSize(vec2u(600, 335));
-    frame_->setOutlineColor(sfm::Color( 51, 153, 255));
+    setSize(vec2u(600, 317));
+    frame_->setOutlineColor(sfm::Color( 64, 64, 64));
     frame_->setOutlineThickness(5);
 
     draw_rect_.pos = vec2i(frame_->getPosition().x, frame_->getPosition().y) + vec2i( 5, 5);
@@ -264,7 +264,7 @@ void BrightnessFilterControlPanel::updateState(const IRenderWindow *renderWindow
 void BrightnessFilterControlPanel::setSize(const vec2u& size)
 {
     ControlPanel::setSize(size);
-    frame_->setSize(vec2u(size.x - 20, size.y - 50 - 20));
+    frame_->setSize(vec2u(size.x - 20, size.y - 32 - 20));
     frame_->setPosition(getPos() + vec2i(10, 10));
 }
 
