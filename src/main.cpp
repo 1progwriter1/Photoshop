@@ -5,10 +5,10 @@
 #include <sys/plugins.hpp>
 
 
-// TODO: текст рисуется относительно lowerBound, а не относительно getLocalBounds.
+// * текст рисуется относительно lowerBound, а не относительно getLocalBounds.
 // * исправить UNSharpMask
 // * spline
-// TODO: Изменить интерфейс, так, чтобы он стал похож на Final Cut Pro or Adobe Photoshop
+// * Изменить интерфейс, так, чтобы он стал похож на Final Cut Pro or Adobe Photoshop
 // TODO: изменяемый в runtime интерфейс
 
 

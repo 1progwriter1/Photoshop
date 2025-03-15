@@ -33,7 +33,7 @@ void onUnloadPlugin()
 
 
 Line::Line( wid_t init_id, std::unique_ptr<sfm::ITexture> init_texture, std::unique_ptr<sfm::ISprite> init_sprite)
-    :   ABarButton( init_id, std::move(init_texture), std::move(init_sprite)), canvas_( dynamic_cast<ICanvas *>( kRootWindowPtr->getWindowById( psapi::kCanvasWindowId)))
+    :   ABarButton( init_id, std::move(init_texture), std::move(init_sprite)), canvas_( static_cast<ICanvas *>( kRootWindowPtr->getWindowById( psapi::kCanvasWindowId)))
 {
     assert( canvas_ && "Failed to cast to canvas" );
     layer_ = canvas_->getTempLayer();
