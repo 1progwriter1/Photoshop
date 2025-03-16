@@ -160,6 +160,8 @@ void NestedMenu::addWindow(std::unique_ptr<IWindow> window)
     window->setPos(window_pos);
     window->setSize(sfm::vec2u(100, 32));
 
+    window->setSize(sfm::vec2u(20, 30));
+
     if ( buttons_.empty() )
     {
         size_.x = std::max(min_size, window->getSize().x + min_offset);

@@ -18,6 +18,8 @@ const std::array<Color, 10> PALETTE_COLORS =
     Color(102, 0, 204),
     Color(76, 153, 0),
     // Color::getStandardColor(psapi::sfm::Color::Type::Black)
+    // Color::getStandardColor(psapi::sfm::Color::Type::White),
+    // Color::getStandardColor(psapi::sfm::Color::Type::Black)
 };
 
 
