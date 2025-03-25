@@ -90,6 +90,21 @@
 
 Для фильтра яркости доступна панель для выбора уровня яркости для всех вертикальных зон индивидуально.
 
+<table>
+  <tr>
+    <td align="center">
+      <img src="readme_img/brightness.png" width="200">
+      <br>
+      <small>Изображение</small>
+    </td>
+    <td align="center">
+      <img src="readme_img/panel.png" width="200">
+      <br>
+      <small>Панель</small>
+    </td>
+  </tr>
+</table>
+
 **Размытие Гаусса**
 
 <table>
