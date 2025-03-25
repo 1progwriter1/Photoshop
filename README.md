@@ -62,7 +62,7 @@
       <small>До</small>
     </td>
     <td align="center">
-      <img src="readme_img/blur_after.png.png" width="200">
+      <img src="readme_img/blur_after.png" width="200">
       <br>
       <small>После</small>
     </td>
